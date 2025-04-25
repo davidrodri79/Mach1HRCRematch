@@ -1,14 +1,18 @@
 package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.ScreenUtils;
 
 public class StartupScreen implements Screen {
 
     Main game;
+    int counter = 0;
+    console con;
 
     public StartupScreen(Main game)
     {
         this.game = game;
+        con = new console();
     }
 
     @Override
@@ -18,6 +22,171 @@ public class StartupScreen implements Screen {
 
     @Override
     public void render(float delta) {
+
+        ScreenUtils.clear(0f, 0f, 0f, 1f);
+        game.batch.begin();
+        //game.batch.draw(game.image, 140, 210);
+        for(int i = 0; i < con.mess.size(); i++)
+        {
+            game.fuente.show_text(game.batch, 20, 450-25*i, con.mess.get(i), 0);
+        }
+        game.batch.end();
+
+
+        switch(counter){
+
+            case 1 :
+                con.add_mess("mach 1 hrc rematch                 -  v1.0");
+                con.add_mess("by active minds, 2003-2025");
+                con.add_mess("coded by nhsp - last update : 2025 april 5");
+                con.add_mess("-------------------------------------------");
+                con.add_mess("starting system...");
+                //changed=TRUE;
+                break;
+
+            case 2 :
+                /*delay(1000);
+
+                switch(gdata.resol){
+                    case 0 : SCREENX=320; SCREENY=240; break;
+                    case 1 : SCREENX=400; SCREENY=300; break;
+                    case 2 : SCREENX=512; SCREENY=384; break;
+                    case 3 : SCREENX=640; SCREENY=480; break;
+                    case 4 : SCREENX=800; SCREENY=600; break;
+                    case 5 : SCREENX=1024; SCREENY=768; break;
+                };
+                sprintf(s,"graphics mode %dx%dx16b initialized.",SCREENX,SCREENY);
+                con->add_mess(s);
+                sprintf(s,"using z-buffer depth of 24b");
+                con->add_mess(s);
+                changed=TRUE;*/
+                break;
+
+            case 3 :
+                /*delay(500);
+                sprintf(s,"GL_RENDERER : %s", strlwr(renderer));
+                con->add_mess(s);
+                if(!accelerated){
+                    con->add_mess("warning : no 3d hardware found!");
+                    con->add_mess("running software version.");
+                };
+                changed=TRUE;*/
+                break;
+
+            case 4 :
+                /*delay(300);
+                changed=TRUE;*/
+                break;
+
+            case 5 :
+                //delay(300);
+                con.add_mess("loading miscellanous textures...");
+                /*flame=new texture("sprite\\light",TEX_PCX,FALSE,TRUE);
+                shield=new texture("sprite\\shield",TEX_PCX,FALSE,TRUE);
+                explos=new texture("sprite\\explos",TEX_PCX,FALSE,FALSE);
+                smoke=new texture("sprite\\smoke",TEX_PCX,FALSE,TRUE);
+                changed=TRUE;*/
+                break;
+
+            case 6 :
+                //delay(300);
+                con.add_mess("loading miscellaneous 3d models...");
+                /*burnt=new solid();
+                burnt->load_mesh("model\\burnt.msh");
+                burnt->centrate(TRUE,TRUE,TRUE);
+                cup=new solid();
+                cup->load_mesh("model\\cup.msh");
+                cup->centrate(TRUE,TRUE,TRUE);*/
+                game.brain=new solid();
+                game.brain.load_mesh("intro/brain.msh");
+                /*brain->centrate(TRUE,TRUE,TRUE);
+                active=new sprite(256,64,"intro\\active");
+                minds=new sprite(256,64,"intro\\minds");
+                presents=new sprite(256,64,"intro\\presents");
+                changed=TRUE;*/
+                break;
+
+            case 7 :
+                /*delay(300);
+                con->add_mess("initializing directinput devices...");
+                ctr=new controlm();
+                ctr->initialize(hwnd);
+                if(ctr->joystick_available())
+                    con->add_mess("directinput compatible joystick found.");
+                changed=TRUE;*/
+                break;
+
+            case 8 :
+                //delay(300);
+                con.add_mess("loading game sprites...");
+                /*light=new sprite(2,2,"sprite\\light");
+                posnumber=new sprite(64,64,"sprite\\position");
+                speed=new sprite(64,64,"sprite\\speed");
+                kmh=new sprite(128,32,"sprite\\kmh");
+                power[0]=new sprite(256,128,"sprite\\power");
+                power[1]=new sprite(256,128,"sprite\\fullpowe");
+                spower[0]=new sprite(256,32,"sprite\\spower");
+                spower[1]=new sprite(256,32,"sprite\\sfullpow");
+                recover=new sprite(128,64,"sprite\\recover");
+                start[0]=new sprite(256,256,"sprite\\start3");
+                start[1]=new sprite(256,256,"sprite\\start2");
+                start[2]=new sprite(256,256,"sprite\\start1");
+                start[3]=new sprite(256,256,"sprite\\startgo");
+                wallp=new sprite(128,128,"sprite\\wallp");
+                title[0]=new sprite(256,256,"sprite\\title1",FALSE);
+                title[1]=new sprite(256,256,"sprite\\title2",FALSE);
+                for(i=0; i<6; i++){
+                    sprintf(s,"scene\\%spr",scenes[i].name);
+                    preview[i]=new sprite(128,128,s);
+                };
+                shadow=new texture("sprite\\shade",TEX_PCX,FALSE,TRUE);
+                for(i=0; i<NSHIPS; i++){
+                    sprintf(s,"model\\%ssm",models[i].file);
+                    mini[i]=new sprite(128,128,s);
+                };
+                mistery=new sprite(128,128,"sprite\\mistery");
+                i=0;
+                while(i<10){
+                    sprintf(s,"cursor\\c%d",i+1);
+                    plcursor[i]=new sprite(32,32,s);
+                    i++;
+                };
+                arrow=new sprite(32,32,"cursor\\arrow");
+                statbar=new sprite(128,16,"sprite\\statbar");
+                menucur=new sprite(256,256,"cursor\\menucur");
+                oppico=new sprite(32,32,"cursor\\opp");
+                changed=TRUE;*/
+                break;
+
+            case 9 :
+                //delay(300);
+                con.add_mess("loading game samples...");
+                /*wthree=new wave();
+                wthree->load("sound\\trhee.smp");
+                wtwo=new wave();
+                wtwo->load("sound\\two.smp");
+                wone=new wave();
+                wone->load("sound\\one.smp");
+                wgo=new wave();
+                wgo->load("sound\\go.smp");
+                wconfirm=new wave();
+                wconfirm->load("sound\\takepow.smp");
+
+                // Load intro music
+                ZeroMemory(&XMParams, sizeof XMParams);
+                XMParams.classID = CLSID_TRACKERXM;
+                sprintf(s,"intro\\am.mus");
+                XMParams.fileName = s;
+                XMParams.flags = FLAG_LOOP;
+                XMParams.input = INPUT_DISK;
+                XMParams.output = OUTPUT_DSOUND;
+
+                gAudio->getSoundClass(SOUNDCLASS_XM, &XMParams, (void**)&mus);
+                changed=TRUE;*/
+                break;
+        };
+        counter++;
+        //if(counter>12) {lock=FALSE; set_state(INTRO);};
 
     }
 
