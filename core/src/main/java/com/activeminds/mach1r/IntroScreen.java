@@ -77,39 +77,12 @@ public class IntroScreen implements Screen {
         else if (counter>1050)
             game.presents.render2d(game.batch,0,0,256,64,200,50,440,85,(counter-1050)/350f);
         game.batch.end();
-        /*
-        glClearColor(0.0,0.0,0.0,1.0);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45,1.3,0.1,ZFAR);
-	gluLookAt(0,0,1,0,0,0,0.0,1.0,0.0);
-	glEnable(GL_DEPTH_TEST);
-	set_one_light();
-	cam.look_at(0,2,350,0,0,0);
-	if(counter<490)
-		brain->render(&cam,0,0,-9800+20*float(counter),0,counter/100.0,(490-counter)/100.0);
-	else
-		brain->render(&cam,0,0,0,0,counter/100.0,0);
 
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0, 640, 0, 480);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
-	if(counter>=1050){
-		active->render2d(0,0,256,64,50,380,300,420,1.0);
-		minds->render2d(0,0,256,64,320,380,620,420,1.0);
-	}else if (counter>700){
-		active->render2d(0,0,256,64,50,380,300,420,(counter-700)/350.0);
-		minds->render2d(0,0,256,64,320,380,620,420,(counter-700)/350.0);
-	}
-	if(counter>=1400)
-		presents->render2d(0,0,256,64,200,50,440,85,1.0);
-	else if (counter>1050)
-		presents->render2d(0,0,256,64,200,50,440,85,(counter-1050)/350.0);
+        if((game.ctr.algun_boton(controlm.TEC1)) || (counter>=1680)){
+            //mus->stop(); mus->release();
+            game.setScreen(new TitleScreen(game));
+        }
 
-         */
 
     }
 

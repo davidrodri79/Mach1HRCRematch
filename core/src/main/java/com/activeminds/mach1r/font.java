@@ -27,7 +27,7 @@ public class font {
         for(int i = 0; i < text.length(); i++)
         {
             int c = text.charAt(i) - 32 + (128 * set);
-            batch.draw(glyphs[c], /*new TextureRegion(tex.gdxTexture,16,16,16,16)*/ x + i*16, y);
+            batch.draw(glyphs[c], /*new TextureRegion(tex.gdxTexture,16,16,16,16)*/ x + i*14, y);
         }
 
     }

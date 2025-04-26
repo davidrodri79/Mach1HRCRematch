@@ -23,14 +23,14 @@ public class StartupScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        /*ScreenUtils.clear(0f, 0f, 0f, 1f);
+        ScreenUtils.clear(0f, 0f, 0f, 1f);
         game.batch.begin();
         //game.batch.draw(game.image, 140, 210);
         for(int i = 0; i < con.mess.size(); i++)
         {
             game.fuente.show_text(game.batch, 20, 450-25*i, con.mess.get(i), 0);
         }
-        game.batch.end();*/
+        game.batch.end();
 
 
         switch(counter){
@@ -107,10 +107,10 @@ public class StartupScreen implements Screen {
                 break;
 
             case 7 :
-                /*delay(300);
-                con->add_mess("initializing directinput devices...");
-                ctr=new controlm();
-                ctr->initialize(hwnd);
+                /*delay(300);*/
+                con.add_mess("initializing input devices...");
+                game.ctr=new controlm();
+                /*ctr->initialize(hwnd);
                 if(ctr->joystick_available())
                     con->add_mess("directinput compatible joystick found.");
                 changed=TRUE;*/
@@ -131,11 +131,11 @@ public class StartupScreen implements Screen {
                 start[0]=new sprite(256,256,"sprite\\start3");
                 start[1]=new sprite(256,256,"sprite\\start2");
                 start[2]=new sprite(256,256,"sprite\\start1");
-                start[3]=new sprite(256,256,"sprite\\startgo");
-                wallp=new sprite(128,128,"sprite\\wallp");
-                title[0]=new sprite(256,256,"sprite\\title1",FALSE);
-                title[1]=new sprite(256,256,"sprite\\title2",FALSE);
-                for(i=0; i<6; i++){
+                start[3]=new sprite(256,256,"sprite\\startgo");*/
+                game.wallp=new sprite(128,128,"sprite/wallp.png");
+                game.title[0]=new sprite(256,256,"sprite/title1.png",false);
+                game.title[1]=new sprite(256,256,"sprite/title2.png",false);
+                /*for(i=0; i<6; i++){
                     sprintf(s,"scene\\%spr",scenes[i].name);
                     preview[i]=new sprite(128,128,s);
                 };
@@ -152,9 +152,9 @@ public class StartupScreen implements Screen {
                     i++;
                 };
                 arrow=new sprite(32,32,"cursor\\arrow");
-                statbar=new sprite(128,16,"sprite\\statbar");
-                menucur=new sprite(256,256,"cursor\\menucur");
-                oppico=new sprite(32,32,"cursor\\opp");
+                statbar=new sprite(128,16,"sprite\\statbar");*/
+                game.menucur=new sprite(256,256,"cursor/menucur.png");
+                /*oppico=new sprite(32,32,"cursor\\opp");
                 changed=TRUE;*/
                 break;
 

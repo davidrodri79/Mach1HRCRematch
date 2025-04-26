@@ -1,14 +1,9 @@
 package com.activeminds.mach1r;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ScreenUtils;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
@@ -19,10 +14,14 @@ public class Main extends Game {
 
     solid brain;
 
-    sprite active, minds, presents;
+    controlm ctr;
+
+    sprite active, minds, presents, title[] = new sprite[2], wallp, menucur;
 
     PerspectiveCamera camera;
     OrthographicCamera camera2d;
+
+    float counter;
 
 
     @Override
@@ -44,6 +43,25 @@ public class Main extends Game {
 
         setScreen(new StartupScreen(this));
 
+    }
+
+    void show_scrolling_wallp()
+    {
+        int i,j;
+        for(i=0; i<5; i++)
+            for(j=-1; j<5; j++)
+                wallp.render2d(batch, 0,0,128,128,128*i,(int)(-(counter%128)+((i%2)*64)+128*j),128*(i+1),(int)(-(counter%128)+((i%2)*64)+128*(j+1)),1.0f);
+
+        //RENDERED_TRIANGLES+=2;
+    }
+
+    void show_menu_cursor(int x, int y)
+    {
+        int f,i,j;
+        f=(int)(counter/5)%16;
+        i=f%4;
+        j=4-(int)(f/4);
+        menucur.render2d(batch, i*64,j*64,(i+1)*64,(j+1)*64,x,y,x+32,y+32,1.0f);
     }
 
     @Override
