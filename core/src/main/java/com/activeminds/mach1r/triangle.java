@@ -19,6 +19,13 @@ public class triangle {
         this.v3 = ve3;
 
         uv = new float[6];
+
+        uv[0] = u1;
+        uv[1] = v1;
+        uv[2] = u2;
+        uv[3] = v2;
+        uv[4] = u3;
+        uv[5] = v3;
     }
 
     public triangle(vertex v1, vertex v2, vertex v3, float r1, float g1, float b1, float r2, float g2, float b2, float r3, float g3, float b3)

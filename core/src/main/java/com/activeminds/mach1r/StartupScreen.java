@@ -23,14 +23,14 @@ public class StartupScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        ScreenUtils.clear(0f, 0f, 0f, 1f);
+        /*ScreenUtils.clear(0f, 0f, 0f, 1f);
         game.batch.begin();
         //game.batch.draw(game.image, 140, 210);
         for(int i = 0; i < con.mess.size(); i++)
         {
             game.fuente.show_text(game.batch, 20, 450-25*i, con.mess.get(i), 0);
         }
-        game.batch.end();
+        game.batch.end();*/
 
 
         switch(counter){
@@ -99,11 +99,11 @@ public class StartupScreen implements Screen {
                 cup->centrate(TRUE,TRUE,TRUE);*/
                 game.brain=new solid();
                 game.brain.load_mesh("intro/brain.msh");
-                /*brain->centrate(TRUE,TRUE,TRUE);
-                active=new sprite(256,64,"intro\\active");
-                minds=new sprite(256,64,"intro\\minds");
-                presents=new sprite(256,64,"intro\\presents");
-                changed=TRUE;*/
+                game.brain.centrate(true,true,true);
+                game.active=new sprite(256,64,"intro/active.png");
+                game.minds=new sprite(256,64,"intro/minds.png");
+                game.presents=new sprite(256,64,"intro/presents.png");
+                /*changed=TRUE;*/
                 break;
 
             case 7 :
@@ -186,7 +186,11 @@ public class StartupScreen implements Screen {
                 break;
         };
         counter++;
-        //if(counter>12) {lock=FALSE; set_state(INTRO);};
+        if(counter>12) {
+            //lock=FALSE;
+            game.setScreen(new IntroScreen(game));
+            dispose();
+        };
 
     }
 

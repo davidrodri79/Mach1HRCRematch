@@ -2,6 +2,11 @@ package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g3d.Shader;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -13,11 +18,19 @@ import java.util.ArrayList;
 public class solid {
 
     ArrayList<vertex> vertexs;
-    ArrayList<String> textures;
+    ArrayList<String> textureFiles;
     ArrayList<triangle> triangles;
+
+    vertex vmin, vmax, vcenter;
+
+    Mesh mesh;
+    Texture[] textures;
 
     public solid()
     {
+        vmin = new vertex(1000,1000,1000);
+        vmax = new vertex(-1000,-1000,-1000);
+        vcenter = new vertex(0,0,0);
     }
 
     boolean load_mesh(String file)
@@ -47,17 +60,36 @@ public class solid {
                 float z = readCPlusFloat(dis);
 
                 vertexs.add(new vertex(x, y, z));
+
+                if(x < vmin.x) vmin.x = x;
+                if(y < vmin.y) vmin.y = y;
+                if(z < vmin.z) vmin.z = z;
+
+                if(x > vmax.x) vmax.x = x;
+                if(y > vmax.y) vmax.y = y;
+                if(z > vmax.z) vmax.z = z;
             }
+
+            vcenter.x = (vmin.x + vmax.x) / 2f;
+            vcenter.y = (vmin.y + vmax.y) / 2f;
+            vcenter.z = (vmin.z + vmax.z) / 2f;
 
             // Vertexs
             int numTextures = readCPlusInt(dis);
 
-            textures = new ArrayList<>();
+            textureFiles = new ArrayList<>();
 
             for(int i = 0; i < numTextures; i++)
             {
                 String texFile = readCPlusString(dis, 40);
-                textures.add(texFile);
+                textureFiles.add(texFile);
+            }
+
+            textures = new Texture[textureFiles.size()];
+            for(int i = 0; i < textureFiles.size(); i++)
+            {
+                textures[i] = new Texture(textureFiles.get(i).toLowerCase()+".png");
+                textures[i].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             }
 
             // Triangles
@@ -99,6 +131,7 @@ public class solid {
                 }
             }
 
+            buildGdxMesh();
 
             return true;
 
@@ -108,12 +141,134 @@ public class solid {
 
     }
 
+    void centrate(boolean x, boolean y, boolean z)
+    {
+        for(int i = 0; i < vertexs.size(); i++)
+        {
+            vertex v = vertexs.get(i);
+            if(x) v.x-=vcenter.x;
+            if(y) v.y-=vcenter.y;
+            if(z) v.z-=vcenter.z;
+            vertexs.set(i, v);
+        }
+
+        buildGdxMesh();
+    }
+
+    private void buildGdxMesh()
+    {
+        float[] vertices = new float[triangles.size() * 15];
+        short[] indices = new short[triangles.size() * 3];
+
+        for(int i = 0; i < triangles.size(); i++)
+        {
+            vertices[15 * i]        = triangles.get(i).v1.x;
+            vertices[15 * i + 1]    = triangles.get(i).v1.y;
+            vertices[15 * i + 2]    = triangles.get(i).v1.z;
+            vertices[15 * i + 3]    = triangles.get(i).uv[0];
+            vertices[15 * i + 4]    = triangles.get(i).uv[1];
+
+            vertices[15 * i + 5]    = triangles.get(i).v2.x;
+            vertices[15 * i + 6]    = triangles.get(i).v2.y;
+            vertices[15 * i + 7]    = triangles.get(i).v2.z;
+            vertices[15 * i + 8]    = triangles.get(i).uv[2];
+            vertices[15 * i + 9]    = triangles.get(i).uv[3];
+
+            vertices[15 * i + 10]   = triangles.get(i).v3.x;
+            vertices[15 * i + 11]   = triangles.get(i).v3.y;
+            vertices[15 * i + 12]   = triangles.get(i).v3.z;
+            vertices[15 * i + 13]   = triangles.get(i).uv[4];
+            vertices[15 * i + 14]   = triangles.get(i).uv[5];
+
+            indices[3*i] = (short)(3 * i);
+            indices[3*i + 1] = (short)(3 * i + 1);
+            indices[3*i + 2] = (short)(3 * i + 2);
+        }
+
+/*
+        float[] vertices_cubo = new float[] {
+            // --- Cara frontal ---
+            -1, -1,  1,  0, 0,
+            1, -1,  1,  1, 0,
+            1,  1,  1,  1, 1,
+            -1,  1,  1,  0, 1,
+
+            // --- Cara trasera ---
+            1, -1, -1,  0, 0,
+            -1, -1, -1,  1, 0,
+            -1,  1, -1,  1, 1,
+            1,  1, -1,  0, 1,
+
+            // --- Cara izquierda ---
+            -1, -1, -1,  0, 0,
+            -1, -1,  1,  1, 0,
+            -1,  1,  1,  1, 1,
+            -1,  1, -1,  0, 1,
+
+            // --- Cara derecha ---
+            1, -1,  1,  0, 0,
+            1, -1, -1,  1, 0,
+            1,  1, -1,  1, 1,
+            1,  1,  1,  0, 1,
+
+            // --- Cara superior ---
+            -1,  1,  1,  0, 0,
+            1,  1,  1,  1, 0,
+            1,  1, -1,  1, 1,
+            -1,  1, -1,  0, 1,
+
+            // --- Cara inferior ---
+            -1, -1, -1,  0, 0,
+            1, -1, -1,  1, 0,
+            1, -1,  1,  1, 1,
+            -1, -1,  1,  0, 1,
+        };
+
+        short[] indices_cubo = new short[] {
+            0, 1, 2, 2, 3, 0,       // frontal
+            4, 5, 6, 6, 7, 4,       // trasera
+            8, 9,10,10,11, 8,       // izquierda
+            12,13,14,14,15,12,       // derecha
+            16,17,18,18,19,16,       // arriba
+            20,21,22,22,23,20        // abajo
+        };*/
+
+        mesh = new Mesh(true, vertices.length / 5, indices.length,
+            new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+            new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0")
+        );
+        mesh.setVertices(vertices);
+        mesh.setIndices(indices);
+    }
+
+    void render(ShaderProgram shader, PerspectiveCamera camera, float px, float py, float pz, float rx, float ry, float rz)
+    {
+        Matrix4 model = new Matrix4().idt().translate(px,py,pz)
+                                            .rotate(Vector3.X, (float)(180f*rx/Math.PI))
+                                            .rotate(Vector3.Y, (float)(180f*ry/Math.PI))
+                                            .rotate(Vector3.Z, (float)(180f*rz/Math.PI));
+        Matrix4 view = camera.view;
+        Matrix4 proj = camera.projection;
+        Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
+
+        shader.begin();
+        shader.setUniformMatrix("u_mvp", MVP);
+        shader.setUniformi("u_texture", 0);
+
+        textures[0].bind(0);
+        mesh.render(shader, GL20.GL_TRIANGLES);
+        shader.end();
+
+    }
+
     private String readCPlusString(DataInputStream dis, int size) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
+        boolean endReached = false;
         for(int i = 0; i < size; i++)
         {
             char c = (char)dis.readByte();
-            stringBuilder.append(c);
+            if(c == '\0') endReached = true;
+            if(!endReached) stringBuilder.append(c);
         }
         return stringBuilder.toString();
     }
