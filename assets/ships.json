@@ -2,7 +2,17 @@
   "ships" : [
     {
       "name" : "zero-64",
-      "file" : "zero64"
+      "file" : "zero64",
+      "light" : [0.98,0.94,0.68],
+      nlights : 2,
+      "lsize" : 0.6,
+      lpos : [[1.5,-0.5,-4],[-1.5,-0.5,-4]],
+      weight : 1390,
+      enginef : 3,
+      handling : 1,
+      sizex : 3.0,
+      sizey : 3.0,
+      sizez : 7.5
     },
     {
       "name" : "crazy bird",

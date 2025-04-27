@@ -151,8 +151,8 @@ public class StartupScreen implements Screen {
                     plcursor[i]=new sprite(32,32,s);
                     i++;
                 };
-                arrow=new sprite(32,32,"cursor\\arrow");
-                statbar=new sprite(128,16,"sprite\\statbar");*/
+                arrow=new sprite(32,32,"cursor\\arrow");*/
+                game.statbar=new sprite(128,16,"sprite/statbar.png");
                 game.menucur=new sprite(256,256,"cursor/menucur.png");
                 /*oppico=new sprite(32,32,"cursor\\opp");
                 changed=TRUE;*/

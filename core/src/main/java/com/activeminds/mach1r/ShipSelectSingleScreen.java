@@ -66,14 +66,14 @@ public class ShipSelectSingleScreen implements Screen {
 
         game.batch.begin();
         game.fuente.show_text(game.batch, 150,450,"PLEASE SELECT YOUR SHIP",1);
-        game.fuente.show_text(game.batch,30,350, game.pl[0].data.name,0);
-        //pl[0]->logo->render2d(0,0,256,128,30,290,30+256,290+128,1);
+        //game.fuente.show_text(game.batch,30,350, game.pl[0].data.name,0);
+        game.pl[0].logo.render2d(game.batch, 0,0,256,128,30,290,30+256,290+128,1);
         //sprintf(s,"%d KG",pl[0]->data.weight);
-        game.fuente.show_text(game.batch,30,120,"WEIGHT :",0); //fuente->show_text(175,120,s,0);
-        game.fuente.show_text(game.batch,30,90,"BOOST    ",0); //statbar->render2d(0,0,25*(pl[0]->data.enginef+1),16,175,90,175+50*(pl[0]->data.enginef+1),90+16,1-0);
-        game.fuente.show_text(game.batch,30,60,"HANDLING ",0); //statbar->render2d(0,0,25*(pl[0]->data.handling+1),16,175,60,175+50*(pl[0]->data.handling+1),60+16,1-0);
-        //sp=pl[0]->data.enginef-int(pl[0]->data.weight/500)+1;
-        game.fuente.show_text(game.batch,30,30,"MAX.SPEED",0); //statbar->render2d(0,0,25*(sp+1),16,175,30,175+50*(sp+1),30+16,1-0);
+        game.fuente.show_text(game.batch,30,120,"WEIGHT :",0); game.fuente.show_text(game.batch, 175,120,game.pl[0].data.weight+" KG",0);
+        game.fuente.show_text(game.batch,30,90,"BOOST    ",0); game.statbar.render2d(game.batch, 0,0,25*(game.pl[0].data.enginef+1),16,175,90,175+50*(game.pl[0].data.enginef+1),90+16,1-0);
+        game.fuente.show_text(game.batch,30,60,"HANDLING ",0); game.statbar.render2d(game.batch, 0,0,25*(game.pl[0].data.handling+1),16,175,60,175+50*(game.pl[0].data.handling+1),60+16,1-0);
+        float sp=game.pl[0].data.enginef-(int)(game.pl[0].data.weight/500)+1;
+        game.fuente.show_text(game.batch,30,30,"MAX.SPEED",0); game.statbar.render2d(game.batch, 0,0,25*(sp+1),16,175,30,(int)(175+50*(sp+1)),30+16,1-0);
         game.batch.end();
 
         /*
@@ -145,6 +145,8 @@ public class ShipSelectSingleScreen implements Screen {
                 case ENDURANCE : set_state(ENDUR_SEL); break;
                 case CHAMPIONSHIP : random_ships(1); set_state(CHAMP_STAGE); break;
             };*/
+            game.setScreen(new SingleRaceSelectScreen(game));
+            dispose();
         };
         if(sel_dir==1){
             sel_offset--;

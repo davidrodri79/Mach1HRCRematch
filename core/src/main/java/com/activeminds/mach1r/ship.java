@@ -25,8 +25,9 @@ public class ship {
         ArrayList<ship_model> ships;
     }
 
-    solid mesh;
+    solid mesh, lowres;
     ship_model data;
+    sprite logo;
 
     public ship(int model, int id, Object course) {
 
@@ -39,6 +40,12 @@ public class ship {
         mesh = new solid();
         mesh.load_mesh("model/"+data.file+".msh");
         mesh.centrate(true,true,true);
+
+        lowres = new solid();
+        lowres.load_mesh("model/"+data.file+"lr.msh");
+        lowres.centrate(true,true,true);
+
+        logo=new sprite(256,128,"sprite/"+data.file+"lg.png");
 
 
     }

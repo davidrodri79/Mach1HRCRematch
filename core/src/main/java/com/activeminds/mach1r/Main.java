@@ -12,6 +12,13 @@ public class Main extends Game {
     public static final int MAXPLAYERS = 4;
     public static final int NSHIPS = 15;
 
+    String dif_name[]={
+        "beginner",
+        "amateur",
+        "professional",
+        "elite"
+    };
+
 
     public class game_data
     {
@@ -40,7 +47,9 @@ public class Main extends Game {
 
     controlm ctr;
 
-    sprite active, minds, presents, title[] = new sprite[2], wallp, menucur;
+    course cour;
+
+    sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar;
 
     ship pl[] = new ship[MAXPLAYERS];
     game_data gdata;
@@ -49,6 +58,8 @@ public class Main extends Game {
     OrthographicCamera camera2d;
 
     float counter;
+
+    int nhumans = 1;
 
 
     @Override
@@ -91,6 +102,92 @@ public class Main extends Game {
         i=f%4;
         j=4-(int)(f/4);
         menucur.render2d(batch, i*64,j*64,(i+1)*64,(j+1)*64,x,y,x+32,y+32,1.0f);
+    }
+
+    void startup_course(int nlaps, int dif, int type, int scene)
+    {
+        //char s[200], song[100];
+        int i,j;
+
+        course.course_info ci = new course.course_info();
+
+        // Generate the course
+        ci.radx=1600+(300*dif);
+        ci.radz=1000+(200*dif);
+        ci.nsegments=(int)((ci.radx+ci.radz)/20);
+        ci.width=70;
+
+        ci.xznoisegap=30-(4*dif);
+        ci.xznoisewidth=450+(75*dif);
+
+        ci.ynoisegap=20-3*dif;
+        ci.ynoisewidth=59+5*dif;
+
+        ci.nboost=1+(2*dif);
+
+        ci.nice=0; ci.nicenob=0; ci.njump=0; ci.nnoborder=0; ci.ntunnel=0;
+
+        if((type==course.TH) || (type==course.JH) || (type==course.NTH) || (type==course.NJTH) || (type==course.IJHN)){
+            ci.nice=dif+1; ci.lice=20+(3*dif);
+        };
+
+        if((type==course.I) || (type==course.IJHN)){
+            ci.nicenob=dif+1; ci.licenob=10+(2*dif);
+        };
+
+        if((type==course.NT) || (type==course.NTH) || (type==course.NJ) || (type==course.NJTH) || (type==course.IJHN)){
+            ci.nnoborder=dif+1; ci.lnoborder=15+(2*dif);
+        };
+
+        if((type==course.TH) || (type==course.T) || (type==course.NT) || (type==course.NTH) || (type==course.NJTH)){
+            ci.ntunnel=dif+1; ci.ltunnel=30;
+        };
+
+        if((type==course.J) || (type==course.JH) || (type==course.NJ) || (type==course.NJTH) || (type==course.IJHN)){
+            ci.njump=dif+1; ci.ljump=2;
+        };
+
+        if(type==course.T){ //Mach 1 Speedway
+            ci.ynoisewidth=0; ci.xznoisewidth=0;
+        };
+
+        ci.nlaps=nlaps; ci.scene=scene;
+
+        if(nhumans<=1) ci.quality=2;
+        else if(nhumans==2) ci.quality=1;
+        else ci.quality=0;
+
+        cour=new course(ci);
+        cour.generate();
+
+        // Load data
+        //sprintf(s,"scene\\%sgr",scenes[scene].name);
+        //ground=new texture(s,TEX_BMP,TRUE,FALSE);
+
+
+        /*for(i=0; i<nplayers; i++){
+            pl[i]=new ship(racing_ship[i],i,cour);
+            position[i]=i;
+        };*/
+
+        //hour_environment();
+
+        // Load music
+        /*ZeroMemory(&XMParams, sizeof XMParams);
+        XMParams.classID = CLSID_TRACKERXM;
+        sprintf(song,"sound\\song%d.mus",(scene%3)+1);
+        XMParams.fileName = song;
+        XMParams.flags = FLAG_LOOP;
+        XMParams.input = INPUT_DISK;
+        XMParams.output = OUTPUT_DSOUND;
+
+        gAudio->getSoundClass(SOUNDCLASS_XM, &XMParams, (void**)&mus);
+
+        mus->setVolume(gdata.music_volume/100.0);
+        if(gdata.music) mus->play();
+
+        paused=FALSE;*/
+
     }
 
     @Override
