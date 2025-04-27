@@ -38,6 +38,16 @@ public class controlm implements InputProcessor {
         return carr[t];
     }
 
+    boolean izq(int t)
+    {
+        return cizq[t];
+    }
+
+    boolean der(int t)
+    {
+        return cder[t];
+    }
+
     boolean algun_boton(int t)
     {
         if((cboton[t][0]) || (cboton[t][1]) || (cboton[t][2]) ||
@@ -53,6 +63,10 @@ public class controlm implements InputProcessor {
             carr[TEC1]= true;
         if(keycode == p_tec[0][1])
             caba[TEC1]= true;
+        if(keycode == p_tec[0][2])
+            cizq[TEC1]= true;
+        if(keycode == p_tec[0][3])
+            cder[TEC1]= true;
         for(int i=0;i<CMAXB;i++) {
             if (keycode == p_tec[0][4 + i]) {
                 cboton[TEC1][i] = true;
@@ -67,6 +81,10 @@ public class controlm implements InputProcessor {
             carr[TEC1]= false;
         if(keycode == p_tec[0][1])
             caba[TEC1]= false;
+        if(keycode == p_tec[0][2])
+            cizq[TEC1]= false;
+        if(keycode == p_tec[0][3])
+            cder[TEC1]= false;
         for(int i=0;i<CMAXB;i++) {
             if (keycode == p_tec[0][4 + i]) {
                 cboton[TEC1][i] = false;

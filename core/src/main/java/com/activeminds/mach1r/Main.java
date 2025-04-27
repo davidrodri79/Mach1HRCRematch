@@ -7,6 +7,30 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
+
+
+    public static final int MAXPLAYERS = 4;
+    public static final int NSHIPS = 15;
+
+
+    public class game_data
+    {
+        int resol;
+        int dummy[] = new int[4];
+        int available[] = new int[NSHIPS];
+        short sel_ship[] = new short[MAXPLAYERS], dif, cour_type, scene, nlaps;
+        long score_champ;
+        int controls[] = new int[4];
+        boolean music, sound, skygrfog;
+        int music_volume, drawdist, daytime, icons[] = new int[4], sel_endur, res_endur, sel_champ;
+
+        game_data()
+        {
+            for(int i=0;i<NSHIPS;i++)
+                available[i] = 1;
+        }
+    }
+
     public SpriteBatch batch;
     Texture image;
 
@@ -17,6 +41,9 @@ public class Main extends Game {
     controlm ctr;
 
     sprite active, minds, presents, title[] = new sprite[2], wallp, menucur;
+
+    ship pl[] = new ship[MAXPLAYERS];
+    game_data gdata;
 
     PerspectiveCamera camera;
     OrthographicCamera camera2d;
@@ -40,6 +67,8 @@ public class Main extends Game {
 
         camera2d = new OrthographicCamera();
         camera2d.setToOrtho(false,  Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        gdata = new game_data();
 
         setScreen(new StartupScreen(this));
 

@@ -1,0 +1,64 @@
+{
+  "ships" : [
+    {
+      "name" : "zero-64",
+      "file" : "zero64"
+    },
+    {
+      "name" : "crazy bird",
+      "file" : "crazybird"
+    },
+    {
+      "name" : "black sagitta",
+      "file" : "sagitta"
+    },
+    {
+      "name" : "gemini",
+      "file" : "gemini"
+    },
+    {
+      "name" : "vampire",
+      "file" : "vampire"
+    },
+    {
+      "name" : "shark-iii",
+      "file" : "shark"
+    },
+    {
+      "name" : "greyhound",
+      "file" : "greyhound"
+    },
+    {
+      "name" : "turbo bull",
+      "file" : "turbobull"
+    },
+    {
+      "name" : "tetrafly",
+      "file" : "tetrafly"
+    },
+    {
+      "name" : "blue lotus",
+      "file" : "bluelotus"
+    },
+    {
+      "name" : "icarus",
+      "file" : "icarus"
+    },
+    {
+      "name" : "hydra",
+      "file" : "hydra"
+    },
+    {
+      "name" : "tornado",
+      "file" : "tornado"
+    },
+    {
+      "name" : "vertigo",
+      "file" : "vertigo"
+    },
+    {
+      "name" : "golden queen",
+      "file" : "queen"
+    }
+  ]
+}

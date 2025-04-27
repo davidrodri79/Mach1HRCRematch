@@ -50,17 +50,21 @@ public class MainMenuScreen implements Screen {
         if(game.counter>2700) {
             game.setScreen(new TitleScreen(game));
         }
-        /*else if(counter>60){
-            if(ctr->tecla(DIK_ESCAPE)) softexit=TRUE;
-            if((ctr->algun_boton(TEC1)) || (ctr->algun_boton(gdata.controls[0])))
+        else if(game.counter>60){
+            //if(ctr->tecla(DIK_ESCAPE)) softexit=TRUE;
+            if((game.ctr.algun_boton(controlm.TEC1)) /*|| (ctr->algun_boton(gdata.controls[0]))*/)
                 switch(cursor){
-                    case 0 : game_mode=SINGLE_R; nhumans=1; set_state(SHIP_SEL_SINGLE); pl[0]=new ship(gdata.sel_ship[0],0,NULL); break;
-                    case 1 : game_mode=CHAMPIONSHIP; nhumans=1; set_state(CHAMP_SEL); break;
+                    case 0 : //game_mode=SINGLE_R; nhumans=1;
+                        game.pl[0]=new ship(game.gdata.sel_ship[0],0,null);
+                        game.setScreen(new ShipSelectSingleScreen(game));
+                        dispose();
+                    break;
+                    /*case 1 : game_mode=CHAMPIONSHIP; nhumans=1; set_state(CHAMP_SEL); break;
                     case 2 : game_mode=VERSUS_R; nhumans=2; set_state(SEL_N_PLAYERS); break;
                     case 3 : game_mode=ENDURANCE; nhumans=1; set_state(SHIP_SEL_SINGLE); pl[0]=new ship(gdata.sel_ship[0],0,NULL); break;
-                    case 4 : set_state(OPTIONS); break;
+                    case 4 : set_state(OPTIONS); break;*/
                 };
-        };*/
+        };
 
 
     }

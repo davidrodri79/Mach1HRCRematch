@@ -88,8 +88,9 @@ public class solid {
             textures = new Texture[textureFiles.size()];
             for(int i = 0; i < textureFiles.size(); i++)
             {
-                textures[i] = new Texture(textureFiles.get(i).toLowerCase()+".png");
+                textures[i] = new Texture(textureFiles.get(i).toLowerCase()+".bmp");
                 textures[i].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+                textures[i].setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
             }
 
             // Triangles
@@ -112,7 +113,7 @@ public class solid {
                     float ty2 = readCPlusFloat(dis);
                     float ty3 = readCPlusFloat(dis);
 
-                    triangles.add(new triangle(vertexs.get(v1), vertexs.get(v2), vertexs.get(v3), tx1, ty1, tx2, ty2, tx3, ty3));
+                    triangles.add(new triangle(vertexs.get(v1), vertexs.get(v2), vertexs.get(v3), num, tx1, ty1, tx2, ty2, tx3, ty3));
                 }
                 else
                 {
@@ -157,28 +158,43 @@ public class solid {
 
     private void buildGdxMesh()
     {
-        float[] vertices = new float[triangles.size() * 15];
+        float[] vertices = new float[triangles.size() * 30];
         short[] indices = new short[triangles.size() * 3];
 
         for(int i = 0; i < triangles.size(); i++)
         {
-            vertices[15 * i]        = triangles.get(i).v1.x;
-            vertices[15 * i + 1]    = triangles.get(i).v1.y;
-            vertices[15 * i + 2]    = triangles.get(i).v1.z;
-            vertices[15 * i + 3]    = triangles.get(i).uv[0];
-            vertices[15 * i + 4]    = triangles.get(i).uv[1];
+            vertices[30 * i]        = triangles.get(i).v1.x;
+            vertices[30 * i + 1]    = triangles.get(i).v1.y;
+            vertices[30 * i + 2]    = triangles.get(i).v1.z;
+            vertices[30 * i + 3]    = triangles.get(i).rgb[0];
+            vertices[30 * i + 4]    = triangles.get(i).rgb[1];
+            vertices[30 * i + 5]    = triangles.get(i).rgb[2];
+            vertices[30 * i + 6]    = 1f;
+            vertices[30 * i + 7]    = triangles.get(i).uv[0];
+            vertices[30 * i + 8]    = triangles.get(i).uv[1];
+            vertices[30 * i + 9]    = triangles.get(i).textureId;
 
-            vertices[15 * i + 5]    = triangles.get(i).v2.x;
-            vertices[15 * i + 6]    = triangles.get(i).v2.y;
-            vertices[15 * i + 7]    = triangles.get(i).v2.z;
-            vertices[15 * i + 8]    = triangles.get(i).uv[2];
-            vertices[15 * i + 9]    = triangles.get(i).uv[3];
+            vertices[30 * i + 10]   = triangles.get(i).v2.x;
+            vertices[30 * i + 11]   = triangles.get(i).v2.y;
+            vertices[30 * i + 12]   = triangles.get(i).v2.z;
+            vertices[30 * i + 13]   = triangles.get(i).rgb[3];
+            vertices[30 * i + 14]   = triangles.get(i).rgb[4];
+            vertices[30 * i + 15]   = triangles.get(i).rgb[5];
+            vertices[30 * i + 16]   = 1f;
+            vertices[30 * i + 17]   = triangles.get(i).uv[2];
+            vertices[30 * i + 18]   = triangles.get(i).uv[3];
+            vertices[30 * i + 19]   = triangles.get(i).textureId;
 
-            vertices[15 * i + 10]   = triangles.get(i).v3.x;
-            vertices[15 * i + 11]   = triangles.get(i).v3.y;
-            vertices[15 * i + 12]   = triangles.get(i).v3.z;
-            vertices[15 * i + 13]   = triangles.get(i).uv[4];
-            vertices[15 * i + 14]   = triangles.get(i).uv[5];
+            vertices[30 * i + 20]    = triangles.get(i).v3.x;
+            vertices[30 * i + 21]   = triangles.get(i).v3.y;
+            vertices[30 * i + 22]   = triangles.get(i).v3.z;
+            vertices[30 * i + 23]   = triangles.get(i).rgb[6];
+            vertices[30 * i + 24]   = triangles.get(i).rgb[7];
+            vertices[30 * i + 25]   = triangles.get(i).rgb[8];
+            vertices[30 * i + 26]   = 1f;
+            vertices[30 * i + 27]   = triangles.get(i).uv[4];
+            vertices[30 * i + 28]   = triangles.get(i).uv[5];
+            vertices[30 * i + 29]   = triangles.get(i).textureId;
 
             indices[3*i] = (short)(3 * i);
             indices[3*i + 1] = (short)(3 * i + 1);
@@ -233,10 +249,18 @@ public class solid {
             20,21,22,22,23,20        // abajo
         };*/
 
-        mesh = new Mesh(true, vertices.length / 5, indices.length,
+        /*mesh = new Mesh(true, vertices.length / 5, indices.length,
             new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
             new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0")
+        );*/
+
+        mesh = new Mesh(true, vertices.length / 10, indices.length,
+            new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+            new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 4, "a_color"),
+            new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0"),
+            new VertexAttribute(VertexAttributes.Usage.Generic, 1, "a_textureID")
         );
+
         mesh.setVertices(vertices);
         mesh.setIndices(indices);
     }
@@ -253,9 +277,13 @@ public class solid {
 
         shader.begin();
         shader.setUniformMatrix("u_mvp", MVP);
-        shader.setUniformi("u_texture", 0);
+        shader.setUniformi("u_textures[0]", 0);
+        shader.setUniformi("u_textures[1]", 1);
+        shader.setUniformi("u_textures[2]", 2); // Dummy (no usamos)
+        shader.setUniformi("u_textures[3]", 3); // Dummy (no usamos)
 
-        textures[0].bind(0);
+        for(int i = 0; i < textures.length; i++)
+            textures[i].bind(i);
         mesh.render(shader, GL20.GL_TRIANGLES);
         shader.end();
 

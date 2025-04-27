@@ -61,6 +61,7 @@ public class IntroScreen implements Screen {
 
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 
         game.camera2d.update();
         game.batch.setProjectionMatrix(game.camera2d.combined);
