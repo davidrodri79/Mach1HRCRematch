@@ -281,6 +281,8 @@ public class solid {
         shader.setUniformi("u_textures[1]", 1);
         shader.setUniformi("u_textures[2]", 2); // Dummy (no usamos)
         shader.setUniformi("u_textures[3]", 3); // Dummy (no usamos)
+        shader.setUniformi("u_textures[4]", 4); // Dummy (no usamos)
+        shader.setUniformi("u_textures[5]", 5); // Dummy (no usamos)
 
         for(int i = 0; i < textures.length; i++)
             textures[i].bind(i);
