@@ -13,6 +13,9 @@ public class texture {
     {
         if(type == TEX_BMP) LoadBMP(tname);
         if(type == TEX_PCX) LoadPCX(tname, alpha);
+
+        gdxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        if(repeat) gdxTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
     }
     boolean LoadBMP(String szFileName)
     {

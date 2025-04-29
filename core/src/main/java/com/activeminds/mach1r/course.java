@@ -1,9 +1,12 @@
 package com.activeminds.mach1r;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
 
@@ -56,6 +59,19 @@ public class course {
     public static final float TDX = 1.0f/8.0f;
     public static final float TDY = 1.0f/8.0f;
 
+    public static class course_scene {
+            String name;
+            String descr;
+            float fogcolor[] = new float[3];
+            float skycolor[] = new float[3];
+            float roadcolor[] = new float[3];
+    }
+
+    static class course_sceneJson {
+
+        ArrayList<course_scene> course_scenes;
+    }
+
     public static class course_info
     {
         int radx, radz, width, nsegments, xznoisewidth, ynoisewidth;
@@ -75,11 +91,28 @@ public class course {
     course_info info;
     node[] nodes;
     int counter;
+    texture road;
+
+    static course_sceneJson scenes;
+
+    static void load_static_data()
+    {
+        Json json = new Json();
+        FileHandle file = Gdx.files.internal("course_scenes.json");
+        String fileText = file.readString();
+        scenes = json.fromJson(course_sceneJson.class, fileText);
+    }
 
     course(course_info ci)
     {
         info = ci;
         counter = 0;
+        String s;
+
+        if(info.quality==2)
+            s = "scene/" + scenes.course_scenes.get(info.scene).name + ".png";
+        else s = "scene/%slr" + scenes.course_scenes.get(info.scene).name + "lr.png";
+        road= new texture(s,texture.TEX_PCX,true,false);
     }
 
     void update()
@@ -285,7 +318,7 @@ public class course {
             nodes[i].mesh = new solid();
             nodes[i].mesh.triangles = new ArrayList<>();
             nodes[i].mesh.textures = new Texture[1];
-            nodes[i].mesh.textures[0] = new Texture("sprite/wallp.png");
+            nodes[i].mesh.textures[0] = road.gdxTexture;
 
 
             v1[0] = new vertex(nodes[i].x[0], nodes[i].y[0], nodes[i].z[0]);
@@ -324,15 +357,44 @@ public class course {
 
              /*
             glTexCoord2f(tx+4*TDX,ty);
-			glVertex3f(v1[0].nx,v1[0].ny,v1[0].nz);
+			glVertex3f(v1[0].nx,v1[0].ny,v1[0].nz);  A
 			glTexCoord2f(tx+4*TDX,ty+2*TDY);
-			glVertex3f(v2[0].nx,v2[0].ny,v2[0].nz);
+			glVertex3f(v2[0].nx,v2[0].ny,v2[0].nz);  B
 			glTexCoord2f(tx+3*TDX,ty);
-			glVertex3f(v1[1].nx,v1[1].ny,v1[1].nz);
+			glVertex3f(v1[1].nx,v1[1].ny,v1[1].nz);  C
 			glTexCoord2f(tx+3*TDX,ty+2*TDY);
-			glVertex3f(v2[1].nx,v2[1].ny,v2[1].nz);
+			glVertex3f(v2[1].nx,v2[1].ny,v2[1].nz);  D
+			glTexCoord2f(tx+TDX,ty);
+			glVertex3f(v1[2].nx,v1[2].ny,v1[2].nz);  E
+			glTexCoord2f(tx+TDX,ty+2*TDY);
+			glVertex3f(v2[2].nx,v2[2].ny,v2[2].nz);	 F
+			glTexCoord2f(tx,ty);
+			glVertex3f(v1[3].nx,v1[3].ny,v1[3].nz);  G
+			glTexCoord2f(tx,ty+2*TDY);
+			glVertex3f(v2[3].nx,v2[3].ny,v2[3].nz);	 H
             */
             nodes[i].mesh.addQuad( v1[0], v2[0], v1[1], v2[1], 0, tx+4*TDX,ty, tx+4*TDX,ty+2*TDY, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY);
+            nodes[i].mesh.addQuad( v1[1], v2[1], v1[2], v2[2], 0, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY, tx+TDX,ty, tx+TDX,ty+2*TDY);
+            nodes[i].mesh.addQuad( v1[2], v2[2], v1[3], v2[3], 0, tx+TDX,ty, tx+TDX,ty+2*TDY, tx,ty, tx,ty+2*TDY);
+
+            /*
+            glVertex3f(v1[3].nx,v1[3].ny,v1[3].nz);
+			glVertex3f(v2[3].nx,v2[3].ny,v2[3].nz);
+			glVertex3f(v1[4].nx,v1[4].ny,v1[4].nz);
+			glVertex3f(v2[4].nx,v2[4].ny,v2[4].nz);
+			glVertex3f(v1[5].nx,v1[5].ny,v1[5].nz);
+			glVertex3f(v2[5].nx,v2[5].ny,v2[5].nz);
+			glVertex3f(v1[0].nx,v1[0].ny,v1[0].nz);
+			glVertex3f(v2[0].nx,v2[0].ny,v2[0].nz);
+             */
+
+            float r = scenes.course_scenes.get(info.scene).roadcolor[0];
+            float g = scenes.course_scenes.get(info.scene).roadcolor[1];
+            float b = scenes.course_scenes.get(info.scene).roadcolor[2];
+
+            nodes[i].mesh.addQuad(v1[3], v2[3], v1[4], v2[4], r, g, b);
+            nodes[i].mesh.addQuad(v1[4], v2[4], v1[5], v2[5], r, g, b);
+            nodes[i].mesh.addQuad(v1[5], v2[5], v1[0], v2[0], r, g, b);
 
             nodes[i].mesh.buildGdxMesh();
         }

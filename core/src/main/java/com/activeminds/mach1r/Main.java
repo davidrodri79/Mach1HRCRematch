@@ -93,6 +93,8 @@ public class Main extends Game {
 
         gdata = new game_data();
 
+        course.load_static_data();
+
         setScreen(new StartupScreen(this));
 
     }

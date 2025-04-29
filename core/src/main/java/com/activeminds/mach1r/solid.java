@@ -269,6 +269,12 @@ public class solid {
     {
         triangles.add( new triangle(ve1, ve2, ve3, texId, u1, v1, u2, v2, u3, v3));
         triangles.add( new triangle(ve2, ve4, ve3, texId, u2, v2, u4, v4, u3, v3));
+    }
+
+    void addQuad(vertex ve1, vertex ve2, vertex ve3, vertex ve4, float r, float g, float b)
+    {
+        triangles.add( new triangle(ve1, ve2, ve3, r, g, b, r, g, b, r, g, b));
+        triangles.add( new triangle(ve2, ve4, ve3, r, g, b, r, g, b, r, g, b));
 
     }
 

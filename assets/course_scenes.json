@@ -1,0 +1,11 @@
+{
+  "course_scenes" : [
+    {
+      "name" : "city",
+      "descr" : "capital",
+      "fogcolor" : [0.9,0.9,0.9],
+      "skycolor" : [0.0,0.749,0.98],
+      "roadcolor" : [0.184,0.271,0.357]
+    }
+  ]
+}
