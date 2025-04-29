@@ -7,5 +7,45 @@
       "skycolor" : [0.0,0.749,0.98],
       "roadcolor" : [0.184,0.271,0.357]
     }
+    ,
+    {
+      "name" : "desert",
+      "descr" : "dusty desert",
+      "fogcolor" : [0.961, 0.823, 0.412],
+      "skycolor" : [0.972, 0.027, 0.004],
+      "roadcolor" : [0.451, 0.388, 0.251]
+    }
+    ,
+    {
+      "name" : "volcano",
+      "descr" : "volcano valley",
+      "fogcolor" : [0.3, 0.3, 0.3],
+      "skycolor" : [1, 0, 0],
+      "roadcolor" : [0, 0, 0]
+    }
+    ,
+    {
+      "name" : "indust",
+      "descr" : "factory complex",
+      "fogcolor" : [0.54, 0.627, 0.545],
+      "skycolor" : [0.227, 0.812, 0.569],
+      "roadcolor" : [0.580, 0.620, 0.580]
+    }
+  ,
+    {
+      "name" : "ruins",
+      "descr" : "ancient ruins",
+      "fogcolor" : [0.769, 0.620, 0.533],
+      "skycolor" : [0.227, 0.812, 0.569],
+      "roadcolor" : [0.937, 0.871, 0.839]
+    }
+    ,
+    {
+      "name" : "sea",
+      "descr" : "coral sea",
+      "fogcolor" : [0.9, 0.9, 0.9],
+      "skycolor" : [0, 0, 0],
+      "roadcolor" : [0.259, 0.223, 0.259]
+    }
   ]
 }

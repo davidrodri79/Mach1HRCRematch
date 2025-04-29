@@ -16,19 +16,59 @@
     },
     {
       "name" : "crazy bird",
-      "file" : "crazybird"
+      "file" : "crazybird",
+      "light" : [0.7,0.7,0.75],
+      nlights : 2,
+      "lsize" : 0.7,
+      lpos : [[1.6,0,-4],[-1.6,0,-4]],
+      weight : 660,
+      enginef : 1,
+      handling : 3,
+      sizex : 3.0,
+      sizey : 2.5,
+      sizez : 5.5
     },
     {
       "name" : "black sagitta",
-      "file" : "sagitta"
+      "file" : "sagitta",
+      "light" : [0.84,0.84,0.84],
+      nlights : 1,
+      "lsize" : 1.2,
+      lpos : [[0,0,-5.5]],
+      weight : 1540,
+      enginef : 2,
+      handling : 3,
+      sizex : 3.0,
+      sizey : 3.0,
+      sizez : 7.0
     },
     {
       "name" : "gemini",
-      "file" : "gemini"
+      "file" : "gemini",
+      "light" : [0.65,0.84,0.65],
+      nlights : 2,
+      "lsize" : 0.9,
+      lpos : [[1.5,-0.1,-4],[-1.5,-0.1,-4]],
+      weight : 1200,
+      enginef : 2,
+      handling : 2,
+      sizex : 4.0,
+      sizey : 2.5,
+      sizez : 6.0
     },
     {
       "name" : "vampire",
-      "file" : "vampire"
+      "file" : "vampire",
+      "light" : [0.77,0.77,1.0],
+      nlights : 2,
+      "lsize" : 0.8,
+      lpos : [[2.8,0.0,-3],[-2.8,0.0,-3]],
+      weight : 1150,
+      enginef : 1,
+      handling : 3,
+      sizex : 3.5,
+      sizey : 3.0,
+      sizez : 7.5
     },
     {
       "name" : "shark-iii",
@@ -64,7 +104,17 @@
     },
     {
       "name" : "vertigo",
-      "file" : "vertigo"
+      "file" : "vertigo",
+      "light" : [1.0,0.78,0.78],
+      nlights : 1,
+      "lsize" : 1.0,
+      lpos : [[0,0,-5.5]],
+      weight : 1310,
+      enginef : 3,
+      handling : 1,
+      sizex : 2.0,
+      sizey : 2.0,
+      sizez : 6.0
     },
     {
       "name" : "golden queen",

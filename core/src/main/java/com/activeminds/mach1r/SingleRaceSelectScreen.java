@@ -37,7 +37,7 @@ public class SingleRaceSelectScreen implements Screen {
         game.fuente.show_text(game.batch,100,330,"EVENT",1);
         //game.fuente.show_text(game.batch,150,300,ctype_name[game.gdata.cour_type],0);
         game.fuente.show_text(game.batch,100,260,"SCENE",1);
-        //game.fuente.show_text(game.batch,150,230,scenes[game.gdata.scene].descr,0);
+        game.fuente.show_text(game.batch,150,230,course.scenes.course_scenes.get(game.gdata.scene).descr,0);
         game.fuente.show_text(game.batch,100,190,"NUMBER OF LAPS",1);
         game.fuente.show_text(game.batch,150,160,""+game.gdata.nlaps,1);
         //preview[gdata.scene]->render2d(0,0,128,128,390,160,390+192,160+144,1);

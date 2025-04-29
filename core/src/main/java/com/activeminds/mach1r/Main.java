@@ -45,6 +45,7 @@ public class Main extends Game {
             controls[3] = controlm.NOTC;
             for(int i=0;i<NSHIPS;i++)
                 available[i] = 1;
+            drawdist = 2;
         }
     }
 
@@ -80,7 +81,7 @@ public class Main extends Game {
 
         fuente = new font("sprite/FONT.png",16,16,14);
 
-        camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera = new PerspectiveCamera(67, 640, 480);
         camera.position.set(0f, 0f, 200f);
         camera.lookAt(0, 0, 0);
         camera.up.set(0, 1, 0);
@@ -89,7 +90,7 @@ public class Main extends Game {
         camera.update();
 
         camera2d = new OrthographicCamera();
-        camera2d.setToOrtho(false,  Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera2d.setToOrtho(false,  640, 480);
 
         gdata = new game_data();
 
@@ -223,14 +224,11 @@ public class Main extends Game {
 
         for(i=nhumans; i<nplayers; i++){
             do{
-                j=course.rand()%NSHIPS;
+                j=course.rand()%5; // NSHIPS
             }while((used[j]==true) || (gdata.available[j]==0));
 
             racing_ship[i]=j; used[j]=true;
         };
-
-        for(i = 0; i < racing_ship.length; i++)
-            racing_ship[i]=0;
 
     }
 
