@@ -54,7 +54,9 @@ public class MainMenuScreen implements Screen {
             //if(ctr->tecla(DIK_ESCAPE)) softexit=TRUE;
             if((game.ctr.algun_boton(controlm.TEC1)) /*|| (ctr->algun_boton(gdata.controls[0]))*/)
                 switch(cursor){
-                    case 0 : //game_mode=SINGLE_R; nhumans=1;
+                    case 0 :
+                        game.game_mode=Main.SINGLE_R;
+                        game.nhumans=1;
                         game.pl[0]=new ship(game.gdata.sel_ship[0],0,null);
                         game.setScreen(new ShipSelectSingleScreen(game));
                         dispose();

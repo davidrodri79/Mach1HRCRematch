@@ -30,6 +30,8 @@ public class LoadingScreen implements Screen {
         lock=FALSE;
         if(game_mode==VERSUS_R) set_state(VERSUS);
         else set_state(SINGLE);*/
+        game.setScreen(new RaceScreen(game));
+        dispose();
 
 
     }

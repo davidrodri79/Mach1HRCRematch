@@ -16,12 +16,26 @@ public class controlm implements InputProcessor {
     public static final int CMET=5;
     public static final int CMAXB=4;
 
+    public static final int CARR = 0;
+    public static final int CABA = 1;
+    public static final int CIZQ = 2;
+    public static final int CDER = 3;
+    public static final int CBU1 = 4;
+    public static final int CBU2 = 5;
+    public static final int CBU3 = 6;
+    public static final int CBU4 = 7;
+    public static final int CBU5 = 8;
+    public static final int CBU6 = 9;
+
+
+
     int p_tec[][]={ {Input.Keys.UP, Input.Keys.DOWN, Input.Keys.LEFT, Input.Keys.RIGHT,  Input.Keys.SHIFT_RIGHT, Input.Keys.CONTROL_RIGHT, Input.Keys.ENTER, Input.Keys.INSERT}, {}};
     boolean carr[] = new boolean[CMET];
     boolean caba[] = new boolean[CMET];
     boolean cizq[] = new boolean[CMET];
     boolean cder[] = new boolean[CMET];
     boolean cboton[][] = new boolean[CMET][CMAXB];
+    int joy_xaxis[] = new int[CMET], joy_yaxis[] = new int[CMET];
 
     public controlm()
     {
@@ -48,12 +62,30 @@ public class controlm implements InputProcessor {
         return cder[t];
     }
 
+    boolean boton(int t, int b) { return cboton[t][b]; }
+
     boolean algun_boton(int t)
     {
         if((cboton[t][0]) || (cboton[t][1]) || (cboton[t][2]) ||
             (cboton[t][3]))
             return true;
         else     return false;
+    }
+
+    void activa(int t, int c)
+    {
+        switch(c){
+            case CARR : carr[t]=true; joy_yaxis[t]=-1000; break;
+            case CABA : caba[t]=true; joy_yaxis[t]=1000; break;
+            case CIZQ : cizq[t]=true; joy_xaxis[t]=-1000; break;
+            case CDER : cder[t]=true; joy_xaxis[t]=1000; break;
+            case CBU1 : cboton[t][0]=true; break;
+            case CBU2 : cboton[t][1]=true; break;
+            case CBU3 : cboton[t][2]=true; break;
+            case CBU4 : cboton[t][3]=true; break;
+            case CBU5 : cboton[t][4]=true; break;
+            case CBU6 : cboton[t][5]=true; break;
+        };
     }
 
     @Override
@@ -63,10 +95,13 @@ public class controlm implements InputProcessor {
             carr[TEC1]= true;
         if(keycode == p_tec[0][1])
             caba[TEC1]= true;
-        if(keycode == p_tec[0][2])
-            cizq[TEC1]= true;
-        if(keycode == p_tec[0][3])
-            cder[TEC1]= true;
+        if(keycode == p_tec[0][2]) {
+            cizq[TEC1] = true;
+            joy_xaxis[TEC1] = -750;
+        }if(keycode == p_tec[0][3]) {
+            cder[TEC1] = true;
+            joy_xaxis[TEC1] = 750;
+        }
         for(int i=0;i<CMAXB;i++) {
             if (keycode == p_tec[0][4 + i]) {
                 cboton[TEC1][i] = true;
@@ -81,10 +116,14 @@ public class controlm implements InputProcessor {
             carr[TEC1]= false;
         if(keycode == p_tec[0][1])
             caba[TEC1]= false;
-        if(keycode == p_tec[0][2])
-            cizq[TEC1]= false;
-        if(keycode == p_tec[0][3])
-            cder[TEC1]= false;
+        if(keycode == p_tec[0][2]) {
+            cizq[TEC1] = false;
+            joy_xaxis[TEC1] = 0;
+        }
+        if(keycode == p_tec[0][3]) {
+            cder[TEC1] = false;
+            joy_xaxis[TEC1] = 0;
+        }
         for(int i=0;i<CMAXB;i++) {
             if (keycode == p_tec[0][4 + i]) {
                 cboton[TEC1][i] = false;

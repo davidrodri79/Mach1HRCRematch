@@ -9,8 +9,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Main extends Game {
 
 
-    public static final int MAXPLAYERS = 4;
+    public static final int MAXPLAYERS = 8;
     public static final int NSHIPS = 15;
+
+    public static final int SINGLE_R = 0;
+    public static final int CHAMPIONSHIP = 1;
+    public static final int VERSUS_R = 2;
+    public static final int ENDURANCE = 3;
+
 
     String dif_name[]={
         "beginner",
@@ -33,6 +39,10 @@ public class Main extends Game {
 
         game_data()
         {
+            controls[0] = controlm.TEC1;
+            controls[1] = controlm.NOTC;
+            controls[2] = controlm.NOTC;
+            controls[3] = controlm.NOTC;
             for(int i=0;i<NSHIPS;i++)
                 available[i] = 1;
         }
@@ -53,13 +63,14 @@ public class Main extends Game {
 
     ship pl[] = new ship[MAXPLAYERS];
     game_data gdata;
+    int nplayers, racing_ship[] = new int[MAXPLAYERS], position[] = new int[MAXPLAYERS];
 
     PerspectiveCamera camera;
     OrthographicCamera camera2d;
 
     float counter;
 
-    int nhumans = 1;
+    int nhumans = 1, game_mode;
 
 
     @Override
@@ -72,6 +83,7 @@ public class Main extends Game {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.position.set(0f, 0f, 200f);
         camera.lookAt(0, 0, 0);
+        camera.up.set(0, 1, 0);
         camera.near = 0.1f;
         camera.far = 2000f;
         camera.update();
@@ -165,10 +177,10 @@ public class Main extends Game {
         //ground=new texture(s,TEX_BMP,TRUE,FALSE);
 
 
-        /*for(i=0; i<nplayers; i++){
+        for(i=0; i<nplayers; i++){
             pl[i]=new ship(racing_ship[i],i,cour);
             position[i]=i;
-        };*/
+        };
 
         //hour_environment();
 
@@ -187,6 +199,36 @@ public class Main extends Game {
         if(gdata.music) mus->play();
 
         paused=FALSE;*/
+
+    }
+
+    void random_ships(int npl)
+    {
+        boolean used[] = new boolean[NSHIPS];
+        int i,j;
+
+        nhumans=npl;
+        if(npl<2) nplayers=6; else nplayers=npl;
+
+        //Random ships for opponents
+        for(i=0; i<NSHIPS; i++)
+            used[i]=false;
+
+        for(i=0; i<nhumans; i++){
+            racing_ship[i]=gdata.sel_ship[i];
+            used[racing_ship[i]]=true;
+        };
+
+        for(i=nhumans; i<nplayers; i++){
+            do{
+                j=course.rand()%NSHIPS;
+            }while((used[j]==true) || (gdata.available[j]==0));
+
+            racing_ship[i]=j; used[j]=true;
+        };
+
+        for(i = 0; i < racing_ship.length; i++)
+            racing_ship[i]=0;
 
     }
 
