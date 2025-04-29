@@ -156,7 +156,7 @@ public class solid {
         buildGdxMesh();
     }
 
-    private void buildGdxMesh()
+    void buildGdxMesh()
     {
         float[] vertices = new float[triangles.size() * 30];
         short[] indices = new short[triangles.size() * 3];
@@ -263,6 +263,13 @@ public class solid {
 
         mesh.setVertices(vertices);
         mesh.setIndices(indices);
+    }
+
+    void addQuad(vertex ve1, vertex ve2, vertex ve3, vertex ve4, int texId, float u1, float v1, float u2, float v2, float u3, float v3, float u4, float v4)
+    {
+        triangles.add( new triangle(ve1, ve2, ve3, texId, u1, v1, u2, v2, u3, v3));
+        triangles.add( new triangle(ve2, ve4, ve3, texId, u2, v2, u4, v4, u3, v3));
+
     }
 
     void render(ShaderProgram shader, PerspectiveCamera camera, float px, float py, float pz, float rx, float ry, float rz)

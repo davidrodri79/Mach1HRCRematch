@@ -147,14 +147,14 @@ public class RaceScreen implements Screen {
         // The course
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
-        glLightfv(GL_LIGHT0,GL_DIFFUSE,diffusebackg);
+        glLightfv(GL_LIGHT0,GL_DIFFUSE,diffusebackg);*/
 
-        l=30+(15*gdata.drawdist);
-        if (nhumans>1) l=int(0.75*l);
+        int l=30+(15*game.gdata.drawdist);
+        if (game.nhumans>1) l= (int) (0.75*l);
 
-        cour->render(&cam,pl[follow]->segment,counter,l);
+        game.cour.render(shipShader, game.camera,game.pl[follow].segment, (long) game.counter,l);
 
-        //Ships
+        /*//Ships
         if(accelerated){
             glDisable(GL_DEPTH_TEST);
 
