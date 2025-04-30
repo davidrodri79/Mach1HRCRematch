@@ -19,6 +19,7 @@ public class texture {
     }
     boolean LoadBMP(String szFileName)
     {
+        gdxTexture = new Texture(szFileName);
         return true;
     }
 

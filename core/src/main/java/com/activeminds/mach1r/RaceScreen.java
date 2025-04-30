@@ -4,12 +4,22 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+
+import java.util.ArrayList;
 
 public class RaceScreen implements Screen {
 
+    public static final float GROUNDWIDTH = 4900.0f;
+    public static final float SKYWIDTH = 6000.0f;
+    public static final float GROUNDTILE = 12.0f;
+    public static final float MAPSCALE = 40.0f;
+
     Main game;
     ShaderProgram shipShader;
+    solid groundMesh, skyMesh;
+    texture ground;
 
     public RaceScreen(Main game)
     {
@@ -25,6 +35,40 @@ public class RaceScreen implements Screen {
         if (!shipShader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + shipShader.getLog());
         }
+
+        // Ground mesh
+        vertex v[] = new vertex[4];
+        int TILE = 7;
+        v[0]=new vertex(0f,course.GROUNDY,0f);
+        v[1]=new vertex(0f,course.GROUNDY,(GROUNDWIDTH/TILE));
+        v[2]=new vertex((GROUNDWIDTH/TILE),course.GROUNDY,(GROUNDWIDTH/TILE));
+        v[3]=new vertex((GROUNDWIDTH/TILE),course.GROUNDY,0f);
+
+        ground= new texture("scene/"+course.scenes.course_scenes.get(game.gdata.scene).name+"gr.bmp",texture.TEX_BMP,true,false);
+        groundMesh = new solid();
+        groundMesh.triangles = new ArrayList<>();
+        groundMesh.textures = new Texture[1];
+        groundMesh.textures[0] = ground.gdxTexture;
+        groundMesh.triangles.add(new triangle(v[0], v[1], v[2], 0, 0, 0f, 0f, GROUNDTILE, GROUNDTILE, GROUNDTILE));
+        groundMesh.triangles.add(new triangle(v[2], v[3], v[0], 0, GROUNDTILE, GROUNDTILE, 0f, GROUNDTILE, 0f, 0f));
+        groundMesh.buildGdxMesh();
+
+        TILE = 5;
+        v[0]=new vertex(0f,course.SKYY,0f);
+        v[1]=new vertex(0f,course.SKYY,(SKYWIDTH/TILE));
+        v[2]=new vertex((SKYWIDTH/TILE),course.SKYY,(SKYWIDTH/TILE));
+        v[3]=new vertex((SKYWIDTH/TILE),course.SKYY,0f);
+
+        float r = course.scenes.course_scenes.get(game.gdata.scene).skycolor[0];
+        float g = course.scenes.course_scenes.get(game.gdata.scene).skycolor[1];
+        float b = course.scenes.course_scenes.get(game.gdata.scene).skycolor[2];
+        skyMesh = new solid();
+        skyMesh.textures = new Texture[0];
+        skyMesh.triangles = new ArrayList<>();
+        skyMesh.triangles.add(new triangle(v[0], v[2], v[1], r, g, b, r, g, b, r, g, b));
+        skyMesh.triangles.add(new triangle(v[2], v[0], v[3], r, g, b, r, g, b, r, g, b));
+        skyMesh.buildGdxMesh();
+
     }
 
     void update_level_action()
@@ -132,17 +176,17 @@ public class RaceScreen implements Screen {
 
         glDisable(GL_LIGHTING);
         glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_DEPTH_TEST);*/
 
         //Ground
-        if(gdata.skygrfog){
+        if(game.gdata.skygrfog){
 
-            glEnable(GL_FOG);
+            //glEnable(GL_FOG);
             show_sky();
         };
         show_ground();
 
-        glClear(GL_DEPTH_BUFFER_BIT);
+        /*glClear(GL_DEPTH_BUFFER_BIT);
 
         // The course
         glEnable(GL_DEPTH_TEST);
@@ -209,6 +253,56 @@ public class RaceScreen implements Screen {
                 start[j]->render2d(0,0,256,256,320-(size/2),240-(size/2),320+(size/2),240+(size/2),1-(i*0.015));
             };
 */
+    }
+
+    float nearest(int n, int m)
+    {
+        return n-(n%m);
+    }
+    void show_ground()
+    {
+        float gx, gz, TILE=7;
+        int i,x,z;
+
+        gx=nearest((int) game.camera.position.x, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
+        gz=nearest((int) game.camera.position.z, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
+
+        for(x=0; x<TILE; x++){
+
+            gz=nearest((int) game.camera.position.z, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
+
+            for(z=0; z<TILE; z++){
+
+                groundMesh.render(shipShader, game.camera, gx, 0f, gz, 0f, 0f, 0f);
+                gz+=GROUNDWIDTH/TILE;
+            };
+
+            gx+=GROUNDWIDTH/TILE;
+        };
+    }
+
+    void show_sky()
+    {
+        float gx, gz, TILE=5;
+        int i,x,z;
+
+
+        gx=nearest((int) game.camera.position.x, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
+        gz=nearest((int) game.camera.position.z, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
+
+        for(x=0; x<TILE; x++){
+
+            gz=nearest((int) game.camera.position.z, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
+
+            for(z=0; z<TILE; z++){
+
+                skyMesh.render(shipShader, game.camera, gx, 0f, gz, 0f, 0f, 0f);
+                gz+=SKYWIDTH/TILE;
+            };
+
+            gx+=SKYWIDTH/TILE;
+        };
+
     }
 
     void show_ship(PerspectiveCamera cam, ship s)

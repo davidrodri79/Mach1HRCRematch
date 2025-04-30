@@ -46,6 +46,8 @@ public class Main extends Game {
             for(int i=0;i<NSHIPS;i++)
                 available[i] = 1;
             drawdist = 2;
+            nlaps = 3;
+            skygrfog = true;
         }
     }
 
