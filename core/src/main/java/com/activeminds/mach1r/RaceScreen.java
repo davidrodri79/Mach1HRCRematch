@@ -89,11 +89,11 @@ public class RaceScreen implements Screen {
         };
 
         if(counter%1000==0)
-            hour_environment();
+            hour_environment();*/
 
         //Item cubes
-        if(counter%240==0)
-            cour->add_random_item();*/
+        if(game.cour.counter%240==0)
+            game.cour.add_random_item();
 
         game.cour.update();
 

@@ -3,7 +3,6 @@ package com.activeminds.mach1r;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -22,6 +21,7 @@ public class solid {
     ArrayList<triangle> triangles;
 
     vertex vmin, vmax, vcenter;
+    float []scale=new float[3], col_coef = new float[3];
 
     Mesh mesh;
     Texture[] textures;
@@ -31,6 +31,7 @@ public class solid {
         vmin = new vertex(1000,1000,1000);
         vmax = new vertex(-1000,-1000,-1000);
         vcenter = new vertex(0,0,0);
+        scale[0] = 1f; scale[1] = 1f; scale[2] = 1f;
     }
 
     boolean load_mesh(String file)
@@ -142,6 +143,10 @@ public class solid {
 
     }
 
+    void set_scale(float x, float y, float z)
+    {
+        scale[0] = x; scale[1] = x; scale[2] = z;
+    }
     void centrate(boolean x, boolean y, boolean z)
     {
         for(int i = 0; i < vertexs.size(); i++)
@@ -268,10 +273,16 @@ public class solid {
     void addQuad(vertex ve1, vertex ve2, vertex ve3, vertex ve4, int texId, float u1, float v1, float u2, float v2, float u3, float v3, float u4, float v4)
     {
         triangles.add( new triangle(ve1, ve2, ve3, texId, u1, v1, u2, v2, u3, v3));
+        triangles.add( new triangle(ve3, ve4, ve1, texId, u3, v3, u4, v4, u1, v1));
+    }
+
+    void addQuadFromStripe(vertex ve1, vertex ve2, vertex ve3, vertex ve4, int texId, float u1, float v1, float u2, float v2, float u3, float v3, float u4, float v4)
+    {
+        triangles.add( new triangle(ve1, ve2, ve3, texId, u1, v1, u2, v2, u3, v3));
         triangles.add( new triangle(ve2, ve4, ve3, texId, u2, v2, u4, v4, u3, v3));
     }
 
-    void addQuad(vertex ve1, vertex ve2, vertex ve3, vertex ve4, float r, float g, float b)
+    void addQuadFromStripe(vertex ve1, vertex ve2, vertex ve3, vertex ve4, float r, float g, float b)
     {
         triangles.add( new triangle(ve1, ve2, ve3, r, g, b, r, g, b, r, g, b));
         triangles.add( new triangle(ve2, ve4, ve3, r, g, b, r, g, b, r, g, b));
@@ -283,7 +294,35 @@ public class solid {
         Matrix4 model = new Matrix4().idt().translate(px,py,pz)
                                             .rotate(Vector3.X, (float)(180f*rx/Math.PI))
                                             .rotate(Vector3.Y, (float)(180f*ry/Math.PI))
-                                            .rotate(Vector3.Z, (float)(180f*rz/Math.PI));
+                                            .rotate(Vector3.Z, (float)(180f*rz/Math.PI))
+                                            .scale( scale[0], scale[1], scale[2]);
+        Matrix4 view = camera.view;
+        Matrix4 proj = camera.projection;
+        Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
+
+        shader.begin();
+        shader.setUniformMatrix("u_mvp", MVP);
+        shader.setUniformi("u_textures[0]", 0);
+        shader.setUniformi("u_textures[1]", 1);
+        shader.setUniformi("u_textures[2]", 2); // Dummy (no usamos)
+        shader.setUniformi("u_textures[3]", 3); // Dummy (no usamos)
+        shader.setUniformi("u_textures[4]", 4); // Dummy (no usamos)
+        shader.setUniformi("u_textures[5]", 5); // Dummy (no usamos)
+
+        for(int i = 0; i < textures.length; i++)
+            textures[i].bind(i);
+        mesh.render(shader, GL20.GL_TRIANGLES);
+        shader.end();
+
+    }
+
+    void alpha_render(ShaderProgram shader, PerspectiveCamera camera, float px, float py, float pz, float rx, float ry, float rz, float alpha)
+    {
+        Matrix4 model = new Matrix4().idt().translate(px,py,pz)
+            .rotate(Vector3.X, (float)(180f*rx/Math.PI))
+            .rotate(Vector3.Y, (float)(180f*ry/Math.PI))
+            .rotate(Vector3.Z, (float)(180f*rz/Math.PI))
+            .scale( scale[0], scale[1], scale[2]);
         Matrix4 view = camera.view;
         Matrix4 proj = camera.projection;
         Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);

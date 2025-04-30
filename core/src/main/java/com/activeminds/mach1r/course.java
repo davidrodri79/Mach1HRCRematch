@@ -17,9 +17,16 @@ public class course {
 
     enum {NORMAL=0, START, END, BOOSTER, TUNNEL, JUMP, NOBORDER, ICE, NBICE, EMPTY};
 
-    enum {NONE=0, ENERGY, BOOST, SHIELD, POWER, MINE};
+    enum {NONE=0, ENERGY, BOOST, SHIELD, POWER, MINE};*/
 
-    enum {TH=0,J,JH,NT,NTH,NJ,NJTH,I,IJHN,T};
+    public static final int NONE = 0;
+    public static final int ENERGY = 1;
+    public static final int BOOST = 2;
+    public static final int SHIELD = 3;
+    public static final int POWER = 4;
+    public static final int MINE = 5;
+
+    /*enum {TH=0,J,JH,NT,NTH,NJ,NJTH,I,IJHN,T};
 
     enum {CITY=0, DESERT, VOLCANO, INDUSTRY, RUINS, SEA};*/
 
@@ -92,6 +99,7 @@ public class course {
     node[] nodes;
     int counter;
     texture road;
+    solid decorate[] = new solid[3], scube, ecube, bcube, power, mine;
 
     static course_sceneJson scenes;
 
@@ -113,18 +121,71 @@ public class course {
             s = "scene/" + scenes.course_scenes.get(info.scene).name + ".png";
         else s = "scene/%slr" + scenes.course_scenes.get(info.scene).name + "lr.png";
         road= new texture(s,texture.TEX_PCX,true,false);
+
+        for(int i=0; i<3; i++){
+            decorate[i]=new solid();
+            decorate[i].load_mesh("scene/"+scenes.course_scenes.get(ci.scene).name+(i+1)+".msh");
+            decorate[i].centrate(true,false,true);
+        };
+
+        //Item cubes
+        scube=generateCube(4, "sprite/scube.bmp");
+
+        ecube=generateCube(4, "sprite/ecube.bmp");
+
+        bcube=generateCube(4, "sprite/bcube.bmp");
+
+        power=new solid();
+        power.load_mesh("model/power.msh");
+        power.centrate(true, true, true);
+
+        mine=new solid();
+        mine.load_mesh("model/mine.msh");
+        mine.centrate(true, true, true);
+    }
+
+    solid generateCube(float side, String texture)
+    {
+        //Item cubes
+        solid cube=new solid();
+
+        cube.vertexs = new ArrayList<>();
+        cube.vertexs.add(new vertex(side,side,side)); // 0
+        cube.vertexs.add(new vertex(0,side,side)); // 1
+        cube.vertexs.add(new vertex(0,0,side)); // 2
+        cube.vertexs.add(new vertex(side,0,side)); // 3
+        cube.vertexs.add(new vertex(side,side,0)); // side
+        cube.vertexs.add(new vertex(side,side,side)); // 5
+        cube.vertexs.add(new vertex(side,0,0)); // 6
+        cube.vertexs.add(new vertex(0,side,0)); // 7
+        cube.vertexs.add(new vertex(0,0,0)); // 8
+
+        cube.triangles = new ArrayList<>();
+        cube.textures = new Texture[1];
+        cube.textures[0] = new Texture(texture);
+        cube.addQuad(cube.vertexs.get(0), cube.vertexs.get(1), cube.vertexs.get(2), cube.vertexs.get(3),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(4), cube.vertexs.get(5), cube.vertexs.get(3), cube.vertexs.get(6),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(7), cube.vertexs.get(4), cube.vertexs.get(6), cube.vertexs.get(8),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(1), cube.vertexs.get(7), cube.vertexs.get(8), cube.vertexs.get(2),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(4), cube.vertexs.get(7), cube.vertexs.get(1), cube.vertexs.get(8),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(3), cube.vertexs.get(2), cube.vertexs.get(8), cube.vertexs.get(6),0,0, 0, 1,0, 1,1, 0,1);
+
+        cube.centrate(true, true, true);
+        cube.buildGdxMesh();
+
+        return cube;
     }
 
     void update()
     {
         counter++;
-        /*^for(int i=0; i<info.nsegments; i++){
+        for(int i=0; i<info.nsegments; i++){
 
             if((nodes[i].itemfade<1.0) && (nodes[i].item!=NONE)){
                 nodes[i].itemfade-=0.01;
                 if(nodes[i].itemfade<=0.0) nodes[i].item=NONE;
             };
-        };*/
+        };
     }
 
     static int rand()
@@ -373,9 +434,9 @@ public class course {
 			glTexCoord2f(tx,ty+2*TDY);
 			glVertex3f(v2[3].nx,v2[3].ny,v2[3].nz);	 H
             */
-            nodes[i].mesh.addQuad( v1[0], v2[0], v1[1], v2[1], 0, tx+4*TDX,ty, tx+4*TDX,ty+2*TDY, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY);
-            nodes[i].mesh.addQuad( v1[1], v2[1], v1[2], v2[2], 0, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY, tx+TDX,ty, tx+TDX,ty+2*TDY);
-            nodes[i].mesh.addQuad( v1[2], v2[2], v1[3], v2[3], 0, tx+TDX,ty, tx+TDX,ty+2*TDY, tx,ty, tx,ty+2*TDY);
+            nodes[i].mesh.addQuadFromStripe( v1[0], v2[0], v1[1], v2[1], 0, tx+4*TDX,ty, tx+4*TDX,ty+2*TDY, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY);
+            nodes[i].mesh.addQuadFromStripe( v1[1], v2[1], v1[2], v2[2], 0, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY, tx+TDX,ty, tx+TDX,ty+2*TDY);
+            nodes[i].mesh.addQuadFromStripe( v1[2], v2[2], v1[3], v2[3], 0, tx+TDX,ty, tx+TDX,ty+2*TDY, tx,ty, tx,ty+2*TDY);
 
             /*
             glVertex3f(v1[3].nx,v1[3].ny,v1[3].nz);
@@ -392,9 +453,9 @@ public class course {
             float g = scenes.course_scenes.get(info.scene).roadcolor[1];
             float b = scenes.course_scenes.get(info.scene).roadcolor[2];
 
-            nodes[i].mesh.addQuad(v1[3], v2[3], v1[4], v2[4], r, g, b);
-            nodes[i].mesh.addQuad(v1[4], v2[4], v1[5], v2[5], r, g, b);
-            nodes[i].mesh.addQuad(v1[5], v2[5], v1[0], v2[0], r, g, b);
+            nodes[i].mesh.addQuadFromStripe(v1[3], v2[3], v1[4], v2[4], r, g, b);
+            nodes[i].mesh.addQuadFromStripe(v1[4], v2[4], v1[5], v2[5], r, g, b);
+            nodes[i].mesh.addQuadFromStripe(v1[5], v2[5], v1[0], v2[0], r, g, b);
 
             nodes[i].mesh.buildGdxMesh();
         }
@@ -626,25 +687,26 @@ public class course {
         glEnable(GL_LIGHTING);
         glEnable(GL_CULL_FACE);
         glEnable(GL_LIGHT0); glDisable(GL_LIGHT1); glDisable(GL_LIGHT2); glDisable(GL_LIGHT3);
-        glDisable(GL_LIGHT4); glDisable(GL_LIGHT5); glDisable(GL_LIGHT6); glDisable(GL_LIGHT7);
+        glDisable(GL_LIGHT4); glDisable(GL_LIGHT5); glDisable(GL_LIGHT6); glDisable(GL_LIGHT7);*/
 
         for(s=0; s<range; s++){
-            i=(startseg-int(range/2)+s)%info.nsegments;
+            i=(startseg-(range/2)+s)%info.nsegments;
+            if(i < 0) i += info.nsegments;
 
             if(nodes[i].item!=NONE){
 
                 switch(nodes[i].item){
-                    case BOOST : bcube->alpha_render(cam,cube_x(i),cube_y(i)+3.5,cube_z(i),counter/50.0,counter/75.0,0,nodes[i].itemfade); break;
-                    case ENERGY: ecube->alpha_render(cam,cube_x(i),cube_y(i)+3.5,cube_z(i),counter/50.0,counter/75.0,0,nodes[i].itemfade); break;
-                    case SHIELD: scube->alpha_render(cam,cube_x(i),cube_y(i)+3.5,cube_z(i),counter/50.0,counter/75.0,0,nodes[i].itemfade); break;
-                    case POWER : power->alpha_render(cam,cube_x(i),cube_y(i)+3.5,cube_z(i),counter/50.0,counter/75.0,0,nodes[i].itemfade); break;
-                    case MINE  : mine->alpha_render(cam,cube_x(i),cube_y(i)+3.5+2*sin(counter/50.0),cube_z(i),counter/50.0,counter/75.0,0,nodes[i].itemfade); break;
+                    case BOOST : bcube.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
+                    case ENERGY: ecube.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
+                    case SHIELD: scube.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
+                    case POWER : power.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
+                    case MINE  : mine.alpha_render(shader, cam,cube_x(i), (float) (cube_y(i)+3.5f+2f*Math.sin(counter/50.0f)),cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
                 };
             };
         };
 
-        glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight);
-        glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight);
+        /*glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight);
+        glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight);*/
 
         //Decorates
         if(info.quality>0)
@@ -652,12 +714,27 @@ public class course {
                 i=(startseg-range+s)%info.nsegments;
                 if(i<0) i+=info.nsegments;
                 if(nodes[i].detype<=2){
-                    decorate[nodes[i].detype]->set_scale(nodes[i].dscalexz,nodes[i].dscaley,nodes[i].dscalexz);
-                    decorate[nodes[i].detype]->render(cam,nodes[i].dex,GROUNDY,nodes[i].dez,0,0,0);
+                    decorate[nodes[i].detype].set_scale(nodes[i].dscalexz,nodes[i].dscaley,nodes[i].dscalexz);
+                    decorate[nodes[i].detype].render(shader, cam, nodes[i].dex,GROUNDY,nodes[i].dez,0,0,0);
                 };
             };
-            */
 
+    }
+
+    float cube_x(int s)
+    {
+        int s2=(s+1)%info.nsegments;
+        return (float) ((nodes[s].x[1]+nodes[s].x[2]+nodes[s2].x[1]+nodes[s2].x[2])/4.0);
+    }
+    float cube_y(int s)
+    {
+        int s2=(s+1)%info.nsegments;
+        return (float) ((nodes[s].y[1]+nodes[s].y[2]+nodes[s2].y[1]+nodes[s2].y[2])/4.0);
+    }
+    float cube_z(int s)
+    {
+        int s2=(s+1)%info.nsegments;
+        return (float) ((nodes[s].z[1]+nodes[s].z[2]+nodes[s2].z[1]+nodes[s2].z[2])/4.0);
     }
 
     Vector2 edge_perpendicular_vector(int s, int e, boolean invert)
@@ -750,5 +827,18 @@ public class course {
 
         // Solve the equation
         return ((nodes[s].a*x)+(nodes[s].c*z)+nodes[s].d)/(-nodes[s].b);
+    }
+
+    void add_random_item()
+    {
+        int i;
+
+        do{
+            i=(rand()%(info.nsegments-10))+1;
+
+        }while(nodes[i].item!=NONE);
+
+        nodes[i].item= (short) ((rand()%5)+1);
+        nodes[i].itemfade=1.0f;
     }
 }
