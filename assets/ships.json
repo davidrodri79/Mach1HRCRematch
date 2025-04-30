@@ -72,35 +72,115 @@
     },
     {
       "name" : "shark-iii",
-      "file" : "shark"
+      "file" : "shark",
+      "light" : [0.65,0.88,1.0],
+      nlights : 3,
+      "lsize" : 0.9,
+      lpos : [[2.5,-0.7,-2],[0.0,-0.5,-5.5],[-2.5,-0.7,-2.0]],
+      weight : 1250,
+      enginef : 2,
+      handling : 2,
+      sizex : 3.5,
+      sizey : 3,
+      sizez : 8.5
     },
     {
       "name" : "greyhound",
-      "file" : "greyhound"
+      "file" : "greyhound",
+      "light" : [1,0.84,0.54],
+      nlights : 1,
+      "lsize" : 0.8,
+      lpos : [[0,0.15,-3.5]],
+      weight : 930,
+      enginef : 2,
+      handling : 2,
+      sizex : 2.5,
+      sizey : 2,
+      sizez : 7.0
     },
     {
       "name" : "turbo bull",
-      "file" : "turbobull"
+      "file" : "turbobull",
+      "light" : [0.98,0.957,0.671],
+      nlights : 1,
+      "lsize" : 1.4,
+      lpos : [[0,-0.25,-6.5]],
+      weight : 1750,
+      enginef : 3,
+      handling : 1,
+      sizex : 3.0,
+      sizey : 3.5,
+      sizez : 8.5
     },
     {
       "name" : "tetrafly",
-      "file" : "tetrafly"
+      "file" : "tetrafly",
+      "light" : [0.94,0.94,0.79],
+      nlights : 4,
+      "lsize" : 0.6,
+      lpos : [[1,1,-5],[-1,1,-5],[1,-1,-5],[-1,-1,-5]],
+      weight : 1200,
+      enginef : 3,
+      handling : 1,
+      sizex : 3.5,
+      sizey : 3.5,
+      sizez : 7
     },
     {
       "name" : "blue lotus",
-      "file" : "bluelotus"
+      "file" : "bluelotus",
+      "light" : [0.8,0.8,1.0],
+      nlights : 3,
+      "lsize" : 0.8,
+      lpos : [[0,0,-5.5],[-1.9,0.6,-4.0],[1.9,0.6,-4.0]],
+      weight : 1530,
+      enginef : 2,
+      handling : 2,
+      sizex : 4.5,
+      sizey : 2.0,
+      sizez : 7
     },
     {
       "name" : "icarus",
-      "file" : "icarus"
+      "file" : "icarus",
+      "light" : [0.73,1,1],
+      nlights : 1,
+      "lsize" : 1.2,
+      lpos : [[0,-0.25,-6]],
+      weight : 1510,
+      enginef : 3,
+      handling : 1,
+      sizex : 3.0,
+      sizey : 3.0,
+      sizez : 10
     },
     {
       "name" : "hydra",
-      "file" : "hydra"
+      "file" : "hydra",
+      "light" : [0.9,0.9,0.9],
+      nlights : 1,
+      "lsize" : 1.1,
+      lpos : [[0,0.3,-6]],
+      weight : 1810,
+      enginef : 3,
+      handling : 1,
+      sizex : 5,
+      sizey : 3.5,
+      sizez : 7
     },
     {
       "name" : "tornado",
-      "file" : "tornado"
+      "file" : "tornado",
+      "light" : [1.0,0.7,0.97],
+      nlights : 1,
+      "lsize" : 1.2,
+      lpos : [[0,-0.1,-5.5]],
+      weight : 1460,
+      enginef : 3,
+      handling : 1,
+      sizex : 3.5,
+      sizey : 2,
+      sizez : 5.8
     },
     {
       "name" : "vertigo",
@@ -118,7 +198,17 @@
     },
     {
       "name" : "golden queen",
-      "file" : "queen"
+      "file" : "queen",
+      "light" : [0.98,0.94,0.68],
+      nlights : 1,
+      "lsize" : 1.2,
+      lpos : [[0,-0.1,-6.0]],
+      weight : 1230,
+      enginef : 4,
+      handling : 1,
+      sizex : 3.5,
+      sizey : 2.5,
+      sizez : 9
     }
   ]
 }

@@ -737,6 +737,52 @@ public class course {
         return (float) ((nodes[s].z[1]+nodes[s].z[2]+nodes[s2].z[1]+nodes[s2].z[2])/4.0);
     }
 
+    boolean inside_segment(float xx, float zz, int s)
+    {
+        int s2=(s+1)%info.nsegments;
+
+
+        if((inside_triangle(xx,zz,nodes[s].x[9],nodes[s].y[9],nodes[s].z[9],
+            nodes[s2].x[9],nodes[s2].y[9],nodes[s2].z[9],
+            nodes[s2].x[10],nodes[s2].y[10],nodes[s2].z[10])) ||
+            (inside_triangle(xx,zz,nodes[s].x[9],nodes[s].y[9],nodes[s].z[9],
+                nodes[s2].x[10],nodes[s2].y[10],nodes[s2].z[10],
+                nodes[s].x[10],nodes[s].y[10],nodes[s].z[10])))
+            return true;
+
+        else return false;
+    }
+    boolean inside_triangle(float xx, float zz, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3)
+    {
+        float temp;
+
+        if((xx<x1) && (xx<x2) && (xx<x3)) return false;
+        if((xx>x1) && (xx>x2) && (xx>x3)) return false;
+        if((zz<z1) && (zz<z2) && (zz<z3)) return false;
+        if((zz>z1) && (zz>z2) && (zz>z3)) return false;
+
+        if(z1>z3){
+
+            temp=x3; x3=x1; x1=temp;
+            temp=z3; z3=z1; z1=temp;
+        }
+        if(z1>z2){
+
+            temp=x2; x2=x1; x1=temp;
+            temp=z2; z2=z1; z1=temp;
+        }
+        if(z2>z3){
+
+            temp=x3; x3=x2; x2=temp;
+            temp=z3; z3=z2; z2=temp;
+        }
+
+        if((z1==z2) && (z2==z3)) return false;
+        if((zz<z1) || (zz>=z3)) return false;
+
+        return true;
+    }
+
     Vector2 edge_perpendicular_vector(int s, int e, boolean invert)
     {
         float a,b,x1,x2,y1,y2,m;

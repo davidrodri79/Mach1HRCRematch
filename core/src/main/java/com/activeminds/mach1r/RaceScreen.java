@@ -16,10 +16,18 @@ public class RaceScreen implements Screen {
     public static final float GROUNDTILE = 12.0f;
     public static final float MAPSCALE = 40.0f;
 
+    public static final int SINGLE = 0;
+    public static final int VERSUS = 1;
+    public static final int FINISHED = 2;
+    public static final int DISQUAL = 3;
+
     Main game;
     ShaderProgram shipShader;
     solid groundMesh, skyMesh;
     texture ground;
+
+    int state;
+    long counter;
 
     public RaceScreen(Main game)
     {
@@ -71,6 +79,12 @@ public class RaceScreen implements Screen {
 
     }
 
+    void set_state(int s)
+    {
+        state = s;
+        counter = 0;
+    }
+
     void update_level_action()
     {
         /*int i, j, k, l;
@@ -113,26 +127,28 @@ public class RaceScreen implements Screen {
         for(int i=game.nhumans; i<game.nplayers; i++)
             game.pl[i].ia_update(game.camera,game.ctr);
 
-        /*for(i=0; i<nplayers; i++)
-            for(j=0; j<nplayers; j++)
+        for(int i=0; i<game.nplayers; i++)
+            for(int j=0; j<game.nplayers; j++)
                 if(i<j)
-                    if(pl[i]->collide(pl[j]))
-        cour->play_3d_sample(&cam,pl[i]->x,pl[i]->y,pl[i]->z,pl[i]->colsound);
+                    if(game.pl[i].collide(game.pl[j]))
+                    {
+                        //cour->play_3d_sample(&cam,pl[i]->x,pl[i]->y,pl[i]->z,pl[i]->colsound);
+                    }
 
-        l=0;
-        while((l<nplayers) && (pl[position[l]]->raceover)) l++;
+        int l=0;
+        while((l<game.nplayers) && (game.pl[game.position[l]].raceover)) l++;
 
-        for(i=0; i<nplayers; i++)
-            for(j=l; j<nplayers-1; j++)
-                if(more_advanced(pl[position[j+1]],pl[position[j]])){
+        for(int i=0; i<game.nplayers; i++)
+            for(int j=l; j<game.nplayers-1; j++)
+                if(more_advanced(game.pl[game.position[j+1]],game.pl[game.position[j]])){
 
-                    k=position[j];
-                    position[j]=position[j+1];
-                    position[j+1]=k;
+                    int k=game.position[j];
+                    game.position[j]=game.position[j+1];
+                    game.position[j+1]=k;
 
-                    pl[position[j]]->pos=j+1;
-                    pl[position[j+1]]->pos=j+2;
-                };*/
+                    game.pl[game.position[j]].pos=j+1;
+                    game.pl[game.position[j+1]].pos=j+2;
+                };
     }
 
     void show_level_action(int follow)
@@ -377,6 +393,21 @@ public class RaceScreen implements Screen {
 
     }
 
+    boolean more_advanced(ship s1, ship s2)
+    {
+        if(s1.lap>s2.lap) return true;
+        else if(s1.lap<s2.lap) return false;
+        else if(s1.lap==s2.lap){
+            if(s1.nextsegment>s2.nextsegment) return true;
+            else if(s1.nextsegment<s2.nextsegment) return true;
+            else if(game.cour.distance_to_segment(s1.renderx,s1.y,s1.renderz,s1.nextsegment)<
+                game.cour.distance_to_segment(s2.renderx,s2.y,s2.renderz,s2.nextsegment))
+                return true;
+            else return false;
+        };
+        return false;
+    }
+
     @Override
     public void show() {
 
@@ -385,6 +416,7 @@ public class RaceScreen implements Screen {
     @Override
     public void render(float delta) {
 
+        counter++;
         /*
         if(gdata.skygrfog)
             glEnable(GL_FOG);
@@ -432,7 +464,32 @@ public class RaceScreen implements Screen {
 
         // LOGIC ============================================
 
-        update_level_action();
+        if (state == SINGLE)
+        {
+            //if(!paused)
+                update_level_action();
+            //else if ((ctr->algun_boton(TEC1)) || (ctr->algun_boton(gdata.controls[0]))) paused=FALSE;
+            if(game.pl[0].raceover) set_state(FINISHED);
+            if(game.pl[0].state==ship.DESTR) set_state(DISQUAL);
+            //if(ctr->tecla(DIK_ESCAPE)) {abort_champ=TRUE; set_state(RACE_RESULT);};
+            //if((ctr->tecla(DIK_F5)) && (cour->counter>360)) {paused=TRUE;};
+        }
+        else if (state == VERSUS)
+        {
+
+        }
+        else if (state == FINISHED || state == DISQUAL)
+        {
+            update_level_action();
+            //if(counter==1) mus->stop();
+            //if((counter==1) && (state==FINISHED)) play_voice("finished.smp");
+            //if((counter==5) && (state==DISQUAL)) play_voice("badluck.smp");
+            //ctr->actualiza();
+            if((counter>=300) && (game.ctr.algun_boton(game.gdata.controls[0]))){
+                game.setScreen(new RaceResultScreen(game));
+                dispose();
+            };
+        }
     }
 
     @Override
@@ -458,5 +515,8 @@ public class RaceScreen implements Screen {
     @Override
     public void dispose() {
 
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
     }
 }

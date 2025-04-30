@@ -226,7 +226,7 @@ public class Main extends Game {
 
         for(i=nhumans; i<nplayers; i++){
             do{
-                j=course.rand()%5; // NSHIPS
+                j=course.rand()%NSHIPS;
             }while((used[j]==true) || (gdata.available[j]==0));
 
             racing_ship[i]=j; used[j]=true;

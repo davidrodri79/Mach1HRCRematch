@@ -26,14 +26,13 @@ public class LoadingScreen implements Screen {
                 championship[gdata.sel_champ].races[champ_stage].dif,
                 championship[gdata.sel_champ].races[champ_stage].type,
                 championship[gdata.sel_champ].races[champ_stage].scene); break;
-        };
-        lock=FALSE;
-        if(game_mode==VERSUS_R) set_state(VERSUS);
-        else set_state(SINGLE);*/
-        game.setScreen(new RaceScreen(game));
+        };*/
+
+        RaceScreen scr = new RaceScreen(game);
+        if(game.game_mode==game.VERSUS_R) scr.set_state(RaceScreen.VERSUS);
+        else scr.set_state(RaceScreen.SINGLE);
+        game.setScreen(scr);
         dispose();
-
-
     }
 
     @Override

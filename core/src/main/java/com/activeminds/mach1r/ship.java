@@ -302,12 +302,12 @@ public class ship {
 
         //Drawing: Update which is the course segment where the ship is
 
-	/*seg=(segment+1)%cour.info.nsegments;
-	if(cour.inside_segment(renderx,renderz,seg)) segment=seg;
-	else{
-		seg=segment-1; if(seg<0) seg+=cour.info.nsegments;
-		if(cour.inside_segment(renderx,renderz,seg)) segment=seg;
-	}*/
+        seg=(segment+1)%cour.info.nsegments;
+        if(cour.inside_segment(renderx,renderz,seg)) segment=seg;
+        else{
+            seg=segment-1; if(seg<0) seg+=cour.info.nsegments;
+            if(cour.inside_segment(renderx,renderz,seg)) segment=seg;
+        }
         // Check if ok by distances
         //if(!cour.inside_segment(renderx,renderz,segment)){
         seg=(segment+1)%cour.info.nsegments;
@@ -380,42 +380,43 @@ public class ship {
             };
 
         //Pick up items
-        /*
+
         dx=renderx-cour.cube_x(segment); dy=y-cour.cube_y(segment); dz=renderz-cour.cube_z(segment);
 
         if(state==PLAY)
             if((dx*dx)+(dy*dy)+(dz*dz)<DISTPICKUP)
-                if((cour.nodes[segment].itemfade==1.0) && (cour.nodes[segment].item!=NONE)){
+                if((cour.nodes[segment].itemfade==1.0) && (cour.nodes[segment].item!=course.NONE)){
 
                     switch(cour.nodes[segment].item){
 
-                        case ENERGY : gain_energy(50);
-                            cour.play_3d_sample(cam,x,y,z,takee); break;
-                        case BOOST  : nboosts++;
-                            cour.play_3d_sample(cam,x,y,z,takee); break;
+                        case course.ENERGY : gain_energy(50);
+                            //cour.play_3d_sample(cam,x,y,z,takee); break;
+                        case course.BOOST  : nboosts++;
+                            //cour.play_3d_sample(cam,x,y,z,takee); break;
 
-                        case SHIELD : shield=SHIELDDURATION;
-                            cour.play_3d_sample(cam,x,y,z,takes); break;
-                        case POWER  : power++;
-                            new_message("           power tank");
-                            cour.play_3d_sample(cam,x,y,z,takepow); break;
-                        case MINE   : if((shield==0) && (hypermode==0)){
+                        case course.SHIELD : shield= (short) SHIELDDURATION;
+                            //cour.play_3d_sample(cam,x,y,z,takes); break;
+                        case course.POWER  : power++;
+                            //new_message("           power tank");
+                            //cour.play_3d_sample(cam,x,y,z,takepow);
+                            break;
+                        case course.MINE   : if((shield==0) && (hypermode==0)){
                             lose_energy(75);
-                            counter=0; state=STUN; stunforce=int(velocity*40);
-                            cour.play_3d_sample(cam,x,y,z,litexpl);
+                            counter=0; state=STUN; stunforce= (int) (velocity*40);
+                            //cour.play_3d_sample(cam,x,y,z,litexpl);
                         };
                             break;
 
                     };
                     cour.nodes[segment].itemfade-=0.01;
                     if(power==5) {
-                        hypermode=HYPERDURATION;
-                        new_message("      hyper mode reached!");
-                        cour.play_3d_sample(cam,x,y,z,fullpower);
+                        hypermode= (short) HYPERDURATION;
+                        //new_message("      hyper mode reached!");
+                        //cour.play_3d_sample(cam,x,y,z,fullpower);
                         power=0;
                     };
                 };
-                */
+
 
         if(boost>0) boost--;
         if(shield>0) shield--;
@@ -547,6 +548,61 @@ public class ship {
 
     }
 
+    boolean collide(ship s)
+    {
+        float dx=(renderx-s.renderx), dy=(y-s.y), dz=(renderz-s.renderz), dist,
+        v1[] = new float[3], v2[] = new float[3], m1, m2, ix, iy, iz, c1, c2;
+
+        dist=(dx*dx)+(dy*dy)+(dz*dz)+0.01f;
+
+        if(dist<DISTCOLLIDE){
+
+            // One ship inside another
+            //if(dist<DISTCOLLIDE*0.75){
+
+            ix=(x-s.x)/2.0f; iy=(y-s.y)/2.0f; iz=(z-s.z)/2.0f;
+
+            x+=ix; y+=iy; z+=iz;
+            s.x-=ix; s.y-=iy; s.z-=iz;
+            //};
+
+            v1[0]=vel[0]; v1[1]=vel[1]; v1[2]=vel[2];
+            v2[0]=s.vel[0]; v2[1]=s.vel[1]; v2[2]=s.vel[2];
+
+            // My reaction
+            if((s.hypermode>0) || (s.shield>0)){
+                c1=1.0f; c2=1.0f;
+            }else{
+                c1=0.35f; c2=0.65f;
+            };
+            if((hypermode==0) && (shield>0)) {vel[0]=c1*v1[0]+c2*v2[0]; vel[1]=c1*v1[1]+c2*v2[1]; vel[2]=c1*v1[2]+c2*v2[2];};
+            if((shield==0) && (hypermode==0) && ((s.shield>0) || (s.hypermode>0))){
+                lose_energy(25);
+                counter=0; state=STUN; stunforce= (int) ((velocity+s.velocity)*30);
+                //cour->play_3d_sample(cam,x,y,z,litexpl);
+            }
+
+            // Other's reaction
+            if((hypermode>0) || (shield>0)){
+                c1=1.0f; c2=1.0f;
+            }else{
+                c1=0.35f; c2=0.65f;
+            };
+            if((s.hypermode==0) && (s.shield>0)) {s.vel[0]=c1*v2[0]+c2*v1[0]; s.vel[1]=c1*v2[1]+c2*v1[1]; s.vel[2]=c1*v2[2]+c2*v1[2];};
+            if((s.shield==0) && (s.hypermode==0) && ((shield>0) || (hypermode>0))){
+                s.lose_energy(25);
+                s.counter=0; s.state=STUN; s.stunforce= (int) ((velocity+s.velocity)*30);
+                //cour->play_3d_sample(cam,s->x,s->y,s->z,s->litexpl);
+            }
+
+            lose_energy((int) (s.data.weight*velocity/100.0));
+            s.lose_energy((int) (data.weight*s.velocity/100.0));
+
+            return true;
+        };
+        return false;
+    }
+
     float module(float x, float y, float z)
     {
         return (float) Math.sqrt(x*x+y*y+z*z);
@@ -590,5 +646,11 @@ public class ship {
             lowres.render(shader, cam, renderx,y,renderz,rx, (float) (ry+Math.PI),0);
         };
 
+    }
+
+    String time_str(long t)
+    {
+        //sprintf(s,"%d'%02d.%02d",int(t/3600.0),int((t%3600)/60.0),int((t%60)*1.6667));
+        return "00'00.00";
     }
 }
