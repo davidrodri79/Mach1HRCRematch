@@ -2,10 +2,12 @@ package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector3;
 
 import java.util.ArrayList;
 
@@ -20,6 +22,7 @@ public class RaceScreen implements Screen {
     public static final int VERSUS = 1;
     public static final int FINISHED = 2;
     public static final int DISQUAL = 3;
+    public static final int DEMO = 4;
 
     Main game;
     ShaderProgram shipShader;
@@ -34,8 +37,8 @@ public class RaceScreen implements Screen {
         this.game = game;
 
         // Crear shaders
-        String vertexShader = Gdx.files.internal("vertex.glsl").readString();
-        String fragmentShader = Gdx.files.internal("fragment.glsl").readString();
+        String vertexShader = Gdx.files.internal("shader/ship_vertex.glsl").readString();
+        String fragmentShader = Gdx.files.internal("shader/ship_fragment.glsl").readString();
 
         ShaderProgram.pedantic = false;
         shipShader = new ShaderProgram(vertexShader, fragmentShader);
@@ -164,6 +167,7 @@ public class RaceScreen implements Screen {
         */
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Gdx.gl.glClearColor(course.scenes.course_scenes.get(game.gdata.scene).fogcolor[0], course.scenes.course_scenes.get(game.gdata.scene).fogcolor[1], course.scenes.course_scenes.get(game.gdata.scene).fogcolor[2], 1.f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
@@ -208,6 +212,17 @@ public class RaceScreen implements Screen {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glLightfv(GL_LIGHT0,GL_DIFFUSE,diffusebackg);*/
+
+        shipShader.setUniformf("u_ambientColor", 0.1f, 0.1f, 0.1f);
+
+        shipShader.setUniformi("u_numLights", 1);
+        shipShader.setUniformf("u_lightPos[0]", new Vector3(3, 1000, 1000));
+        shipShader.setUniformf("u_lightColor[0]", new Vector3(1, 1, 1));
+        shipShader.setUniformf("u_lightIntensity[0]", 1.0f);
+
+        shipShader.setUniformf("u_fogColor", course.scenes.course_scenes.get(game.gdata.scene).fogcolor[0], course.scenes.course_scenes.get(game.gdata.scene).fogcolor[1], course.scenes.course_scenes.get(game.gdata.scene).fogcolor[2]); // gris claro
+        shipShader.setUniformf("u_fogStart", 10.0f);
+        shipShader.setUniformf("u_fogEnd", 1000.0f);
 
         int l=30+(15*game.gdata.drawdist);
         if (game.nhumans>1) l= (int) (0.75*l);
@@ -345,6 +360,7 @@ public class RaceScreen implements Screen {
             s->mesh->set_color_coef(HYPER_COL[0],HYPER_COL[1],HYPER_COL[2]);
             s->lowres->set_color_coef(HYPER_COL[0],HYPER_COL[1],HYPER_COL[2]);
         };*/
+
         s.render(shipShader, cam,true);
 
         /*
@@ -487,6 +503,17 @@ public class RaceScreen implements Screen {
             //ctr->actualiza();
             if((counter>=300) && (game.ctr.algun_boton(game.gdata.controls[0]))){
                 game.setScreen(new RaceResultScreen(game));
+                dispose();
+            };
+        }
+        else if (state == DEMO)
+        {
+            update_level_action();
+            //ctr->actualiza();
+            if((game.ctr.algun_boton(controlm.TEC1)) || (counter>7200) || (game.pl[0].state==ship.DESTR))
+            {
+                //destroy_course();
+                game.setScreen(new TitleScreen(game));
                 dispose();
             };
         }

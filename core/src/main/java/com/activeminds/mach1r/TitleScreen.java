@@ -42,7 +42,13 @@ public class TitleScreen implements Screen {
                 game.setScreen(new MainMenuScreen(game));
                 dispose();
             }
-        //if(counter>1800) {random_ships(0); startup_course(2,rand()%4,rand()%10,rand()%6); pl[0]->raceover=TRUE; set_state(DEMO);};
+        if(counter>1800) {
+            game.random_ships(0);
+            game.startup_course(2,course.rand()%4,course.rand()%10,course.rand()%6); game.pl[0].raceover=true;
+            game.game_mode = Main.DEMO;
+            game.setScreen(new LoadingScreen(game));
+            dispose();
+        };
 
 
     }

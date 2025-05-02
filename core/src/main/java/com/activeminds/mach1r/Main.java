@@ -16,6 +16,7 @@ public class Main extends Game {
     public static final int CHAMPIONSHIP = 1;
     public static final int VERSUS_R = 2;
     public static final int ENDURANCE = 3;
+    public static final int DEMO = 4;
 
 
     String dif_name[]={

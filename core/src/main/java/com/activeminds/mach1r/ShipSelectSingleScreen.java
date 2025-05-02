@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class ShipSelectSingleScreen implements Screen {
@@ -18,8 +19,8 @@ public class ShipSelectSingleScreen implements Screen {
         game.counter = 0f;
 
         // Crear shaders
-        String vertexShader = Gdx.files.internal("vertex.glsl").readString();
-        String fragmentShader = Gdx.files.internal("fragment.glsl").readString();
+        String vertexShader = Gdx.files.internal("shader/ship_vertex.glsl").readString();
+        String fragmentShader = Gdx.files.internal("shader/ship_fragment.glsl").readString();
 
         ShaderProgram.pedantic = false;
         shader = new ShaderProgram(vertexShader, fragmentShader);
@@ -58,7 +59,22 @@ public class ShipSelectSingleScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
+        shader.begin();
+
+        shader.setUniformf("u_ambientColor", 0f, 0f, 0f);
+
+        shader.setUniformi("u_numLights", 1);
+        shader.setUniformf("u_lightPos[0]", new Vector3(3, 1000, 1000));
+        shader.setUniformf("u_lightColor[0]", new Vector3(1, 1, 1));
+        shader.setUniformf("u_lightIntensity[0]", 1.0f);
+
+        shader.setUniformf("u_fogColor", 1f, 1f, 1f); // gris claro
+        shader.setUniformf("u_fogStart", 10.0f);
+        shader.setUniformf("u_fogEnd", 1000.0f);
+
+
 	    game.pl[0].mesh.render(shader, game.camera,sel_offset,0,0,0,game.counter/100.0f,0);
+        shader.end();
 
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);

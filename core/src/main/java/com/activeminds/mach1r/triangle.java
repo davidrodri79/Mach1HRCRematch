@@ -1,8 +1,11 @@
 package com.activeminds.mach1r;
 
+import com.badlogic.gdx.math.Vector3;
+
 public class triangle {
 
     vertex v1, v2, v3;
+    Vector3 normal;
     float []uv;
     float []rgb;
     int textureId;
@@ -18,6 +21,8 @@ public class triangle {
         this.v1 = ve1;
         this.v2 = ve2;
         this.v3 = ve3;
+
+        do_normal();
 
         this.textureId = textureId;
 
@@ -49,6 +54,8 @@ public class triangle {
         this.v2 = v2;
         this.v3 = v3;
 
+        do_normal();
+
         this.textureId = -1;
 
         uv = new float[6];
@@ -71,6 +78,21 @@ public class triangle {
         rgb[7] = g3;
         rgb[8] = b3;
 
+    }
+
+    void do_normal()
+    {
+        float x1,x2,y1,y2,z1,z2,m;
+
+        //Calculate surface normal (for lighting)
+        x1=v2.x-v1.x; x2=v3.x-v1.x;
+        y1=v2.y-v1.y; y2=v3.y-v1.y;
+        z1=v2.z-v1.z; z2=v3.z-v1.z;
+
+        normal = new Vector3((y1*z2)-(y2*z1), (z1*x2)-(x1*z2), (x1*y2)-(x2*y1));
+        normal.x = normal.x / normal.len();
+        normal.y = normal.y / normal.len();
+        normal.z = normal.z / normal.len();
     }
 
 }

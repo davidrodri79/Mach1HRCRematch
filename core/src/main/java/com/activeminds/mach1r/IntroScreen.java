@@ -20,8 +20,8 @@ public class IntroScreen implements Screen {
         this.game = game;
 
         // Crear shaders
-        String vertexShader = Gdx.files.internal("vertex.glsl").readString();
-        String fragmentShader = Gdx.files.internal("fragment.glsl").readString();
+        String vertexShader = Gdx.files.internal("shader/ship_vertex.glsl").readString();
+        String fragmentShader = Gdx.files.internal("shader/ship_fragment.glsl").readString();
 
         ShaderProgram.pedantic = false;
         shader = new ShaderProgram(vertexShader, fragmentShader);
@@ -53,6 +53,18 @@ public class IntroScreen implements Screen {
         game.camera.update();
 
 
+        shader.begin();
+
+        shader.setUniformf("u_ambientColor", 0f, 0f, 0f);
+
+        shader.setUniformi("u_numLights", 1);
+        shader.setUniformf("u_lightPos[0]", new Vector3(3, 1000, 1000));
+        shader.setUniformf("u_lightColor[0]", new Vector3(1, 1, 1));
+        shader.setUniformf("u_lightIntensity[0]", 1.0f);
+
+        shader.setUniformf("u_fogColor", 0f, 0f, 0f); // gris claro
+        shader.setUniformf("u_fogStart", 5000.0f);
+        shader.setUniformf("u_fogEnd", 10000.0f);
 
         if(counter<490)
             game.brain.render(shader, game.camera,0,0,-9800+20*(float)(counter),0,counter/100f,(490-counter)/100f);

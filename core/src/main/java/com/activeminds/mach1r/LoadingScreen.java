@@ -30,6 +30,7 @@ public class LoadingScreen implements Screen {
 
         RaceScreen scr = new RaceScreen(game);
         if(game.game_mode==game.VERSUS_R) scr.set_state(RaceScreen.VERSUS);
+        else if (game.game_mode==game.DEMO) scr.set_state(RaceScreen.DEMO);
         else scr.set_state(RaceScreen.SINGLE);
         game.setScreen(scr);
         dispose();
