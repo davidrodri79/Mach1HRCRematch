@@ -25,6 +25,7 @@ public class solid {
 
     Mesh mesh;
     Texture[] textures;
+    boolean gouraud = false;
 
     public solid()
     {
@@ -34,8 +35,10 @@ public class solid {
         scale[0] = 1f; scale[1] = 1f; scale[2] = 1f;
     }
 
-    boolean load_mesh(String file)
+    boolean load_mesh(String file, boolean gouraud)
     {
+        this.gouraud = gouraud;
+
         FileHandle f = Gdx.files.internal(file);
         InputStream inputStream = f.read();
         if (inputStream == null) return false;
@@ -137,6 +140,23 @@ public class solid {
                 triangles.add(tri);
             }
 
+            if(gouraud)
+            {
+                for(int i = 0; i < triangles.size(); i++)
+                {
+                    triangle tri = triangles.get(i);
+                    tri.v1.addNormal(tri.normal);
+                    tri.v2.addNormal(tri.normal);
+                    tri.v3.addNormal(tri.normal);
+                }
+
+                for(int i = 0; i < vertexs.size(); i++)
+                {
+                    vertex v = vertexs.get(i);
+                    v.gouraudNormal();
+                }
+            }
+
             buildGdxMesh();
 
             return true;
@@ -175,9 +195,18 @@ public class solid {
             vertices[39 * i]        = triangles.get(i).v1.x;
             vertices[39 * i + 1]    = triangles.get(i).v1.y;
             vertices[39 * i + 2]    = triangles.get(i).v1.z;
-            vertices[39 * i + 3]    = triangles.get(i).normal.x;
-            vertices[39 * i + 4]    = triangles.get(i).normal.y;
-            vertices[39 * i + 5]    = triangles.get(i).normal.z;
+            if(gouraud)
+            {
+                vertices[39 * i + 3]    = triangles.get(i).v1.sumNormals.x;
+                vertices[39 * i + 4]    = triangles.get(i).v1.sumNormals.y;
+                vertices[39 * i + 5]    = triangles.get(i).v1.sumNormals.z;
+            }
+            else
+            {
+                vertices[39 * i + 3]    = triangles.get(i).normal.x;
+                vertices[39 * i + 4]    = triangles.get(i).normal.y;
+                vertices[39 * i + 5]    = triangles.get(i).normal.z;
+            }
             vertices[39 * i + 6]    = triangles.get(i).rgb[0];
             vertices[39 * i + 7]    = triangles.get(i).rgb[1];
             vertices[39 * i + 8]    = triangles.get(i).rgb[2];
@@ -189,9 +218,18 @@ public class solid {
             vertices[39 * i + 13]   = triangles.get(i).v2.x;
             vertices[39 * i + 14]   = triangles.get(i).v2.y;
             vertices[39 * i + 15]   = triangles.get(i).v2.z;
-            vertices[39 * i + 16]   = triangles.get(i).normal.x;
-            vertices[39 * i + 17]   = triangles.get(i).normal.y;
-            vertices[39 * i + 18]   = triangles.get(i).normal.z;
+            if(gouraud)
+            {
+                vertices[39 * i + 16]    = triangles.get(i).v2.sumNormals.x;
+                vertices[39 * i + 17]    = triangles.get(i).v2.sumNormals.y;
+                vertices[39 * i + 18]    = triangles.get(i).v2.sumNormals.z;
+            }
+            else
+            {
+                vertices[39 * i + 16] = triangles.get(i).normal.x;
+                vertices[39 * i + 17] = triangles.get(i).normal.y;
+                vertices[39 * i + 18] = triangles.get(i).normal.z;
+            }
             vertices[39 * i + 19]   = triangles.get(i).rgb[3];
             vertices[39 * i + 20]   = triangles.get(i).rgb[4];
             vertices[39 * i + 21]   = triangles.get(i).rgb[5];
@@ -203,9 +241,18 @@ public class solid {
             vertices[39 * i + 26]   = triangles.get(i).v3.x;
             vertices[39 * i + 27]   = triangles.get(i).v3.y;
             vertices[39 * i + 28]   = triangles.get(i).v3.z;
-            vertices[39 * i + 29]   = triangles.get(i).normal.x;
-            vertices[39 * i + 30]   = triangles.get(i).normal.y;
-            vertices[39 * i + 31]   = triangles.get(i).normal.z;
+            if(gouraud)
+            {
+                vertices[39 * i + 29]    = triangles.get(i).v3.sumNormals.x;
+                vertices[39 * i + 30]    = triangles.get(i).v3.sumNormals.y;
+                vertices[39 * i + 31]    = triangles.get(i).v3.sumNormals.z;
+            }
+            else
+            {
+                vertices[39 * i + 29] = triangles.get(i).normal.x;
+                vertices[39 * i + 30] = triangles.get(i).normal.y;
+                vertices[39 * i + 31] = triangles.get(i).normal.z;
+            }
             vertices[39 * i + 32]   = triangles.get(i).rgb[6];
             vertices[39 * i + 33]   = triangles.get(i).rgb[7];
             vertices[39 * i + 34]   = triangles.get(i).rgb[8];

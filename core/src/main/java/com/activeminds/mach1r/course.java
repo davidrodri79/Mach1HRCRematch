@@ -95,7 +95,7 @@ public class course {
         solid mesh;
     }
 
-    course_info info;
+    public course_info info;
     node[] nodes;
     int counter;
     texture road;
@@ -124,7 +124,7 @@ public class course {
 
         for(int i=0; i<3; i++){
             decorate[i]=new solid();
-            decorate[i].load_mesh("scene/"+scenes.course_scenes.get(ci.scene).name+(i+1)+".msh");
+            decorate[i].load_mesh("scene/"+scenes.course_scenes.get(ci.scene).name+(i+1)+".msh", true);
             decorate[i].centrate(true,false,true);
         };
 
@@ -136,11 +136,11 @@ public class course {
         bcube=generateCube(4, "sprite/bcube.bmp");
 
         power=new solid();
-        power.load_mesh("model/power.msh");
+        power.load_mesh("model/power.msh", true);
         power.centrate(true, true, true);
 
         mine=new solid();
-        mine.load_mesh("model/mine.msh");
+        mine.load_mesh("model/mine.msh", true);
         mine.centrate(true, true, true);
     }
 

@@ -18,15 +18,20 @@ public class LoadingScreen implements Screen {
     public void render(float delta) {
 
         // LOGIC =======================================================================
-        game.startup_course(game.gdata.nlaps,game.gdata.dif,game.gdata.cour_type,game.gdata.scene);
-        /*switch(game_mode){
-            default : startup_course(gdata.nlaps,gdata.dif,gdata.cour_type,gdata.scene); break;
+
+        switch(game.game_mode){
+            case Main.SINGLE_R: game.startup_course(game.gdata.nlaps,game.gdata.dif,game.gdata.cour_type,game.gdata.scene); break;
+            case Main.DEMO:
+                game.startup_course(2,course.rand()%4,course.rand()%10,course.rand()%6);
+                game.pl[0].raceover=true;
+                break;
+            /*default : startup_course(gdata.nlaps,gdata.dif,gdata.cour_type,gdata.scene); break;
             case ENDURANCE : nplayers=2; racing_ship[1]=endurance[gdata.sel_endur].op; startup_course(endurance[gdata.sel_endur].nlaps,endurance[gdata.sel_endur].dif,endurance[gdata.sel_endur].type,endurance[gdata.sel_endur].scene); break;
             case CHAMPIONSHIP : startup_course(championship[gdata.sel_champ].races[champ_stage].nlaps,
                 championship[gdata.sel_champ].races[champ_stage].dif,
                 championship[gdata.sel_champ].races[champ_stage].type,
-                championship[gdata.sel_champ].races[champ_stage].scene); break;
-        };*/
+                championship[gdata.sel_champ].races[champ_stage].scene); break;*/
+        };
 
         RaceScreen scr = new RaceScreen(game);
         if(game.game_mode==game.VERSUS_R) scr.set_state(RaceScreen.VERSUS);

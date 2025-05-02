@@ -98,7 +98,7 @@ public class StartupScreen implements Screen {
                 cup->load_mesh("model\\cup.msh");
                 cup->centrate(TRUE,TRUE,TRUE);*/
                 game.brain=new solid();
-                game.brain.load_mesh("intro/brain.msh");
+                game.brain.load_mesh("intro/brain.msh", true);
                 game.brain.centrate(true,true,true);
                 game.active=new sprite(256,64,"intro/active.png");
                 game.minds=new sprite(256,64,"intro/minds.png");

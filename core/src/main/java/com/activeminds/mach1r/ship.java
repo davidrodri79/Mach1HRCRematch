@@ -77,11 +77,11 @@ public class ship {
 
         data = l.ships.get(model);
         mesh = new solid();
-        mesh.load_mesh("model/"+data.file+".msh");
+        mesh.load_mesh("model/"+data.file+".msh", true);
         mesh.centrate(true,true,true);
 
         lowres = new solid();
-        lowres.load_mesh("model/"+data.file+"lr.msh");
+        lowres.load_mesh("model/"+data.file+"lr.msh", true);
         lowres.centrate(true,true,true);
 
         logo=new sprite(256,128,"sprite/"+data.file+"lg.png");

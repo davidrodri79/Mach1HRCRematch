@@ -25,7 +25,7 @@ public class RaceScreen implements Screen {
     public static final int DEMO = 4;
 
     Main game;
-    ShaderProgram shipShader;
+    ShaderProgram shipShader, skyShader;
     solid groundMesh, skyMesh;
     texture ground;
 
@@ -47,6 +47,16 @@ public class RaceScreen implements Screen {
             Gdx.app.error("Shader", "Error al compilar: " + shipShader.getLog());
         }
 
+        vertexShader = Gdx.files.internal("shader/sky_vertex.glsl").readString();
+        fragmentShader = Gdx.files.internal("shader/sky_fragment.glsl").readString();
+
+        ShaderProgram.pedantic = false;
+        skyShader = new ShaderProgram(vertexShader, fragmentShader);
+
+        if (!skyShader.isCompiled()) {
+            Gdx.app.error("Shader", "Error al compilar: " + skyShader.getLog());
+        }
+
         // Ground mesh
         vertex v[] = new vertex[4];
         int TILE = 7;
@@ -55,7 +65,7 @@ public class RaceScreen implements Screen {
         v[2]=new vertex((GROUNDWIDTH/TILE),course.GROUNDY,(GROUNDWIDTH/TILE));
         v[3]=new vertex((GROUNDWIDTH/TILE),course.GROUNDY,0f);
 
-        ground= new texture("scene/"+course.scenes.course_scenes.get(game.gdata.scene).name+"gr.bmp",texture.TEX_BMP,true,false);
+        ground= new texture("scene/"+course.scenes.course_scenes.get(game.cour.info.scene).name+"gr.bmp",texture.TEX_BMP,true,false);
         groundMesh = new solid();
         groundMesh.triangles = new ArrayList<>();
         groundMesh.textures = new Texture[1];
@@ -70,9 +80,9 @@ public class RaceScreen implements Screen {
         v[2]=new vertex((SKYWIDTH/TILE),course.SKYY,(SKYWIDTH/TILE));
         v[3]=new vertex((SKYWIDTH/TILE),course.SKYY,0f);
 
-        float r = course.scenes.course_scenes.get(game.gdata.scene).skycolor[0];
-        float g = course.scenes.course_scenes.get(game.gdata.scene).skycolor[1];
-        float b = course.scenes.course_scenes.get(game.gdata.scene).skycolor[2];
+        float r = course.scenes.course_scenes.get(game.cour.info.scene).skycolor[0];
+        float g = course.scenes.course_scenes.get(game.cour.info.scene).skycolor[1];
+        float b = course.scenes.course_scenes.get(game.cour.info.scene).skycolor[2];
         skyMesh = new solid();
         skyMesh.textures = new Texture[0];
         skyMesh.triangles = new ArrayList<>();
@@ -167,7 +177,7 @@ public class RaceScreen implements Screen {
         */
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClearColor(course.scenes.course_scenes.get(game.gdata.scene).fogcolor[0], course.scenes.course_scenes.get(game.gdata.scene).fogcolor[1], course.scenes.course_scenes.get(game.gdata.scene).fogcolor[2], 1.f);
+        Gdx.gl.glClearColor(course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[0], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[1], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[2], 1.f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
@@ -220,7 +230,7 @@ public class RaceScreen implements Screen {
         shipShader.setUniformf("u_lightColor[0]", new Vector3(1, 1, 1));
         shipShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
-        shipShader.setUniformf("u_fogColor", course.scenes.course_scenes.get(game.gdata.scene).fogcolor[0], course.scenes.course_scenes.get(game.gdata.scene).fogcolor[1], course.scenes.course_scenes.get(game.gdata.scene).fogcolor[2]); // gris claro
+        shipShader.setUniformf("u_fogColor", course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[0], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[1], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[2]); // gris claro
         shipShader.setUniformf("u_fogStart", 10.0f);
         shipShader.setUniformf("u_fogEnd", 1000.0f);
 
@@ -317,6 +327,10 @@ public class RaceScreen implements Screen {
         float gx, gz, TILE=5;
         int i,x,z;
 
+        skyShader.begin();
+        skyShader.setUniformf("u_fogColor", course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[0], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[1], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[2]); // gris claro
+        skyShader.setUniformf("u_fogStart", 10.0f);
+        skyShader.setUniformf("u_fogEnd", 1000.0f);
 
         gx=nearest((int) game.camera.position.x, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
         gz=nearest((int) game.camera.position.z, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
@@ -327,12 +341,14 @@ public class RaceScreen implements Screen {
 
             for(z=0; z<TILE; z++){
 
-                skyMesh.render(shipShader, game.camera, gx, 0f, gz, 0f, 0f, 0f);
+                skyMesh.render(skyShader, game.camera, gx, 0f, gz, 0f, 0f, 0f);
                 gz+=SKYWIDTH/TILE;
             };
 
             gx+=SKYWIDTH/TILE;
         };
+
+        skyShader.end();
 
     }
 
