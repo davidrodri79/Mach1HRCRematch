@@ -648,6 +648,20 @@ public class ship {
 
     }
 
+    float light_x(int c)
+    {
+        return (float) (renderx+((data.lpos[c][0]*Math.cos(-ry+Math.PI/2f))+(data.lpos[c][2]*Math.sin(ry-Math.PI/2f))));
+    }
+    float light_y(int c)
+    {
+        return y+data.lpos[c][1];
+    }
+    float light_z(int c)
+    {
+        return (float) (renderz+((data.lpos[c][0]*Math.sin(-ry+Math.PI/2f))+(data.lpos[c][2]*Math.cos(ry-Math.PI/2f))));
+    }
+
+
     String time_str(long t)
     {
         //sprintf(s,"%d'%02d.%02d",int(t/3600.0),int((t%3600)/60.0),int((t%60)*1.6667));

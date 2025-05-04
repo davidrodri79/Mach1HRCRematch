@@ -254,11 +254,11 @@ public class RaceScreen implements Screen {
         /*glDisable(GL_FOG);
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
-        glDepthMask(0);
-        for(i=nplayers-1; i>=0; i--)
-            show_ship_flame(&cam,pl[i]);
+        glDepthMask(0);*/
+        for(int i=game.nplayers-1; i>=0; i--)
+            show_ship_flame(game.camera,game.pl[i]);
 
-        // Opponent cursor in versus
+        /*// Opponent cursor in versus
         glDisable(GL_CULL_FACE);
         for(i=0; i<nhumans; i++){
             size=0.1*sqrt(pl[i]->dist);
@@ -422,6 +422,18 @@ public class RaceScreen implements Screen {
             };
         };
         glDepthMask(1);*/
+
+    }
+
+    void show_ship_flame(PerspectiveCamera cam, ship s)
+    {
+
+        float a=s.engine,f;
+        float sx=5.0f*s.data.lsize*a, sy=5.0f*s.data.lsize*a;
+        int i;
+
+        for(i=0; i<s.data.nlights; i++)
+            game.show_3d_sprite(cam,shipShader,game.flame,0,0,1,1,s.light_x(i),s.light_y(i),s.light_z(i),s.lightcol[0],s.lightcol[1],s.lightcol[2],sx,sy,a);
 
     }
 

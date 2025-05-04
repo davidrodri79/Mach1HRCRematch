@@ -81,11 +81,11 @@ public class StartupScreen implements Screen {
             case 5 :
                 //delay(300);
                 con.add_mess("loading miscellanous textures...");
-                /*flame=new texture("sprite\\light",TEX_PCX,FALSE,TRUE);
-                shield=new texture("sprite\\shield",TEX_PCX,FALSE,TRUE);
-                explos=new texture("sprite\\explos",TEX_PCX,FALSE,FALSE);
-                smoke=new texture("sprite\\smoke",TEX_PCX,FALSE,TRUE);
-                changed=TRUE;*/
+                game.flame=new texture("sprite/light.png",texture.TEX_PCX,false,true);
+                game.shield=new texture("sprite/shield.png",texture.TEX_PCX,false,true);
+                game.explos=new texture("sprite/explos.png",texture.TEX_PCX,false,true);
+                game.smoke=new texture("sprite/smoke.png",texture.TEX_PCX,false,true);
+                /*changed=TRUE;*/
                 break;
 
             case 6 :
