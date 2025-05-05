@@ -311,27 +311,34 @@ public class RaceScreen implements Screen {
         glMatrixMode (GL_PROJECTION);
         glLoadIdentity();
         gluOrtho2D(0, 640, 0, 480);
-        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHTING);*/
+
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+        game.batch.begin();
 
         // Ship messages
-        if(pl[follow]->messcount>0)
-        fuente->show_text(100,320,pl[follow]->message,0);
+        if(game.pl[follow].messcount>0)
+            game.fuente.show_text( game.batch, 100,320,game.pl[follow].message,0);
 
-        if(pl[follow]->state==DESTR){
-        fuente->show_text(180,350,"DISQUALIFIED FROM RACE",1);
-        fuente->show_text(270,100,"GAME OVER",1);
-    };
+        if(game.pl[follow].state==ship.DESTR){
+            game.fuente.show_text(game.batch, 180,350,"DISQUALIFIED FROM RACE",1);
+            game.fuente.show_text(game.batch, 270,100,"GAME OVER",1);
+        };
 
         //Start countdown
-        for(j=0; j<4; j++)
-            if((cour->counter>360+(60*j)) && (cour->counter<=420+(60*j))){
+        for(int j=0; j<4; j++)
+            if((game.cour.counter>360+(60*j)) && (game.cour.counter<=420+(60*j))){
 
-                i=counter-(360+(60*j));
-                size=2000/(0.25*i);
+                long i=counter-(360+(60*j));
+                float size=2000f/(0.25f*i);
 
-                start[j]->render2d(0,0,256,256,320-(size/2),240-(size/2),320+(size/2),240+(size/2),1-(i*0.015));
+                game.start[j].render2d(game.batch, 0,0,256,256,(int)(320-(size/2)),(int)(240-(size/2)),(int)(320+(size/2)),(int)(240+(size/2)),1f-(i*0.015f));
             };
-*/
+
+        game.batch.end();
+
     }
 
     float nearest(int n, int m)
@@ -640,50 +647,55 @@ public class RaceScreen implements Screen {
         float c1=1.0f,c2=1.0f,c3=1.0f;
         int dur;
 
-        /*
-
         // Energy bar & recovery
-        recover->render2d(0,48,128,64,x+60,y+100,x+60+128,y+116,1);
-        recover->render2d(0,32,24*pl[i]->power,48,x+60,y+100,x+60+24*pl[i]->power,y+116,1);
-        if((pl[i]->hypermode>0) && (int(counter/10)%2==0))
-        recover->render2d(0,16,128,32,x+60,y+100,x+188,y+116,1);
+        game.recover.render2d(game.batch,0,48,128,64,x+60,y+100,x+60+128,y+116,1);
+        game.recover.render2d(game.batch,0,32,24*game.pl[i].power,48,x+60,y+100,x+60+24*game.pl[i].power,y+116,1);
+        if((game.pl[i].hypermode>0) && ((int)(counter/10)%2==0))
+            game.recover.render2d(game.batch,0,16,128,32,x+60,y+100,x+188,y+116,1);
 
-        dur=int(pl[i]->energy/4.0); if(dur==0) dur=1;
+        dur=(int)(game.pl[i].energy/4.0f); if(dur==0) dur=1;
 
-        if(pl[i]->hypermode>0){
-        c1=HYPER_COL[0]; c2=HYPER_COL[1]; c3=HYPER_COL[2];
-    }else if((pl[i]->energy<MAXENERGY/4) && (counter%dur<int(dur/3.0))){
-        c1=DAMAGED_COL[0]; c2=DAMAGED_COL[1]; c3=DAMAGED_COL[2];
-    }else{
-        c1=1.0; c2=1.0; c3=1.0;
-    };
+        if(game.pl[i].hypermode>0){
+            c1=HYPER_COL[0]; c2=HYPER_COL[1]; c3=HYPER_COL[2];
+        }else if((game.pl[i].energy<ship.MAXENERGY/4) && (counter%dur<(int)(dur/3.0))){
+            c1=DAMAGED_COL[0]; c2=DAMAGED_COL[1]; c3=DAMAGED_COL[2];
+        }else{
+            c1=1.0f; c2=1.0f; c3=1.0f;
+        };
 
         if(size==0){
-            power[0]->render2dcolor(0,0,256,128,x,y,x+256,y+128,1,c1,c2,c3);
-            power[1]->render2dcolor(0,0,75+int(116*(float(pl[i]->energy)/float(MAXENERGY))),128,x,y,x+75+int(116*(float(pl[i]->energy)/float(MAXENERGY))),y+128,1,c1,c2,c3);
+            game.power[0].render2dcolor(game.batch, 0,0,256,128,x,y,x+256,y+128,1,c1,c2,c3);
+            game.power[1].render2dcolor(game.batch,0,0,
+                75+((float) (116 * game.pl[i].energy) /ship.MAXENERGY),
+                128,x,y,
+                (int)(x+75+((float)(116*game.pl[i].energy)/ship.MAXENERGY)),
+                y+128,1,c1,c2,c3);
         }else{
             x-=15; y+=70;
-            spower[0]->render2dcolor(0,0,256,32,x,y,x+256,y+32,1,c1,c2,c3);
-            spower[1]->render2dcolor(0,0,75+int(116*(float(pl[i]->energy)/float(MAXENERGY))),32,x,y,x+75+int(116*(float(pl[i]->energy)/float(MAXENERGY))),y+32,1,c1,c2,c3);
+            game.spower[0].render2dcolor(game.batch,0,0,256,32,x,y,x+256,y+32,1,c1,c2,c3);
+            game.spower[1].render2dcolor(game.batch,0,0,
+                75+((float) (116 * game.pl[i].energy) /ship.MAXENERGY),
+                32,x,y,
+                x+75+(116*game.pl[i].energy/ship.MAXENERGY),y+32,1,c1,c2,c3);
 
         };
-        */
+
     }
     void show_icon_rank()
     {
         int i,x,y;
         float s=1.0f, c;
-        /*
-        for(i=0; i<nplayers; i++){
 
-            if(i<3) s=1.4-(0.2*i); else s=1.0;
+        for(i=0; i<game.nplayers; i++){
+
+            if(i<3) s=1.4f-(0.2f*i); else s=1.0f;
             x=70; y=300-40*i;
-            if(pl[position[i]]->state==DESTR) c=0.1; else c=1.0;
-            mini[racing_ship[position[i]]]->render2dcolor(0,0,128,128,x,y,x+61*s,y+46*s,1.0,c,c,c);
+            if(game.pl[game.position[i]].state==ship.DESTR) c=0.1f; else c=1.0f;
+            game.mini[game.racing_ship[game.position[i]]].render2dcolor(game.batch, 0,0,128,128,x,y,(int)(x+61*s),(int)(y+46*s),1.0f,c,c,c);
             x=30; y=310-40*i;
-            posnumber->render2d((i%4)*16,64-(16*(int(i/4)+1)),((i%4)+1)*16,64-(16*int(i/4)),x,y,x+32,y+32,1);
+            game.posnumber.render2d(game.batch, (i%4)*16,64-(16*((int)(i/4)+1)),((i%4)+1)*16,64-(16*(int)(i/4)),x,y,x+32,y+32,1);
         };
-        */
+
     }
     void show_map(int x,int y)
     {

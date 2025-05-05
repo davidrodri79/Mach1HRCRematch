@@ -1,12 +1,8 @@
 package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
@@ -66,7 +62,8 @@ public class Main extends Game {
 
     course cour;
 
-    sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar, posnumber, speed, kmh;
+    sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar, posnumber, speed, kmh,
+        mini[] = new sprite[NSHIPS], power[] = new sprite[2], spower[] = new sprite[2], recover, start[] = new sprite[4];
     texture flame, shield, explos, smoke;
 
     ship pl[] = new ship[MAXPLAYERS];
@@ -101,6 +98,7 @@ public class Main extends Game {
 
         gdata = new game_data();
 
+        ship.load_static_data();
         course.load_static_data();
 
         setScreen(new StartupScreen(this));

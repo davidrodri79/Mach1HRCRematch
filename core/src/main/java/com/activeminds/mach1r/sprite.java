@@ -36,4 +36,13 @@ public class sprite {
         batch.setColor(1, 1, 1, 1);
     }
 
+    void render2dcolor(SpriteBatch batch, float ox, float oy, float ex, float ey, int px, int py, int pex, int pey, float a, float r, float g, float b)
+    {
+        ey = sy - ey;
+        oy = sy - oy;
+        batch.setColor(r, g, b, a);
+        batch.draw(texture,px,py,pex-px,pey-py, ox/sx, oy/sy, ex/sx, ey/sy);
+        batch.setColor(1, 1, 1, 1);
+    }
+
 }

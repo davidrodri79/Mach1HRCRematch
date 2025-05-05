@@ -123,15 +123,15 @@ public class StartupScreen implements Screen {
                 game.posnumber=new sprite(64,64,"sprite/position.png");
                 game.speed=new sprite(64,64,"sprite/speed.png");
                 game.kmh=new sprite(128,32,"sprite/kmh.png");
-                /*power[0]=new sprite(256,128,"sprite\\power");
-                power[1]=new sprite(256,128,"sprite\\fullpowe");
-                spower[0]=new sprite(256,32,"sprite\\spower");
-                spower[1]=new sprite(256,32,"sprite\\sfullpow");
-                recover=new sprite(128,64,"sprite\\recover");
-                start[0]=new sprite(256,256,"sprite\\start3");
-                start[1]=new sprite(256,256,"sprite\\start2");
-                start[2]=new sprite(256,256,"sprite\\start1");
-                start[3]=new sprite(256,256,"sprite\\startgo");*/
+                game.power[0]=new sprite(256,128,"sprite/power.png");
+                game.power[1]=new sprite(256,128,"sprite/fullpowe.png");
+                game.spower[0]=new sprite(256,32,"sprite/spower.png");
+                game.spower[1]=new sprite(256,32,"sprite/sfullpow.png");
+                game.recover=new sprite(128,64,"sprite/recover.png");
+                game.start[0]=new sprite(256,256,"sprite/start3.png");
+                game.start[1]=new sprite(256,256,"sprite/start2.png");
+                game.start[2]=new sprite(256,256,"sprite/start1.png");
+                game.start[3]=new sprite(256,256,"sprite/startgo.png");
                 game.wallp=new sprite(128,128,"sprite/wallp.png");
                 game.title[0]=new sprite(256,256,"sprite/title1.png",false);
                 game.title[1]=new sprite(256,256,"sprite/title2.png",false);
@@ -139,12 +139,12 @@ public class StartupScreen implements Screen {
                     sprintf(s,"scene\\%spr",scenes[i].name);
                     preview[i]=new sprite(128,128,s);
                 };
-                shadow=new texture("sprite\\shade",TEX_PCX,FALSE,TRUE);
-                for(i=0; i<NSHIPS; i++){
-                    sprintf(s,"model\\%ssm",models[i].file);
-                    mini[i]=new sprite(128,128,s);
+                shadow=new texture("sprite\\shade",TEX_PCX,FALSE,TRUE);*/
+                for(int i=0; i<Main.NSHIPS; i++){
+                    String s = "model/"+ship.models.ships.get(i).file+"sm.png";
+                    game.mini[i]=new sprite(128,128,s);
                 };
-                mistery=new sprite(128,128,"sprite\\mistery");
+                /*mistery=new sprite(128,128,"sprite\\mistery");
                 i=0;
                 while(i<10){
                     sprintf(s,"cursor\\c%d",i+1);

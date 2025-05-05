@@ -3,7 +3,6 @@ package com.activeminds.mach1r;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
@@ -68,14 +67,12 @@ public class ship {
     vertex cam_pos, vrp;
     course cour;
 
+    public static shipModelsJson models;
+
     public ship(int model, int id, course cour) {
 
-        Json json = new Json();
-        FileHandle file = Gdx.files.internal("ships.json");
-        String fileText = file.readString();
-        shipModelsJson l = json.fromJson(shipModelsJson.class, fileText);
 
-        data = l.ships.get(model);
+        data = models.ships.get(model);
         mesh = new solid();
         mesh.load_mesh("model/"+data.file+".msh", true);
         mesh.centrate(true,true,true);
@@ -107,6 +104,14 @@ public class ship {
             y= (float) (cour.y_at_xz(x,z,segment)+3.0);
         };
 
+    }
+
+    static void load_static_data()
+    {
+        Json json = new Json();
+        FileHandle file = Gdx.files.internal("ships.json");
+        String fileText = file.readString();
+        models = json.fromJson(shipModelsJson.class, fileText);
     }
 
     void update(PerspectiveCamera cam, controlm ctr, int tc)
