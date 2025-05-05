@@ -1,5 +1,7 @@
 package com.activeminds.mach1r;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -16,14 +18,28 @@ public class sprite {
     public sprite(float x, float y, String tfile, boolean alpha)
     {
         sx = x; sy = y;
-        texture = new Texture(tfile);
+        if(Gdx.files.internal(tfile).exists())
+        {
+            texture = new Texture(tfile);
+        }
+        else
+        {
+            texture = new Texture((int) x, (int)y, Pixmap.Format.RGBA8888);
+        }
         texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     public sprite(float x, float y, String tfile)
     {
         sx = x; sy = y;
-        texture = new Texture(tfile);
+        if(Gdx.files.internal(tfile).exists())
+        {
+            texture = new Texture(tfile);
+        }
+        else
+        {
+            texture = new Texture((int) x, (int)y, Pixmap.Format.RGBA8888);
+        }
         texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 

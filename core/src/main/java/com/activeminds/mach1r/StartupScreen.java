@@ -144,18 +144,18 @@ public class StartupScreen implements Screen {
                     String s = "model/"+ship.models.ships.get(i).file+"sm.png";
                     game.mini[i]=new sprite(128,128,s);
                 };
-                /*mistery=new sprite(128,128,"sprite\\mistery");
-                i=0;
+                /*mistery=new sprite(128,128,"sprite\\mistery");*/
+                int i=0;
                 while(i<10){
-                    sprintf(s,"cursor\\c%d",i+1);
-                    plcursor[i]=new sprite(32,32,s);
+                    String s = "cursor/c"+(i+1)+".png";
+                    game.plcursor[i]=new sprite(32,32,s);
                     i++;
                 };
-                arrow=new sprite(32,32,"cursor\\arrow");*/
+                game.arrow=new sprite(32,32,"cursor/arrow.png");
                 game.statbar=new sprite(128,16,"sprite/statbar.png");
                 game.menucur=new sprite(256,256,"cursor/menucur.png");
-                /*oppico=new sprite(32,32,"cursor\\opp");
-                changed=TRUE;*/
+                game.oppico=new sprite(32,32,"cursor/opp.png");
+                //changed=TRUE;*/
                 break;
 
             case 9 :

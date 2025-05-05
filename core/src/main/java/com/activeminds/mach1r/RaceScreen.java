@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
@@ -30,6 +31,8 @@ public class RaceScreen implements Screen {
     solid groundMesh, skyMesh;
     Mesh billboard;
     texture ground;
+
+    ShapeRenderer shapeRenderer;
 
     int state;
     long counter;
@@ -68,9 +71,6 @@ public class RaceScreen implements Screen {
         if (!billboardShader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + billboardShader.getLog());
         }
-
-
-
 
         // Ground mesh
         vertex v[] = new vertex[4];
@@ -124,6 +124,9 @@ public class RaceScreen implements Screen {
 
         billboard.setVertices(vertices, 0 , 20);
         billboard.setIndices(indices);
+
+        // Shape Renderer
+        shapeRenderer = new ShapeRenderer();
 
     }
 
@@ -562,11 +565,13 @@ public class RaceScreen implements Screen {
 
         show_icon_rank();
 
+        game.batch.end();
+
         show_map(550,70);
 
         /*if(paused) fuente->show_text(280,230,"paused",0);*/
 
-        game.batch.end();
+
 
         // LOGIC ============================================
 
@@ -738,6 +743,28 @@ public class RaceScreen implements Screen {
 		else oppico->render2d(0,0,32,32,x-int((pl[i]->x)/MAPSCALE)-8,y+int((pl[i]->z)/MAPSCALE)-8,x-int((pl[i]->x)/MAPSCALE)+8,y+int((pl[i]->z)/MAPSCALE)+8,1.0);
         };
         */
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1,1,1,1);
+        // Starting line
+        shapeRenderer.line(x-8-((game.cour.nodes[0].x[1]+game.cour.nodes[0].x[2])/(MAPSCALE*2.0f)),
+            y+((game.cour.nodes[0].z[1]+game.cour.nodes[0].z[2])/(MAPSCALE*2.0f)),
+            x+8-((game.cour.nodes[0].x[1]+game.cour.nodes[0].x[2])/(MAPSCALE*2.0f)),
+            y+((game.cour.nodes[0].z[1]+game.cour.nodes[0].z[2])/(MAPSCALE*2.0f)));
+
+        for(i=0; i< game.cour.info.nsegments; i++)
+            shapeRenderer.line(x-((game.cour.nodes[i].x[1]+game.cour.nodes[i].x[2])/(MAPSCALE*2.0f)),
+                                y+((game.cour.nodes[i].z[1]+game.cour.nodes[i].z[2])/(MAPSCALE*2.0f)),
+                                x-((game.cour.nodes[(i+1)%game.cour.info.nsegments].x[1]+game.cour.nodes[(i+1)%game.cour.info.nsegments].x[2])/(MAPSCALE*2.0f)),
+                                y+((game.cour.nodes[(i+1)%game.cour.info.nsegments].z[1]+game.cour.nodes[(i+1)%game.cour.info.nsegments].z[2])/(MAPSCALE*2.0f)));
+        shapeRenderer.end();
+
+        game.batch.begin();
+        for(i=game.nplayers-1; i>=0; i--){
+            if(i<game.nhumans) game.plcursor[game.gdata.icons[i]].render2d(game.batch, 0,0,32,32,x-(int)((game.pl[i].x)/MAPSCALE)-8,y+(int)((game.pl[i].z)/MAPSCALE)-8,x-(int)((game.pl[i].x)/MAPSCALE)+8,y+(int)((game.pl[i].z)/MAPSCALE)+8,1.0f);
+		else game.oppico.render2d(game.batch, 0,0,32,32,x-(int)((game.pl[i].x)/MAPSCALE)-8,y+(int)((game.pl[i].z)/MAPSCALE)-8,x-(int)((game.pl[i].x)/MAPSCALE)+8,y+(int)((game.pl[i].z)/MAPSCALE)+8,1.0f);
+        };
+        game.batch.end();
     }
 
     void show_3d_sprite(PerspectiveCamera cam, texture tex, float u1, float v1, float u2, float v2, float x, float y, float z, float r, float g, float b, float sx, float sy, float a)

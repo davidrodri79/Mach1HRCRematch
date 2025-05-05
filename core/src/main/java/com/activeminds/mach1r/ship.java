@@ -151,7 +151,7 @@ public class ship {
 
             dif_an=da;
 
-            //if(da>=2*Math.PI/3) new_message("           wrong way!");
+            if(da>=2*Math.PI/3) new_message("           wrong way!");
 
             // Movement: Speed, acceleration
             enginef= (float) (110.0+(10.0*data.enginef));
@@ -231,7 +231,7 @@ public class ship {
         if((engwavplaying==true) && (velocity<=0.1)) {engsound->stop(); engwavplaying=false;};
         if(engwavplaying) cour.update_3d_sample(cam,x,y,z,(velocity*DSBFREQUENCY_MAX/15.0),engsound);*/
 
-        //if(velocity_kmh()>=MACH_1) new_message("       mach-1 speed reached!");
+        if(velocity_kmh()>=MACH_1) new_message("       mach-1 speed reached!");
         if(velocity_kmh()>maxspeed) maxspeed= (int) velocity_kmh();
 
         /*if((alawavplaying==false) && ((energy<(int)(MAXENERGY/4)) && (state<BURN))) {alarm->playlooped(); alawavplaying=true;};
@@ -349,10 +349,11 @@ public class ship {
             if(lap==cour.info.nlaps) {totaltime=time; raceover=true;};
             if(lap<cour.info.nlaps) lap++;
             laptime=time-laptime;
-            /*time_str(t,laptime);
-            if(lap<cour.info.nlaps) sprintf(s,"        lap %d:%s",lap,t);
-            else if((lap==cour.info.nlaps) && (!raceover)) {sprintf(s,"      final lap:%s",t); finallapflag=true;};
-            new_message(s);*/
+            t = time_str(laptime);
+            if(lap<cour.info.nlaps) s="        lap "+lap+":"+t;
+            else if((lap==cour.info.nlaps) && (!raceover)) { s="      final lap:"+t; finallapflag=true;}
+            else s="";
+            new_message(s);
         };
 
         // Manage states
@@ -395,28 +396,31 @@ public class ship {
                     switch(cour.nodes[segment].item){
 
                         case course.ENERGY : gain_energy(50);
-                            //cour.play_3d_sample(cam,x,y,z,takee); break;
+                            //cour.play_3d_sample(cam,x,y,z,takee);
+                            break;
                         case course.BOOST  : nboosts++;
-                            //cour.play_3d_sample(cam,x,y,z,takee); break;
+                            //cour.play_3d_sample(cam,x,y,z,takee);
+                            break;
 
                         case course.SHIELD : shield= (short) SHIELDDURATION;
-                            //cour.play_3d_sample(cam,x,y,z,takes); break;
+                            //cour.play_3d_sample(cam,x,y,z,takes);
+                            break;
                         case course.POWER  : power++;
-                            //new_message("           power tank");
+                            new_message("           power tank");
                             //cour.play_3d_sample(cam,x,y,z,takepow);
                             break;
                         case course.MINE   : if((shield==0) && (hypermode==0)){
-                            lose_energy(75);
-                            counter=0; state=STUN; stunforce= (int) (velocity*40);
-                            //cour.play_3d_sample(cam,x,y,z,litexpl);
-                        };
+                                lose_energy(75);
+                                counter=0; state=STUN; stunforce= (int) (velocity*40);
+                                //cour.play_3d_sample(cam,x,y,z,litexpl);
+                            };
                             break;
 
                     };
                     cour.nodes[segment].itemfade-=0.01;
                     if(power==5) {
                         hypermode= (short) HYPERDURATION;
-                        //new_message("      hyper mode reached!");
+                        new_message("      hyper mode reached!");
                         //cour.play_3d_sample(cam,x,y,z,fullpower);
                         power=0;
                     };
@@ -691,6 +695,11 @@ public class ship {
         return (float) (renderz+((data.lpos[c][0]*Math.sin(-ry+Math.PI/2f))+(data.lpos[c][2]*Math.cos(ry-Math.PI/2f))));
     }
 
+    void new_message(String t)
+    {
+        message = t;
+        messcount=240;
+    }
 
     String time_str(long t)
     {
