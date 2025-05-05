@@ -66,7 +66,7 @@ public class Main extends Game {
 
     course cour;
 
-    sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar, posnumber;
+    sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar, posnumber, speed, kmh;
     texture flame, shield, explos, smoke;
 
     ship pl[] = new ship[MAXPLAYERS];
@@ -120,7 +120,7 @@ public class Main extends Game {
     void show_menu_cursor(int x, int y)
     {
         int f,i,j;
-        f=(int)(counter/5)%16;
+        f=(int)((int)counter/5)%16;
         i=f%4;
         j=4-(int)(f/4);
         menucur.render2d(batch, i*64,j*64,(i+1)*64,(j+1)*64,x,y,x+32,y+32,1.0f);

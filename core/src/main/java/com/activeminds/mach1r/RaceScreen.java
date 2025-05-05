@@ -619,17 +619,21 @@ public class RaceScreen implements Screen {
     }
     void show_speed(int sp, int x, int y)
     {
-        /*
+
         int j,p;
-        char v[10];
+        String v;
         // Speed counter
-        sprintf(v,"%4d",sp);
+        v = ""+sp;
+        if(sp < 1000) v = " "+v;
+        if(sp < 100) v = " "+v;
+        if(sp < 10) v = " "+v;
+
         for(j=0; j<4; j++){
-            p=int(v[j]-'0');
-            if(v[j]!=' ') speed->render2d((p%4)*16,64-(16*(int(p/4)+1)),((p%4)+1)*16,64-(16*int(p/4)),x+48*j,y,x+64+48*j,y+64,1);
+            p=(int)(v.charAt(j)-'0');
+            if(v.charAt(j)!=' ') game.speed.render2d(game.batch, (p%4)*16,64-(16*((int)(p/4)+1)),((p%4)+1)*16,64-(16*(int)(p/4)),x+48*j,y,x+64+48*j,y+64,1);
         };
-        kmh->render2d(0,0,128,32,x+200,y+10,x+328,y+42,1);
-        */
+        game.kmh.render2d(game.batch, 0,0,128,32,x+200,y+10,x+328,y+42,1);
+
     }
     void show_power(int i, int x, int y, int size)
     {
