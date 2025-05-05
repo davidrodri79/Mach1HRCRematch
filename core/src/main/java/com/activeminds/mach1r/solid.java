@@ -33,6 +33,7 @@ public class solid {
         vmax = new vertex(-1000,-1000,-1000);
         vcenter = new vertex(0,0,0);
         scale[0] = 1f; scale[1] = 1f; scale[2] = 1f;
+        col_coef[0] = 1f; col_coef[1] = 1f; col_coef[2] = 1f;
     }
 
     boolean load_mesh(String file, boolean gouraud)
@@ -370,6 +371,7 @@ public class solid {
         shader.setUniformi("u_textures[3]", 3); // Dummy (no usamos)
         shader.setUniformi("u_textures[4]", 4); // Dummy (no usamos)
         shader.setUniformi("u_textures[5]", 5); // Dummy (no usamos)
+        shader.setUniformf("u_colorCoef", col_coef[0], col_coef[1], col_coef[2]);
 
         for(int i = 0; i < textures.length; i++)
             textures[i].bind(i);
@@ -458,5 +460,12 @@ public class solid {
             .getInt();
         boolean result = (boolValue != 0); // true si es distinto de 0
         return result;
+    }
+
+    public void set_color_coef(float r, float g, float b) {
+
+        col_coef[0] = r;
+        col_coef[1] = g;
+        col_coef[2] = b;
     }
 }

@@ -17,6 +17,8 @@ uniform vec3 u_fogColor;
 uniform float u_fogStart;
 uniform float u_fogEnd;
 
+uniform vec3 u_colorCoef;
+
 varying vec3 v_worldPos;
 varying vec4 v_color;
 varying vec3 v_normal;
@@ -56,7 +58,7 @@ void main() {
         lightAccum += u_lightColor[i] * diff * u_lightIntensity[i];
     }
 
-    vec3 finalColor = texColor.rgb * v_color.xyz * lightAccum;
+    vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum;
 
     // --- FOG EFFECT ---
     float dist = length(v_worldPos); // distancia al origen de cámara

@@ -2,11 +2,9 @@ package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 import java.util.ArrayList;
@@ -24,9 +22,13 @@ public class RaceScreen implements Screen {
     public static final int DISQUAL = 3;
     public static final int DEMO = 4;
 
+    public static final float DAMAGED_COL[]={1.0f,0.5f,0.5f};
+    public static final float HYPER_COL[]={0.96f,0.85f,0.04f};
+
     Main game;
-    ShaderProgram shipShader, skyShader;
+    ShaderProgram shipShader, skyShader, billboardShader;
     solid groundMesh, skyMesh;
+    Mesh billboard;
     texture ground;
 
     int state;
@@ -57,6 +59,19 @@ public class RaceScreen implements Screen {
             Gdx.app.error("Shader", "Error al compilar: " + skyShader.getLog());
         }
 
+        vertexShader = Gdx.files.internal("shader/billboard_vertex.glsl").readString();
+        fragmentShader = Gdx.files.internal("shader/billboard_fragment.glsl").readString();
+
+        ShaderProgram.pedantic = false;
+        billboardShader = new ShaderProgram(vertexShader, fragmentShader);
+
+        if (!billboardShader.isCompiled()) {
+            Gdx.app.error("Shader", "Error al compilar: " + billboardShader.getLog());
+        }
+
+
+
+
         // Ground mesh
         vertex v[] = new vertex[4];
         int TILE = 7;
@@ -74,6 +89,7 @@ public class RaceScreen implements Screen {
         groundMesh.triangles.add(new triangle(v[2], v[3], v[0], 0, GROUNDTILE, GROUNDTILE, 0f, GROUNDTILE, 0f, 0f));
         groundMesh.buildGdxMesh();
 
+        // Sky mesh
         TILE = 5;
         v[0]=new vertex(0f,course.SKYY,0f);
         v[1]=new vertex(0f,course.SKYY,(SKYWIDTH/TILE));
@@ -89,6 +105,25 @@ public class RaceScreen implements Screen {
         skyMesh.triangles.add(new triangle(v[0], v[2], v[1], r, g, b, r, g, b, r, g, b));
         skyMesh.triangles.add(new triangle(v[2], v[0], v[3], r, g, b, r, g, b, r, g, b));
         skyMesh.buildGdxMesh();
+
+        // Billboard mesh
+        billboard = new Mesh(true, 4, 6,
+            new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+            new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0")
+        );
+
+        // Quad en XY (como un sprite 2D)
+        float[] vertices = new float[] {
+            -0.5f, -0.5f, 0f, 0f, 1f,
+            0.5f, -0.5f, 0f, 1f, 1f,
+            0.5f,  0.5f, 0f, 1f, 0f,
+            -0.5f,  0.5f, 0f, 0f, 0f
+        };
+
+        short[] indices = new short[] { 0, 1, 2, 2, 3, 0 };
+
+        billboard.setVertices(vertices, 0 , 20);
+        billboard.setIndices(indices);
 
     }
 
@@ -255,6 +290,7 @@ public class RaceScreen implements Screen {
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glDepthMask(0);*/
+        Gdx.gl.glDepthMask(false);
         for(int i=game.nplayers-1; i>=0; i--)
             show_ship_flame(game.camera,game.pl[i]);
 
@@ -267,8 +303,10 @@ public class RaceScreen implements Screen {
                 show_3d_sprite(&cam,arrow->tex,0,0,1,1,pl[i]->renderx,pl[i]->y+(size/3.0),pl[i]->renderz,1.0,1.0,1.0,size/2,size/2,1.0);
             };
         };
-        glDepthMask(1);
-
+        */
+        //glDepthMask(1);
+        Gdx.gl.glDepthMask(true);
+        /*
 
         glMatrixMode (GL_PROJECTION);
         glLoadIdentity();
@@ -364,18 +402,18 @@ public class RaceScreen implements Screen {
 
         if(accelerated)
             for(i=0; i<nplayers; i++)
-                set_light(cam,i+1,pl[i]->x,pl[i]->y,pl[i]->z,pl[i]->lightcol[0],pl[i]->lightcol[1],pl[i]->lightcol[2],pl[i]->engine);
+                set_light(cam,i+1,pl[i]->x,pl[i]->y,pl[i]->z,pl[i]->lightcol[0],pl[i]->lightcol[1],pl[i]->lightcol[2],pl[i]->engine);*/
 
-        dur=int(s->energy/4.0); if(dur==0) dur=1;
-        if((s->energy<MAXENERGY/4) && (counter%dur<int(dur/3.0))){
-        s->mesh->set_color_coef(DAMAGED_COL[0],DAMAGED_COL[1],DAMAGED_COL[2]);
-        s->lowres->set_color_coef(DAMAGED_COL[0],DAMAGED_COL[1],DAMAGED_COL[2]);
+        dur=(int)(s.energy/4.0); if(dur==0) dur=1;
+        if((s.energy<ship.MAXENERGY/4) && (counter%dur<(int)(dur/3.0))){
+            s.mesh.set_color_coef(DAMAGED_COL[0],DAMAGED_COL[1],DAMAGED_COL[2]);
+            s.lowres.set_color_coef(DAMAGED_COL[0],DAMAGED_COL[1],DAMAGED_COL[2]);
         };
-        if(s->hypermode>0){
+        if(s.hypermode>0){
 
-            s->mesh->set_color_coef(HYPER_COL[0],HYPER_COL[1],HYPER_COL[2]);
-            s->lowres->set_color_coef(HYPER_COL[0],HYPER_COL[1],HYPER_COL[2]);
-        };*/
+            s.mesh.set_color_coef(HYPER_COL[0],HYPER_COL[1],HYPER_COL[2]);
+            s.lowres.set_color_coef(HYPER_COL[0],HYPER_COL[1],HYPER_COL[2]);
+        };
 
         s.render(shipShader, cam,true);
 
@@ -385,43 +423,55 @@ public class RaceScreen implements Screen {
 
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
-        glDepthMask(0);
+        glDepthMask(0);*/
 
 
-        if(s->shield>0){
+        Gdx.gl.glDepthMask(false);
+        if(s.shield>0){
+
+
+            Vector3 dir = cam.direction;
+
+            // Yaw: rotación alrededor del eje Y (horizontal)
+            float yaw = (float) Math.atan2(dir.x, dir.z);
+
+            // Pitch: rotación alrededor del eje X (vertical)
+            float pitch = (float) Math.asin(dir.y);
 
             //sz=s->data.sizez+4.0;
-            dif=fabs(s->ry-cam->ry);
-            sz=((4.0+s->data.sizex)*fabs(sin(dif)))+((4.0+s->data.sizez)*fabs(cos(dif)));
+            dif=Math.abs(s.ry-pitch);
+            sz= (float) (((4.0+s.data.sizex)*Math.abs(Math.sin(dif)))+((4.0+s.data.sizez)*Math.abs(Math.cos(dif))));
             //sy=s->data.sizey+4.0;
-            sy=((4.0+s->data.sizez)*fabs(sin(cam->rx)))+((1.0+s->data.sizey)*fabs(cos(cam->rx)));
+            sy= (float) (((4.0f+s.data.sizez)*Math.abs(Math.sin(yaw)))+((1.0f+s.data.sizey)*Math.abs(Math.cos(yaw))));
 
-            if(s->shield>80) a=1.0;
-            else a=1.0-((80-s->shield)/80.0);
-            show_3d_sprite(cam,shield,0,0,1,1,s->renderx,s->y,s->renderz,0.3125,0.5507,0.9922,sz,sy,a);
+            if(s.shield>80) a=1.0f;
+            else a=1.0f-((80-s.shield)/80.0f);
+            show_3d_sprite(cam,game.shield,0,0,1,1,s.renderx,s.y,s.renderz,0.3125f,0.5507f,0.9922f,sz,sy,a);
         };
 
         // Ship burning and destroyed
-        if((s->state>=BURN) || ((s->state==STUN) && (s->counter<=50))){
+        if((s.state>=ship.BURN) || ((s.state==ship.STUN) && (s.counter<=50))){
 
-            switch(s->state){
-                case STUN    : size=9; dur=50; t=explos; c=1.0; dy=0.0; break;
-                case BURN    : size=3; dur=20; t=explos; c=1.0; dy=0.0; break;
-                case BIGEXPL : size=15; dur=100; t=explos; c=1.0; dy=0.0; break;
-                case DESTR   : size=10; dur=60; t=smoke; c=0.0; dy=3.0; break;
+            switch(s.state){
+                case ship.STUN    : size=9; dur=50; t=game.explos; c=1.0f; dy=0.0f; break;
+                case ship.BURN    : size=3; dur=20; t=game.explos; c=1.0f; dy=0.0f; break;
+                case ship.BIGEXPL : size=15; dur=100; t=game.explos; c=1.0f; dy=0.0f; break;
+                case ship.DESTR   : size=10; dur=60; t=game.smoke; c=0.0f; dy=3.0f; break;
+                default: size=10; dur=60; t=game.smoke; c=0.0f; dy=3.0f; break;
             };
 
-            a=1.0-((s->counter%dur)*0.01);
-            i=int((s->counter%dur)*16/dur);
+            a=1.0f-((s.counter%dur)*0.01f);
+            i=(int)((s.counter%dur)*16/dur);
 
-            if(s->state!=BURN) show_3d_sprite(cam,t,0+(0.25*(i%4)),0.25+(0.25*int(i/4)),0.25+(0.25*(i%4)),0+(0.25*int(i/4)),s->renderx,s->y+dy,s->renderz,c,c,c,size,size,a);
+            if(s.state!=ship.BURN) show_3d_sprite(cam,t,0f+(0.25f*(i%4)),0.25f+(0.25f*(i/4)),0.25f+(0.25f*(i%4)),0+(0.25f*(i/4)),s.renderx,s.y+dy,s.renderz,c,c,c,size,size,a);
 		else
-            for(j=0; j<NEXPLS; j++){
-                i=int(s->expframe[j]);
-                show_3d_sprite(cam,t,0+(0.25*(i%4)),0.25+(0.25*int(i/4)),0.25+(0.25*(i%4)),0+(0.25*int(i/4)),s->exppos[j][0],s->exppos[j][1],s->exppos[j][2],1.0,1.0,1.0,size,size,1.0-(s->expframe[j]*0.05));
+            for(j=0; j<ship.NEXPLS; j++){
+                i=(int)(s.expframe[j]);
+                show_3d_sprite(cam,t,0+(0.25f*(i%4)),0.25f+(0.25f*(i/4)),0.25f+(0.25f*(i%4)),0+(0.25f*(i/4)),s.exppos[j][0],s.exppos[j][1],s.exppos[j][2],1.0f,1.0f,1.0f,size,size,1.0f-(s.expframe[j]*0.05f));
             };
         };
-        glDepthMask(1);*/
+        Gdx.gl.glDepthMask(true);
+        //glDepthMask(1);
 
     }
 
@@ -433,7 +483,7 @@ public class RaceScreen implements Screen {
         int i;
 
         for(i=0; i<s.data.nlights; i++)
-            game.show_3d_sprite(cam,shipShader,game.flame,0,0,1,1,s.light_x(i),s.light_y(i),s.light_z(i),s.lightcol[0],s.lightcol[1],s.lightcol[2],sx,sy,a);
+            show_3d_sprite(cam,game.flame,0,0,1,1,s.light_x(i),s.light_y(i),s.light_z(i),s.lightcol[0],s.lightcol[1],s.lightcol[2],sx,sy,a);
 
     }
 
@@ -483,28 +533,33 @@ public class RaceScreen implements Screen {
         glLoadIdentity();
         gluOrtho2D(0, 640, 0, 480);
         glDisable(GL_LIGHTING);
-        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_DEPTH_TEST);*/
 
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+
+        game.batch.begin();
         show_position(0,20,400);
 
-        show_speed(pl[0]->velocity_kmh(),20,10);
+        show_speed((int) game.pl[0].velocity_kmh(),20,10);
 
         show_power(0,400,340,0);
 
         //Lap count
-        sprintf(s,"LAP %d/%d",pl[0]->lap,cour->info.nlaps);
-        fuente->show_text(200,400,s,1);
-        sprintf(s,"BOOST %d",pl[0]->nboosts);
-        fuente->show_text(500,345,s,1);
+        String s = "LAP "+game.pl[0].lap+"/"+game.cour.info.nlaps;
+        game.fuente.show_text(game.batch, 200,400,s,1);
+        s = "BOOST "+game.pl[0].nboosts;
+        game.fuente.show_text(game.batch,500,345,s,1);
 
 
         show_icon_rank();
 
         show_map(550,70);
 
-        if(paused) fuente->show_text(280,230,"paused",0);*/
+        /*if(paused) fuente->show_text(280,230,"paused",0);*/
 
-
+        game.batch.end();
 
         // LOGIC ============================================
 
@@ -529,6 +584,7 @@ public class RaceScreen implements Screen {
             //if((counter==1) && (state==FINISHED)) play_voice("finished.smp");
             //if((counter==5) && (state==DISQUAL)) play_voice("badluck.smp");
             //ctr->actualiza();
+            //ctr->actualiza();
             if((counter>=300) && (game.ctr.algun_boton(game.gdata.controls[0]))){
                 game.setScreen(new RaceResultScreen(game));
                 dispose();
@@ -546,6 +602,200 @@ public class RaceScreen implements Screen {
             };
         }
     }
+
+    void show_position(int i, int x, int y)
+    {
+
+        int p;
+        // Position indicator
+        p=game.pl[i].pos-1;
+        game.posnumber.render2d(game.batch,(p%4)*16,64-(16*((int)(p/4)+1)),((p%4)+1)*16,64-(16*(int)(p/4)),x,y,x+64,y+64,1);
+        p=10;
+        game.posnumber.render2d(game.batch,32,16,48,32,x+50,y,x+114,y+64,1);
+        p=game.nplayers-1;
+        game.posnumber.render2d(game.batch,(p%4)*16,64-(16*((int)(p/4)+1)),((p%4)+1)*16,64-(16*(int)(p/4)),x+105,y,x+153,y+48,1);
+
+
+    }
+    void show_speed(int sp, int x, int y)
+    {
+        /*
+        int j,p;
+        char v[10];
+        // Speed counter
+        sprintf(v,"%4d",sp);
+        for(j=0; j<4; j++){
+            p=int(v[j]-'0');
+            if(v[j]!=' ') speed->render2d((p%4)*16,64-(16*(int(p/4)+1)),((p%4)+1)*16,64-(16*int(p/4)),x+48*j,y,x+64+48*j,y+64,1);
+        };
+        kmh->render2d(0,0,128,32,x+200,y+10,x+328,y+42,1);
+        */
+    }
+    void show_power(int i, int x, int y, int size)
+    {
+        float c1=1.0f,c2=1.0f,c3=1.0f;
+        int dur;
+
+        /*
+
+        // Energy bar & recovery
+        recover->render2d(0,48,128,64,x+60,y+100,x+60+128,y+116,1);
+        recover->render2d(0,32,24*pl[i]->power,48,x+60,y+100,x+60+24*pl[i]->power,y+116,1);
+        if((pl[i]->hypermode>0) && (int(counter/10)%2==0))
+        recover->render2d(0,16,128,32,x+60,y+100,x+188,y+116,1);
+
+        dur=int(pl[i]->energy/4.0); if(dur==0) dur=1;
+
+        if(pl[i]->hypermode>0){
+        c1=HYPER_COL[0]; c2=HYPER_COL[1]; c3=HYPER_COL[2];
+    }else if((pl[i]->energy<MAXENERGY/4) && (counter%dur<int(dur/3.0))){
+        c1=DAMAGED_COL[0]; c2=DAMAGED_COL[1]; c3=DAMAGED_COL[2];
+    }else{
+        c1=1.0; c2=1.0; c3=1.0;
+    };
+
+        if(size==0){
+            power[0]->render2dcolor(0,0,256,128,x,y,x+256,y+128,1,c1,c2,c3);
+            power[1]->render2dcolor(0,0,75+int(116*(float(pl[i]->energy)/float(MAXENERGY))),128,x,y,x+75+int(116*(float(pl[i]->energy)/float(MAXENERGY))),y+128,1,c1,c2,c3);
+        }else{
+            x-=15; y+=70;
+            spower[0]->render2dcolor(0,0,256,32,x,y,x+256,y+32,1,c1,c2,c3);
+            spower[1]->render2dcolor(0,0,75+int(116*(float(pl[i]->energy)/float(MAXENERGY))),32,x,y,x+75+int(116*(float(pl[i]->energy)/float(MAXENERGY))),y+32,1,c1,c2,c3);
+
+        };
+        */
+    }
+    void show_icon_rank()
+    {
+        int i,x,y;
+        float s=1.0f, c;
+        /*
+        for(i=0; i<nplayers; i++){
+
+            if(i<3) s=1.4-(0.2*i); else s=1.0;
+            x=70; y=300-40*i;
+            if(pl[position[i]]->state==DESTR) c=0.1; else c=1.0;
+            mini[racing_ship[position[i]]]->render2dcolor(0,0,128,128,x,y,x+61*s,y+46*s,1.0,c,c,c);
+            x=30; y=310-40*i;
+            posnumber->render2d((i%4)*16,64-(16*(int(i/4)+1)),((i%4)+1)*16,64-(16*int(i/4)),x,y,x+32,y+32,1);
+        };
+        */
+    }
+    void show_map(int x,int y)
+    {
+        int i,j,k,l;
+        /*
+
+        glMatrixMode (GL_PROJECTION);
+        glLoadIdentity();
+        glDisable(GL_DEPTH_TEST);
+        gluOrtho2D(0, 640, 0, 480);
+
+
+        glEnable(GL_LINE_SMOOTH);
+
+        glColor3f(1.0,1.0,1.0);
+
+        glLineWidth(3.0);
+        glBegin(GL_LINES);
+        // Starnting line
+        glVertex2i(x-8-((cour->nodes[0].x[1]+cour->nodes[0].x[2])/(MAPSCALE*2.0)),
+            y+((cour->nodes[0].z[1]+cour->nodes[0].z[2])/(MAPSCALE*2.0)));
+        glVertex2i(x+8-((cour->nodes[0].x[1]+cour->nodes[0].x[2])/(MAPSCALE*2.0)),
+            y+((cour->nodes[0].z[1]+cour->nodes[0].z[2])/(MAPSCALE*2.0)));
+        glEnd();
+
+        glLineWidth(2.0);
+        glBegin(GL_LINE_STRIP);
+        // Course
+        for(i=0; i<cour->info.nsegments-1; i++)
+            glVertex2i(x-((cour->nodes[i].x[1]+cour->nodes[i].x[2])/(MAPSCALE*2.0)),
+                y+((cour->nodes[i].z[1]+cour->nodes[i].z[2])/(MAPSCALE*2.0)));
+
+        glVertex2i(x-((cour->nodes[0].x[1]+cour->nodes[0].x[2])/(MAPSCALE*2.0)),
+            y+((cour->nodes[0].z[1]+cour->nodes[0].z[2])/(MAPSCALE*2.0)));
+        glEnd();
+
+        for(i=nplayers-1; i>=0; i--){
+
+            if(i<nhumans) plcursor[gdata.icons[i]]->render2d(0,0,32,32,x-int((pl[i]->x)/MAPSCALE)-8,y+int((pl[i]->z)/MAPSCALE)-8,x-int((pl[i]->x)/MAPSCALE)+8,y+int((pl[i]->z)/MAPSCALE)+8,1.0);
+		else oppico->render2d(0,0,32,32,x-int((pl[i]->x)/MAPSCALE)-8,y+int((pl[i]->z)/MAPSCALE)-8,x-int((pl[i]->x)/MAPSCALE)+8,y+int((pl[i]->z)/MAPSCALE)+8,1.0);
+        };
+        */
+    }
+
+    void show_3d_sprite(PerspectiveCamera cam, texture tex, float u1, float v1, float u2, float v2, float x, float y, float z, float r, float g, float b, float sx, float sy, float a)
+    {
+        /*vertex v1,v2,v3,v4,v5;
+        float dx=cam->x-x, dy=cam->y-y, dz=cam->z-z;
+        int i;
+
+        if(a==0.0) return;
+
+        glDisable(GL_LIGHTING);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, tex->id);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        v5.reset();
+
+        //Translation & Rotation (Object)
+        v5.translate(x,y,z);
+
+        //Translation & Rotation by the position of the camera
+        v5.translate(-cam->x,-cam->y,-cam->z);
+        v5.rotate(-cam->rx,-cam->ry,-cam->rz);
+
+        v1.nx=v5.nx-sx/2; v1.ny=v5.ny+sy/2; v1.nz=v5.nz;
+        v2.nx=v5.nx+sx/2; v2.ny=v5.ny+sy/2; v2.nz=v5.nz;
+        v3.nx=v5.nx-sx/2; v3.ny=v5.ny-sy/2; v3.nz=v5.nz;
+        v4.nx=v5.nx+sx/2; v4.ny=v5.ny-sy/2; v4.nz=v5.nz;
+
+        glBegin(GL_QUADS);
+
+        glColor4f(r,g,b,a);
+        glNormal3f(0,0,1);
+        glTexCoord2f(u1,w2);
+        glVertex3f(v1.nx,v1.ny,v1.nz);
+        glTexCoord2f(u2,w2);
+        glVertex3f(v2.nx,v2.ny,v2.nz);
+        glTexCoord2f(u2,w1);
+        glVertex3f(v4.nx,v4.ny,v4.nz);
+        glTexCoord2f(u1,w1);
+        glVertex3f(v3.nx,v3.ny,v3.nz);
+
+        glEnd();
+
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_BLEND);
+
+        RENDERED_TRIANGLES+=2;*/
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        float aspect = (float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+
+        v1 = 1.f - v1; v2 = 1.f - v2;
+
+        billboardShader.begin();
+        billboardShader.setUniformi("u_texture", 0);
+        tex.gdxTexture.bind(0);
+        billboardShader.setUniformMatrix("u_projTrans", cam.combined);
+        billboardShader.setUniformf("u_billboardPos", x, y, z); // Posición del sprite
+        billboardShader.setUniformf("u_sizeX", sx * aspect);            // Tamaño del sprite
+        billboardShader.setUniformf("u_sizeY", sy);            // Tamaño del sprite
+        billboardShader.setUniformf("u_color", r, g, b, a);
+        billboardShader.setUniformf("u_uvOffset", u1, v1);
+        billboardShader.setUniformf("u_uvSize", u2 - u1, v2 - v1);
+
+
+        billboard.render(billboardShader, GL20.GL_TRIANGLES);
+        billboardShader.end();
+
+    }
+
 
     @Override
     public void resize(int width, int height) {

@@ -66,7 +66,7 @@ public class Main extends Game {
 
     course cour;
 
-    sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar;
+    sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar, posnumber;
     texture flame, shield, explos, smoke;
 
     ship pl[] = new ship[MAXPLAYERS];
@@ -239,98 +239,6 @@ public class Main extends Game {
 
     }
 
-    void show_3d_sprite(PerspectiveCamera cam, ShaderProgram shader, texture tex, float u1, float w1, float u2, float w2, float x, float y, float z, float r, float g, float b, float sx, float sy, float a)
-    {
-        /*vertex v1,v2,v3,v4,v5;
-        float dx=cam->x-x, dy=cam->y-y, dz=cam->z-z;
-        int i;
-
-        if(a==0.0) return;
-
-        glDisable(GL_LIGHTING);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, tex->id);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        v5.reset();
-
-        //Translation & Rotation (Object)
-        v5.translate(x,y,z);
-
-        //Translation & Rotation by the position of the camera
-        v5.translate(-cam->x,-cam->y,-cam->z);
-        v5.rotate(-cam->rx,-cam->ry,-cam->rz);
-
-        v1.nx=v5.nx-sx/2; v1.ny=v5.ny+sy/2; v1.nz=v5.nz;
-        v2.nx=v5.nx+sx/2; v2.ny=v5.ny+sy/2; v2.nz=v5.nz;
-        v3.nx=v5.nx-sx/2; v3.ny=v5.ny-sy/2; v3.nz=v5.nz;
-        v4.nx=v5.nx+sx/2; v4.ny=v5.ny-sy/2; v4.nz=v5.nz;
-
-        glBegin(GL_QUADS);
-
-        glColor4f(r,g,b,a);
-        glNormal3f(0,0,1);
-        glTexCoord2f(u1,w2);
-        glVertex3f(v1.nx,v1.ny,v1.nz);
-        glTexCoord2f(u2,w2);
-        glVertex3f(v2.nx,v2.ny,v2.nz);
-        glTexCoord2f(u2,w1);
-        glVertex3f(v4.nx,v4.ny,v4.nz);
-        glTexCoord2f(u1,w1);
-        glVertex3f(v3.nx,v3.ny,v3.nz);
-
-        glEnd();
-
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_BLEND);
-
-        RENDERED_TRIANGLES+=2;*/
-
-        float[] vertices = new float[] {
-            -0.5f, -0.5f, 0, 0, 0,
-            0.5f, -0.5f, 0, 1, 0,
-            0.5f,  0.5f, 0, 1, 1,
-            -0.5f,  0.5f, 0, 0, 1
-        };
-
-        short[] indices = new short[] { 0, 1, 2, 2, 3, 0 };
-
-        Mesh billboard = new Mesh(true, 4, 6,
-            new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
-            new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0")
-        );
-        billboard.setVertices(vertices);
-        billboard.setIndices(indices);
-
-        Vector3 billboardPos = new Vector3(x, y, z);
-
-// Dirección desde el billboard a la cámara (solo en XZ)
-        Vector3 camDir = new Vector3(cam.position.x - x, 0, cam.position.z - z);
-        camDir.nor();
-
-// Ángulo en Y entre billboard y cámara (plano XZ)
-        float angleY = (float)Math.atan2(camDir.x, camDir.z); // NO usa Y
-
-// Construir la matriz modelo: solo rotación Y y posición
-        Matrix4 model = new Matrix4()
-            .idt()
-            .translate(billboardPos)
-            .rotate(Vector3.Y, (float)Math.toDegrees(angleY))
-            .scale(sx,sy,1);
-
-
-        Matrix4 MVP = new Matrix4(camera.combined).mul(model);
-
-        shader.begin();
-        shader.setUniformMatrix("u_mvp", MVP);
-        shader.setUniformi("u_texture", 0);
-        tex.gdxTexture.bind(0);
-        billboard.render(shader, GL20.GL_TRIANGLES);
-        shader.end();
-
-
-    }
 
 
     @Override

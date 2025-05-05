@@ -351,11 +351,11 @@ public class ship {
         };
 
         // Manage states
-        //if((state==PLAY) && (energy==0)) {state=BURN; startup_expls(); counter=0;};
+        if((state==PLAY) && (energy==0)) {state=BURN; startup_expls(); counter=0;};
         if((state==STUN) && (counter>=stunforce)) {state=PLAY; counter=0;};
-        //if((state==BURN) && (counter>=240)) {destroy_mesh(); state=BIGEXPL; counter=0;};
+        if((state==BURN) && (counter>=240)) {/*destroy_mesh();*/ state=BIGEXPL; counter=0;};
         if((state==BIGEXPL) && (counter>=100)) {state=DESTR; counter=0;};
-        //if((outofcourse) && (y<=course.GROUNDY+2) && (state<BURN)) {destroy_mesh(); state=BIGEXPL; counter=0;};
+        if((outofcourse) && (y<=course.GROUNDY+2) && (state<BURN)) {/*destroy_mesh();*/ state=BIGEXPL; counter=0;};
 
         //if((state==BIGEXPL) && (counter==1)) cour.play_3d_sample(cam,x,y,z,bigexpl);
         //if((state==BURN) && (counter%20==0)) {litexpl->stop(); cour.play_3d_sample(cam,x,y,z,litexpl);};
@@ -425,7 +425,7 @@ public class ship {
             gain_energy(2);
         };
 
-        //calc_light_color();
+        calc_light_color();
 
         //Camera change
         if(camchwait>0) camchwait--;
@@ -469,6 +469,31 @@ public class ship {
         //ry=an;
 
         update(cam,ctr,controlm.NOTC);
+    }
+
+    void startup_expls()
+    {
+        int i;
+
+        for(i=0; i<NEXPLS; i++){
+            exppos[i][0]=renderx-3.0f+(float)(course.rand()%6);
+            exppos[i][1]=y-3.0f+(float)(course.rand()%6);
+            exppos[i][2]=renderz-3.0f+(float)(course.rand()%6);
+            expframe[i]=3*i;
+        };
+    }
+
+    void calc_light_color()
+    {
+        float f;
+
+        // Color of waste's light
+        if(boost>80.0) f=1.0f;
+        else f=1.0f-((80-boost)/80.0f);
+        lightcol[0]=(data.light[0]*(1.0f-f))+(1.0f*f);
+        lightcol[1]=(data.light[1]*(1.0f-f))+(0.0f*f);
+        lightcol[2]=(data.light[2]*(1.0f-f))+(0.0f*f);
+
     }
 
     float optimal_direction()
