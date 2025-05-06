@@ -61,9 +61,14 @@ public class MainMenuScreen implements Screen {
                         game.setScreen(new ShipSelectSingleScreen(game));
                         dispose();
                     break;
-                    /*case 1 : game_mode=CHAMPIONSHIP; nhumans=1; set_state(CHAMP_SEL); break;
-                    case 2 : game_mode=VERSUS_R; nhumans=2; set_state(SEL_N_PLAYERS); break;
-                    case 3 : game_mode=ENDURANCE; nhumans=1; set_state(SHIP_SEL_SINGLE); pl[0]=new ship(gdata.sel_ship[0],0,NULL); break;
+                    /*case 1 : game_mode=CHAMPIONSHIP; nhumans=1; set_state(CHAMP_SEL); break;*/
+                    case 2 :
+                        game.game_mode=Main.VERSUS_R;
+                        game.nhumans=2;
+                        game.setScreen(new SelectNumPlayersScreen(game));
+                        dispose();
+                        break;
+                    /*case 3 : game_mode=ENDURANCE; nhumans=1; set_state(SHIP_SEL_SINGLE); pl[0]=new ship(gdata.sel_ship[0],0,NULL); break;
                     case 4 : set_state(OPTIONS); break;*/
                 };
         };

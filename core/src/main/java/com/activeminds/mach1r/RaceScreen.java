@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class RaceScreen implements Screen {
@@ -36,6 +37,9 @@ public class RaceScreen implements Screen {
 
     int state;
     long counter;
+    float skyc[] = new float[4], fogc[] = new float[4];
+    vertex sun;
+
 
     public RaceScreen(Main game)
     {
@@ -128,6 +132,8 @@ public class RaceScreen implements Screen {
         // Shape Renderer
         shapeRenderer = new ShapeRenderer();
 
+        sun = new vertex(0f,5000f,5000f);
+
     }
 
     void set_state(int s)
@@ -151,10 +157,10 @@ public class RaceScreen implements Screen {
             if(counter==420) wtwo->playonce();
             if(counter==480) wone->playonce();
             if(counter==560) wgo->playonce();
-        };
+        };*/
 
-        if(counter%1000==0)
-            hour_environment();*/
+        //if(counter%1000==0)
+            hour_environment();
 
         //Item cubes
         if(game.cour.counter%240==0)
@@ -215,7 +221,7 @@ public class RaceScreen implements Screen {
         */
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClearColor(course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[0], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[1], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[2], 1.f);
+        Gdx.gl.glClearColor(fogc[0], fogc[1], fogc[2], 1.f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
@@ -261,14 +267,14 @@ public class RaceScreen implements Screen {
         glEnable(GL_CULL_FACE);
         glLightfv(GL_LIGHT0,GL_DIFFUSE,diffusebackg);*/
 
-        shipShader.setUniformf("u_ambientColor", 0.1f, 0.1f, 0.1f);
+        shipShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
 
         shipShader.setUniformi("u_numLights", 1);
-        shipShader.setUniformf("u_lightPos[0]", new Vector3(3, 1000, 1000));
-        shipShader.setUniformf("u_lightColor[0]", new Vector3(1, 1, 1));
+        shipShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
+        shipShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
         shipShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
-        shipShader.setUniformf("u_fogColor", course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[0], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[1], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[2]); // gris claro
+        shipShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
         shipShader.setUniformf("u_fogStart", 10.0f);
         shipShader.setUniformf("u_fogEnd", 1000.0f);
 
@@ -344,6 +350,61 @@ public class RaceScreen implements Screen {
 
     }
 
+    void hour_environment()
+    {
+        float nightfog[]={0.0f,0.0f,0.0f},
+        daysky[]={0.0f/255.0f,191.0f/255.0f,250.0f/255.0f},
+            dawnsky[]={1.0f,128f/255.0f,0.0f},
+            nightsky[]={0.0f/255.0f,0.0f,100.0f/255.0f},
+		s1[]={0f,0f,0f}, s2[]={0f,0f,0f};
+        float hour, g = 0f, ig, a;
+        //struct tm *newtime;
+        //time_t long_time;
+        int i,j;
+
+        // Different color of sky when dawn or sunset!
+        /*time( &long_time );                // Get time as long integer.
+        newtime = localtime( &long_time ); // Convert to local time.
+        hour = (float) (newtime->tm_hour + (newtime->tm_min/60.0));*/
+
+        LocalTime ahora = LocalTime.now();
+        int hora = ahora.getHour();
+        int minuto = ahora.getMinute();
+
+        hour = hora + (minuto / 60f);
+
+       /* hour = game.cour.counter / 60f;
+        while (hour >= 24.f)
+        {
+            hour -=24.f;
+        }*/
+
+        switch(game.gdata.daytime){
+            case 1 : hour=12.0f; break;
+            case 2 : hour=19.30f; break;
+            case 3 : hour=22.0f; break;
+        };
+
+        if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
+        if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}
+        if((hour>=6.0) && (hour<=8.0)) {g=((hour-6.0f)/2.0f); s1=daysky; s2=nightsky;}
+        if((hour>=18.0) && (hour<=19.5)) {g=1.0f-((hour-18.0f)/1.5f); s1=daysky; s2=dawnsky;}
+        if((hour>=19.5) && (hour<=21.0)) {g=1.0f-((hour-19.5f)/1.5f); s1=dawnsky; s2=nightsky;}
+        ig=1.0f-g;
+        for(i=0; i<3; i++) skyc[i]=(s1[i]*g)+(s2[i]*ig); skyc[3]=1.0f;
+
+        if((hour>8.0) && (hour<18.0)) g=1.0f;
+        if((hour<6.0) || (hour>20.0)) g=0.0f;
+        if((hour>=6.0) && (hour<=8.0)) g=((hour-6.0f)/2.0f);
+        if((hour>=18.0) && (hour<=21.0)) g=1.0f-((hour-18.0f)/3.0f);
+        for(i=0; i<3; i++) fogc[i]=(course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[i]*g)+(nightfog[i]*ig); fogc[3]=1.0f;
+
+        //Sun position!
+
+        a=((hour-7.0f)/12.0f)*3.1415f;
+        sun=new vertex((float) (-5000f*Math.cos(a)), (float) Math.abs(5000f*Math.sin(a)),0f);
+    }
+
     float nearest(int n, int m)
     {
         return n-(n%m);
@@ -376,7 +437,8 @@ public class RaceScreen implements Screen {
         int i,x,z;
 
         skyShader.begin();
-        skyShader.setUniformf("u_fogColor", course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[0], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[1], course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[2]); // gris claro
+        skyShader.setUniformf("u_meshColor", skyc[0], skyc[1], skyc[2]);
+        skyShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
         skyShader.setUniformf("u_fogStart", 10.0f);
         skyShader.setUniformf("u_fogEnd", 1000.0f);
 

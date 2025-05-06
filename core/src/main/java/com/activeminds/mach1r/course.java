@@ -95,6 +95,19 @@ public class course {
         solid mesh;
     }
 
+    public static final String ctype_name[]={
+        "slippery run",
+            "jumping run",
+            "leap and slide",
+            "highway run",
+            "sliding highway",
+            "blind jumps",
+            "tracherous course",
+            "fatal slides",
+            "nightmare run",
+            "mach 1 speedway"
+    };
+
     public course_info info;
     node[] nodes;
     int counter;
@@ -415,52 +428,51 @@ public class course {
                 case JUMP    : tx=0; ty=3*TDY; break;
             };
 
-
-             /*
-            glTexCoord2f(tx+4*TDX,ty);
-			glVertex3f(v1[0].nx,v1[0].ny,v1[0].nz);  A
-			glTexCoord2f(tx+4*TDX,ty+2*TDY);
-			glVertex3f(v2[0].nx,v2[0].ny,v2[0].nz);  B
-			glTexCoord2f(tx+3*TDX,ty);
-			glVertex3f(v1[1].nx,v1[1].ny,v1[1].nz);  C
-			glTexCoord2f(tx+3*TDX,ty+2*TDY);
-			glVertex3f(v2[1].nx,v2[1].ny,v2[1].nz);  D
-			glTexCoord2f(tx+TDX,ty);
-			glVertex3f(v1[2].nx,v1[2].ny,v1[2].nz);  E
-			glTexCoord2f(tx+TDX,ty+2*TDY);
-			glVertex3f(v2[2].nx,v2[2].ny,v2[2].nz);	 F
-			glTexCoord2f(tx,ty);
-			glVertex3f(v1[3].nx,v1[3].ny,v1[3].nz);  G
-			glTexCoord2f(tx,ty+2*TDY);
-			glVertex3f(v2[3].nx,v2[3].ny,v2[3].nz);	 H
-            */
-            nodes[i].mesh.addQuadFromStripe( v1[0], v2[0], v1[1], v2[1], 0, tx+4*TDX,ty, tx+4*TDX,ty+2*TDY, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY);
-            nodes[i].mesh.addQuadFromStripe( v1[1], v2[1], v1[2], v2[2], 0, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY, tx+TDX,ty, tx+TDX,ty+2*TDY);
-            nodes[i].mesh.addQuadFromStripe( v1[2], v2[2], v1[3], v2[3], 0, tx+TDX,ty, tx+TDX,ty+2*TDY, tx,ty, tx,ty+2*TDY);
-
-            /*
-            glVertex3f(v1[3].nx,v1[3].ny,v1[3].nz);
-			glVertex3f(v2[3].nx,v2[3].ny,v2[3].nz);
-			glVertex3f(v1[4].nx,v1[4].ny,v1[4].nz);
-			glVertex3f(v2[4].nx,v2[4].ny,v2[4].nz);
-			glVertex3f(v1[5].nx,v1[5].ny,v1[5].nz);
-			glVertex3f(v2[5].nx,v2[5].ny,v2[5].nz);
-			glVertex3f(v1[0].nx,v1[0].ny,v1[0].nz);
-			glVertex3f(v2[0].nx,v2[0].ny,v2[0].nz);
-             */
-
             float r = scenes.course_scenes.get(info.scene).roadcolor[0];
             float g = scenes.course_scenes.get(info.scene).roadcolor[1];
             float b = scenes.course_scenes.get(info.scene).roadcolor[2];
 
-            nodes[i].mesh.addQuadFromStripe(v1[3], v2[3], v1[4], v2[4], r, g, b);
-            nodes[i].mesh.addQuadFromStripe(v1[4], v2[4], v1[5], v2[5], r, g, b);
-            nodes[i].mesh.addQuadFromStripe(v1[5], v2[5], v1[0], v2[0], r, g, b);
+            switch(nodes[i].type) {
+                case EMPTY : break;
+
+                case NOBORDER:
+                case NBICE:
+                    nodes[i].mesh.addQuadFromStripe(v1[1], v2[1], v1[2], v2[2], 0, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY, tx+TDX,ty, tx+TDX,ty+2*TDY);
+                    nodes[i].mesh.addQuadFromStripe(v1[2], v2[2], v1[4], v2[4], r, g, b);
+                    nodes[i].mesh.addQuadFromStripe(v1[4], v2[4], v1[5], v2[5], r, g, b);
+                    nodes[i].mesh.addQuadFromStripe(v1[5], v2[5], v1[1], v2[1], r, g, b);
+                    break;
+
+                case JUMP:
+                    nodes[i].mesh.addQuadFromStripe(v1[0], v2[6], v1[1], new vertex(v2[1].x,v2[6].y,v2[1].z), 0, tx+4*TDX,ty, tx+4*TDX,ty+2*TDY, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY);
+                    nodes[i].mesh.addQuadFromStripe(v1[1], new vertex(v2[1].x,v2[6].y,v2[1].z), v1[2], new vertex(v2[2].x,v2[8].y,v2[2].z), 0, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY, tx+TDX,ty, tx+TDX,ty+2*TDY);
+                    nodes[i].mesh.addQuadFromStripe(v1[2], new vertex(v2[2].x,v2[8].y,v2[2].z), v1[3], v2[8], 0, tx+4*TDX,ty, tx+4*TDX,ty+2*TDY, tx+3*TDX,ty, tx+3*TDX,ty+2*TDY);
+                    nodes[i].mesh.addQuadFromStripe(v1[3], v2[8], v1[4], v2[4], r, g, b);
+                    nodes[i].mesh.addQuadFromStripe(v1[4], v2[4], v1[5], v2[5], r, g, b);
+                    nodes[i].mesh.addQuadFromStripe(v1[5], v2[5], v1[0], v2[6], r, g, b);
+                    nodes[i].mesh.addQuadFromStripe(v2[5], v2[4], v2[6], v2[8], r, g, b);
+                    break;
+
+                default:
+                    nodes[i].mesh.addQuadFromStripe(v1[0], v2[0], v1[1], v2[1], 0, tx + 4 * TDX, ty, tx + 4 * TDX, ty + 2 * TDY, tx + 3 * TDX, ty, tx + 3 * TDX, ty + 2 * TDY);
+                    nodes[i].mesh.addQuadFromStripe(v1[1], v2[1], v1[2], v2[2], 0, tx + 3 * TDX, ty, tx + 3 * TDX, ty + 2 * TDY, tx + TDX, ty, tx + TDX, ty + 2 * TDY);
+                    nodes[i].mesh.addQuadFromStripe(v1[2], v2[2], v1[3], v2[3], 0, tx + TDX, ty, tx + TDX, ty + 2 * TDY, tx, ty, tx, ty + 2 * TDY);
+                    nodes[i].mesh.addQuadFromStripe(v1[3], v2[3], v1[4], v2[4], r, g, b);
+                    nodes[i].mesh.addQuadFromStripe(v1[4], v2[4], v1[5], v2[5], r, g, b);
+                    nodes[i].mesh.addQuadFromStripe(v1[5], v2[5], v1[0], v2[0], r, g, b);
+                    break;
+            }
+
+            if(nodes[i].type==TUNNEL){
+
+                nodes[i].mesh.addQuadFromStripeDoubleSided(v1[0], v2[0], v1[6], v2[6], 0, 0, 6*TDY, 0, 8*TDY, TDX, 6*TDY, TDX, 8*TDY);
+                nodes[i].mesh.addQuadFromStripeDoubleSided(v1[6], v2[6], v1[7], v2[7], 0,  TDX, 6*TDY, TDX, 8*TDY, 2*TDX, 6*TDY, 2*TDX, 8*TDY);
+                nodes[i].mesh.addQuadFromStripeDoubleSided(v1[7], v2[7], v1[8], v2[8], 0, 2*TDX, 6*TDY, 2*TDX, 8*TDY, 3*TDX,6*TDY, 3*TDX,8*TDY);
+                nodes[i].mesh.addQuadFromStripeDoubleSided(v1[8], v2[8], v1[3], v2[3], 0, 3*TDX,6*TDY, 3*TDX,8*TDY, 4*TDX,6*TDY, 4*TDX,8*TDY);
+            }
 
             nodes[i].mesh.buildGdxMesh();
         }
-
-
 
     }
 

@@ -135,11 +135,11 @@ public class StartupScreen implements Screen {
                 game.wallp=new sprite(128,128,"sprite/wallp.png");
                 game.title[0]=new sprite(256,256,"sprite/title1.png",false);
                 game.title[1]=new sprite(256,256,"sprite/title2.png",false);
-                /*for(i=0; i<6; i++){
-                    sprintf(s,"scene\\%spr",scenes[i].name);
-                    preview[i]=new sprite(128,128,s);
+                for(int i=0; i<6; i++){
+                    String s="scene/"+course.scenes.course_scenes.get(i).name+"pr.png";
+                    game.preview[i]=new sprite(128,128,s);
                 };
-                shadow=new texture("sprite\\shade",TEX_PCX,FALSE,TRUE);*/
+                /*shadow=new texture("sprite\\shade",TEX_PCX,FALSE,TRUE);*/
                 for(int i=0; i<Main.NSHIPS; i++){
                     String s = "model/"+ship.models.ships.get(i).file+"sm.png";
                     game.mini[i]=new sprite(128,128,s);

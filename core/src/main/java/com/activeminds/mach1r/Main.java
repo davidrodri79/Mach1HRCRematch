@@ -63,7 +63,8 @@ public class Main extends Game {
     course cour;
 
     sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar, posnumber, speed, kmh,
-        mini[] = new sprite[NSHIPS], power[] = new sprite[2], spower[] = new sprite[2], recover, start[] = new sprite[4], plcursor[] = new sprite[10], arrow, oppico;
+        mini[] = new sprite[NSHIPS], power[] = new sprite[2], spower[] = new sprite[2], recover, start[] = new sprite[4], plcursor[] = new sprite[10],
+        arrow, oppico, preview[] = new sprite[6];
     texture flame, shield, explos, smoke;
 
     ship pl[] = new ship[MAXPLAYERS];

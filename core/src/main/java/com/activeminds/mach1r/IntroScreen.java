@@ -55,11 +55,11 @@ public class IntroScreen implements Screen {
 
         shader.begin();
 
-        shader.setUniformf("u_ambientColor", 0f, 0f, 0f);
+        shader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
 
         shader.setUniformi("u_numLights", 1);
         shader.setUniformf("u_lightPos[0]", new Vector3(3, 1000, 1000));
-        shader.setUniformf("u_lightColor[0]", new Vector3(1, 1, 1));
+        shader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
         shader.setUniformf("u_lightIntensity[0]", 1.0f);
 
         shader.setUniformf("u_fogColor", 0f, 0f, 0f); // gris claro
