@@ -144,7 +144,7 @@ public class StartupScreen implements Screen {
                     String s = "model/"+ship.models.ships.get(i).file+"sm.png";
                     game.mini[i]=new sprite(128,128,s);
                 };
-                /*mistery=new sprite(128,128,"sprite\\mistery");*/
+                game.mistery=new sprite(128,128,"sprite/mistery.png");
                 int i=0;
                 while(i<10){
                     String s = "cursor/c"+(i+1)+".png";

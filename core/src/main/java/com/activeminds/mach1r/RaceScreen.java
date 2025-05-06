@@ -3,6 +3,7 @@ package com.activeminds.mach1r;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
@@ -34,6 +35,11 @@ public class RaceScreen implements Screen {
     texture ground;
 
     ShapeRenderer shapeRenderer;
+    PerspectiveCamera cameraSingle;
+    PerspectiveCamera cameras2p[] = new PerspectiveCamera[2];
+    PerspectiveCamera cameras4p[] = new PerspectiveCamera[4];
+    SpriteBatch splitScreenBatch;
+    OrthographicCamera splitScreenCamera2d;
 
     int state;
     long counter;
@@ -129,6 +135,16 @@ public class RaceScreen implements Screen {
         billboard.setVertices(vertices, 0 , 20);
         billboard.setIndices(indices);
 
+        cameraSingle = new PerspectiveCamera(67,  Gdx.graphics.getWidth(),  Gdx.graphics.getHeight());
+        for(int i = 0; i < 2; i++)
+            cameras2p[i] = new PerspectiveCamera(67,  Gdx.graphics.getWidth(),  (float) Gdx.graphics.getHeight() / 2);
+        for(int i = 0; i < 4; i++)
+            cameras4p[i] = new PerspectiveCamera(67,  (float) Gdx.graphics.getWidth() / 2,  (float) Gdx.graphics.getHeight() / 2);
+
+        splitScreenBatch = new SpriteBatch();
+        splitScreenCamera2d = new OrthographicCamera();
+        splitScreenCamera2d.setToOrtho(false,  800, 600);
+
         // Shape Renderer
         shapeRenderer = new ShapeRenderer();
 
@@ -175,14 +191,14 @@ public class RaceScreen implements Screen {
 
         for(int i=0; i<game.nhumans; i++){
             //cam.look_at(pl[i]->cam_pos.x,pl[i]->cam_pos.y,pl[i]->cam_pos.z,pl[i]->vrp.x,pl[i]->vrp.y,pl[i]->vrp.z);
-            if(game.pl[i].raceover) game.pl[i].ia_update(game.camera,game.ctr);
+            if(game.pl[i].raceover) game.pl[i].ia_update(null,game.ctr);
 		else
-            game.pl[i].update(game.camera,game.ctr,game.gdata.controls[i]);
+            game.pl[i].update(null,game.ctr,game.gdata.controls[i]);
             //if(pl[i]->finallapflag) { play_voice("finallap.smp"); pl[i]->finallapflag=FALSE;};
         };
 
         for(int i=game.nhumans; i<game.nplayers; i++)
-            game.pl[i].ia_update(game.camera,game.ctr);
+            game.pl[i].ia_update(null,game.ctr);
 
         for(int i=0; i<game.nplayers; i++)
             for(int j=0; j<game.nplayers; j++)
@@ -208,7 +224,7 @@ public class RaceScreen implements Screen {
                 };
     }
 
-    void show_level_action(int follow)
+    void show_level_action(int follow, PerspectiveCamera cam, int vpx, int vpy, int vpw, int vph)
     {
         /*float ry, size;
         int i,j,l;
@@ -220,18 +236,16 @@ public class RaceScreen implements Screen {
         GLfloat diffusebackg[] = { 0.8f, 0.8f, 0.8f, 1.0f };
         */
 
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClearColor(fogc[0], fogc[1], fogc[2], 1.f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glViewport(vpx, vpy, vpw, vph);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
-        game.camera.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y, game.pl[follow].cam_pos.z);
-        game.camera.lookAt(game.pl[follow].vrp.x, game.pl[follow].vrp.y, game.pl[follow].vrp.z);
-        game.camera.up.set(0, 1, 0);
-        game.camera.near = 0.1f;
-        game.camera.far = 10000f;
-        game.camera.update();
+        cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y, game.pl[follow].cam_pos.z);
+        cam.lookAt(game.pl[follow].vrp.x, game.pl[follow].vrp.y, game.pl[follow].vrp.z);
+        cam.up.set(0, 1, 0);
+        cam.near = 0.1f;
+        cam.far = 10000f;
+        cam.update();
 
         /*
         cam.look_at(pl[follow]->cam_pos.x,pl[follow]->cam_pos.y,pl[follow]->cam_pos.z,pl[follow]->vrp.x,pl[follow]->vrp.y,pl[follow]->vrp.z);
@@ -256,9 +270,9 @@ public class RaceScreen implements Screen {
         if(game.gdata.skygrfog){
 
             //glEnable(GL_FOG);
-            show_sky();
+            show_sky(cam);
         };
-        show_ground();
+        show_ground(cam);
 
         /*glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -281,7 +295,7 @@ public class RaceScreen implements Screen {
         int l=30+(15*game.gdata.drawdist);
         if (game.nhumans>1) l= (int) (0.75*l);
 
-        game.cour.render(shipShader, game.camera,game.pl[follow].segment, (long) game.counter,l);
+        game.cour.render(shipShader,cam,game.pl[follow].segment, (long) game.counter,l);
 
         /*//Ships
         if(accelerated){
@@ -292,7 +306,7 @@ public class RaceScreen implements Screen {
         };*/
 
         for(int i=game.nplayers-1; i>=0; i--)
-            show_ship(game.camera,game.pl[i]);
+            show_ship(cam,game.pl[i]);
 
         // The fuel wastes
         /*glDisable(GL_FOG);
@@ -301,18 +315,18 @@ public class RaceScreen implements Screen {
         glDepthMask(0);*/
         Gdx.gl.glDepthMask(false);
         for(int i=game.nplayers-1; i>=0; i--)
-            show_ship_flame(game.camera,game.pl[i]);
+            show_ship_flame(cam,game.pl[i]);
 
-        /*// Opponent cursor in versus
-        glDisable(GL_CULL_FACE);
-        for(i=0; i<nhumans; i++){
-            size=0.1*sqrt(pl[i]->dist);
-            if((i!=follow) && (pl[i]->dist>200*200) && (pl[i]->dist<1000*1000)){
-                show_3d_sprite(&cam,plcursor[gdata.icons[i]]->tex,0,0,1,1,pl[i]->renderx,pl[i]->y+(size*1.1),pl[i]->renderz,1.0,1.0,1.0,size,size,1.0);
-                show_3d_sprite(&cam,arrow->tex,0,0,1,1,pl[i]->renderx,pl[i]->y+(size/3.0),pl[i]->renderz,1.0,1.0,1.0,size/2,size/2,1.0);
+        // Opponent cursor in versus
+        //glDisable(GL_CULL_FACE);
+        for(int i=0; i<game.nhumans; i++){
+            float size= (float) (0.1f*Math.sqrt(game.pl[i].dist));
+            if((i!=follow) && (game.pl[i].dist>200*200) && (game.pl[i].dist<1000*1000)){
+                show_3d_sprite(cam,game.plcursor[game.gdata.icons[i]].texture,0,1,1,0,game.pl[i].renderx,game.pl[i].y+(size*1.1f),game.pl[i].renderz,1.0f,1.0f,1.0f,size,size,1.0f);
+                show_3d_sprite(cam,game.arrow.texture,0,1,1,0,game.pl[i].renderx,game.pl[i].y+(size/3.0f),game.pl[i].renderz,1.0f,1.0f,1.0f,size/2,size/2,1.0f);
             };
         };
-        */
+
         //glDepthMask(1);
         Gdx.gl.glDepthMask(true);
         /*
@@ -409,21 +423,21 @@ public class RaceScreen implements Screen {
     {
         return n-(n%m);
     }
-    void show_ground()
+    void show_ground(PerspectiveCamera cam)
     {
         float gx, gz, TILE=7;
         int i,x,z;
 
-        gx=nearest((int) game.camera.position.x, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
-        gz=nearest((int) game.camera.position.z, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
+        gx=nearest((int) cam.position.x, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
+        gz=nearest((int) cam.position.z, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
 
         for(x=0; x<TILE; x++){
 
-            gz=nearest((int) game.camera.position.z, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
+            gz=nearest((int) cam.position.z, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
 
             for(z=0; z<TILE; z++){
 
-                groundMesh.render(shipShader, game.camera, gx, 0f, gz, 0f, 0f, 0f);
+                groundMesh.render(shipShader, cam, gx, 0f, gz, 0f, 0f, 0f);
                 gz+=GROUNDWIDTH/TILE;
             };
 
@@ -431,7 +445,7 @@ public class RaceScreen implements Screen {
         };
     }
 
-    void show_sky()
+    void show_sky(PerspectiveCamera cam)
     {
         float gx, gz, TILE=5;
         int i,x,z;
@@ -442,16 +456,16 @@ public class RaceScreen implements Screen {
         skyShader.setUniformf("u_fogStart", 10.0f);
         skyShader.setUniformf("u_fogEnd", 1000.0f);
 
-        gx=nearest((int) game.camera.position.x, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
-        gz=nearest((int) game.camera.position.z, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
+        gx=nearest((int) cam.position.x, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
+        gz=nearest((int) cam.position.z, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
 
         for(x=0; x<TILE; x++){
 
-            gz=nearest((int) game.camera.position.z, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
+            gz=nearest((int) cam.position.z, (int) (SKYWIDTH/GROUNDTILE))-(SKYWIDTH/2);
 
             for(z=0; z<TILE; z++){
 
-                skyMesh.render(skyShader, game.camera, gx, 0f, gz, 0f, 0f, 0f);
+                skyMesh.render(skyShader, cam, gx, 0f, gz, 0f, 0f, 0f);
                 gz+=SKYWIDTH/TILE;
             };
 
@@ -583,6 +597,9 @@ public class RaceScreen implements Screen {
     public void render(float delta) {
 
         counter++;
+
+        // 3D Layer : Scene ====================================================
+
         /*
         if(gdata.skygrfog)
             glEnable(GL_FOG);
@@ -599,37 +616,153 @@ public class RaceScreen implements Screen {
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();*/
-        show_level_action(0);
 
-        /*glMatrixMode (GL_PROJECTION);
-        glLoadIdentity();
-        gluOrtho2D(0, 640, 0, 480);
-        glDisable(GL_LIGHTING);
-        glDisable(GL_DEPTH_TEST);*/
+        Gdx.gl.glClearColor(fogc[0], fogc[1], fogc[2], 1.f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+        if (state == SINGLE) {
+            show_level_action(0, cameraSingle, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        } else if (state == VERSUS) {
+            if (game.nhumans == 2) {
+                show_level_action(0, cameras2p[0], 0, Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()/2);
+                show_level_action(1, cameras2p[1], 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()/2);
+            }
+            else if (game.nhumans >= 3)
+            {
+                show_level_action(0, cameras4p[0], 0, Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()/2);
+                show_level_action(1, cameras4p[1], Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()/2);
+                show_level_action(2, cameras4p[2], 0, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()/2);
+                if(game.nhumans == 4)
+                {
+                    show_level_action(3, cameras4p[3], Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()/2);
+                }
+            }
+        } else if (state == DEMO) {
+            show_level_action(0, cameraSingle, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        }
+
+        // 2D Layer: HUD =================================================================================
+
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 
-        game.batch.begin();
-        show_position(0,20,400);
+        if(state == SINGLE)
+        {
+            game.batch.begin();
+            show_position(game.batch,0, 20, 400);
 
-        show_speed((int) game.pl[0].velocity_kmh(),20,10);
+            show_speed(game.batch, (int) game.pl[0].velocity_kmh(), 20, 10);
 
-        show_power(0,400,340,0);
+            show_power(game.batch,0, 400, 340, 0);
 
-        //Lap count
-        String s = "LAP "+game.pl[0].lap+"/"+game.cour.info.nlaps;
-        game.fuente.show_text(game.batch, 200,400,s,1);
-        s = "BOOST "+game.pl[0].nboosts;
-        game.fuente.show_text(game.batch,500,345,s,1);
+            //Lap count
+            String s = "LAP " + game.pl[0].lap + "/" + game.cour.info.nlaps;
+            game.fuente.show_text(game.batch, 200, 400, s, 1);
+            s = "BOOST " + game.pl[0].nboosts;
+            game.fuente.show_text(game.batch, 500, 345, s, 1);
+
+            show_icon_rank();
+
+            game.batch.end();
+
+            show_map(550, 70);
+        }
+        else if(state == VERSUS)
+        {
+            if(game.nhumans == 2)
+            {
+                game.batch.begin();
+
+                show_position(game.batch,0, 0, 410);
+                show_speed(game.batch,(int) game.pl[0].velocity_kmh(), 0, 240);
+                show_power(game.batch,0, 420, 350, 0);
+                String s = "BOOST " + game.pl[0].nboosts;
+                game.fuente.show_text(game.batch, 520, 357, s, 1);
+                s = "LAP " + game.pl[0].lap + "/" + game.cour.info.nlaps;
+                game.fuente.show_text(game.batch, 200, 455, s, 1);
+
+                show_position(game.batch,1, 0, 10);
+                show_speed(game.batch,(int) game.pl[1].velocity_kmh(), 0, 176);
+                show_power(game.batch,1, 420, 5, 0);
+                s = "BOOST " + game.pl[0].nboosts;
+                game.fuente.show_text(game.batch, 520, 12, s, 1);
+                s = "LAP " + game.pl[1].lap + "/" + game.cour.info.nlaps;
+                game.fuente.show_text(game.batch, 200, 10, s, 1);
+
+                game.batch.end();
+
+                show_map(550, 240);
+            }
+            else if(game.nhumans>=3){
 
 
-        show_icon_rank();
+               splitScreenCamera2d.update();
+               splitScreenBatch.setProjectionMatrix(splitScreenCamera2d.combined);
+               splitScreenBatch.begin();
 
-        game.batch.end();
+                show_position(splitScreenBatch, 0,0,530);
+                show_speed(splitScreenBatch, (int) game.pl[0].velocity_kmh(),0,295);
+                show_power(splitScreenBatch, 0,200,470,1);
 
-        show_map(550,70);
+                show_position(splitScreenBatch, 1,630,530);
+                show_speed(splitScreenBatch, (int) game.pl[1].velocity_kmh(),470,295);
+                show_power(splitScreenBatch, 1,360,470,1);
+
+                show_position(splitScreenBatch, 2,0,10);
+                show_speed(splitScreenBatch, (int) game.pl[2].velocity_kmh(),0,240);
+                show_power(splitScreenBatch, 2,200,-40,1);
+
+                if(game.nhumans==4) {
+                    show_position(splitScreenBatch, 3, 630, 10);
+                    show_speed(splitScreenBatch, (int) game.pl[3].velocity_kmh(), 470, 240);
+                    show_power(splitScreenBatch, 3, 360, -40, 1);
+                }
+                splitScreenBatch.end();
+
+                game.camera2d.update();
+                game.batch.setProjectionMatrix(game.camera2d.combined);
+                game.batch.begin();
+
+                String s = "BOOST "+game.pl[0].nboosts;
+                game.fuente.show_text(game.batch,207,418,s,1);
+                s = game.pl[0].lap+"/"+game.cour.info.nlaps;
+                game.fuente.show_text(game.batch,145,455,s,1);
+
+                s="BOOST "+game.pl[1].nboosts;
+                game.fuente.show_text(game.batch, 335,418,s,1);
+                s = game.pl[1].lap+"/"+game.cour.info.nlaps;
+                game.fuente.show_text(game.batch, 450,455,s,1);
+
+                s = "BOOST "+game.pl[2].nboosts;
+                game.fuente.show_text(game.batch, 207,10,s,1);
+                s = game.pl[2].lap+"/"+game.cour.info.nlaps;
+                game.fuente.show_text(game.batch, 145,10,s,1);
+
+                if(game.nhumans==4){
+                    s = "BOOST "+game.pl[3].nboosts;
+                    game.fuente.show_text(game.batch,335,10,s,1);
+                    s =  game.pl[3].lap+"/"+game.cour.info.nlaps;
+                    game.fuente.show_text(game.batch,450,10,s,1);
+                }
+                game.batch.end();
+
+                if(game.nhumans==3)
+                {
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                    shapeRenderer.setColor(0f,0f,0f, 1f);
+                    shapeRenderer.rect(Gdx.graphics.getWidth()/2, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+                    shapeRenderer.end();
+                    show_map(480,120);
+                }
+                else
+                {
+                    show_map(320,240);
+                }
+            };
+
+        }
 
         /*if(paused) fuente->show_text(280,230,"paused",0);*/
 
@@ -649,7 +782,12 @@ public class RaceScreen implements Screen {
         }
         else if (state == VERSUS)
         {
-
+            //if(!paused)
+                update_level_action();
+            //else if ((ctr->algun_boton(TEC1)) || (ctr->algun_boton(gdata.controls[0]))) paused=FALSE;
+            if(all_finished()) set_state(FINISHED);
+            //if(ctr->tecla(DIK_ESCAPE)) {set_state(RACE_RESULT);};
+            //if((ctr->tecla(DIK_F5)) && (cour->counter>360)) {paused=TRUE;};
         }
         else if (state == FINISHED || state == DISQUAL)
         {
@@ -677,21 +815,32 @@ public class RaceScreen implements Screen {
         }
     }
 
-    void show_position(int i, int x, int y)
+    boolean all_finished()
+    {
+        boolean a=true;
+        int i;
+
+        for(i=0; i<game.nhumans; i++)
+            if(((game.pl[i].raceover) || (game.pl[i].state==ship.DESTR)) && (a))
+        a=true; else a=false;
+        return a;
+    }
+
+    void show_position(SpriteBatch batch, int i, int x, int y)
     {
 
         int p;
         // Position indicator
         p=game.pl[i].pos-1;
-        game.posnumber.render2d(game.batch,(p%4)*16,64-(16*((int)(p/4)+1)),((p%4)+1)*16,64-(16*(int)(p/4)),x,y,x+64,y+64,1);
+        game.posnumber.render2d(batch,(p%4)*16,64-(16*((int)(p/4)+1)),((p%4)+1)*16,64-(16*(int)(p/4)),x,y,x+64,y+64,1);
         p=10;
-        game.posnumber.render2d(game.batch,32,16,48,32,x+50,y,x+114,y+64,1);
+        game.posnumber.render2d(batch,32,16,48,32,x+50,y,x+114,y+64,1);
         p=game.nplayers-1;
-        game.posnumber.render2d(game.batch,(p%4)*16,64-(16*((int)(p/4)+1)),((p%4)+1)*16,64-(16*(int)(p/4)),x+105,y,x+153,y+48,1);
+        game.posnumber.render2d(batch,(p%4)*16,64-(16*((int)(p/4)+1)),((p%4)+1)*16,64-(16*(int)(p/4)),x+105,y,x+153,y+48,1);
 
 
     }
-    void show_speed(int sp, int x, int y)
+    void show_speed(SpriteBatch batch, int sp, int x, int y)
     {
 
         int j,p;
@@ -704,21 +853,21 @@ public class RaceScreen implements Screen {
 
         for(j=0; j<4; j++){
             p=(int)(v.charAt(j)-'0');
-            if(v.charAt(j)!=' ') game.speed.render2d(game.batch, (p%4)*16,64-(16*((int)(p/4)+1)),((p%4)+1)*16,64-(16*(int)(p/4)),x+48*j,y,x+64+48*j,y+64,1);
+            if(v.charAt(j)!=' ') game.speed.render2d(batch, (p%4)*16,64-(16*((int)(p/4)+1)),((p%4)+1)*16,64-(16*(int)(p/4)),x+48*j,y,x+64+48*j,y+64,1);
         };
-        game.kmh.render2d(game.batch, 0,0,128,32,x+200,y+10,x+328,y+42,1);
+        game.kmh.render2d(batch, 0,0,128,32,x+200,y+10,x+328,y+42,1);
 
     }
-    void show_power(int i, int x, int y, int size)
+    void show_power(SpriteBatch batch, int i, int x, int y, int size)
     {
         float c1=1.0f,c2=1.0f,c3=1.0f;
         int dur;
 
         // Energy bar & recovery
-        game.recover.render2d(game.batch,0,48,128,64,x+60,y+100,x+60+128,y+116,1);
-        game.recover.render2d(game.batch,0,32,24*game.pl[i].power,48,x+60,y+100,x+60+24*game.pl[i].power,y+116,1);
+        game.recover.render2d(batch,0,48,128,64,x+60,y+100,x+60+128,y+116,1);
+        game.recover.render2d(batch,0,32,24*game.pl[i].power,48,x+60,y+100,x+60+24*game.pl[i].power,y+116,1);
         if((game.pl[i].hypermode>0) && ((int)(counter/10)%2==0))
-            game.recover.render2d(game.batch,0,16,128,32,x+60,y+100,x+188,y+116,1);
+            game.recover.render2d(batch,0,16,128,32,x+60,y+100,x+188,y+116,1);
 
         dur=(int)(game.pl[i].energy/4.0f); if(dur==0) dur=1;
 
@@ -731,16 +880,16 @@ public class RaceScreen implements Screen {
         };
 
         if(size==0){
-            game.power[0].render2dcolor(game.batch, 0,0,256,128,x,y,x+256,y+128,1,c1,c2,c3);
-            game.power[1].render2dcolor(game.batch,0,0,
+            game.power[0].render2dcolor(batch, 0,0,256,128,x,y,x+256,y+128,1,c1,c2,c3);
+            game.power[1].render2dcolor(batch,0,0,
                 75+((float) (116 * game.pl[i].energy) /ship.MAXENERGY),
                 128,x,y,
                 (int)(x+75+((float)(116*game.pl[i].energy)/ship.MAXENERGY)),
                 y+128,1,c1,c2,c3);
         }else{
             x-=15; y+=70;
-            game.spower[0].render2dcolor(game.batch,0,0,256,32,x,y,x+256,y+32,1,c1,c2,c3);
-            game.spower[1].render2dcolor(game.batch,0,0,
+            game.spower[0].render2dcolor(batch,0,0,256,32,x,y,x+256,y+32,1,c1,c2,c3);
+            game.spower[1].render2dcolor(batch,0,0,
                 75+((float) (116 * game.pl[i].energy) /ship.MAXENERGY),
                 32,x,y,
                 x+75+(116*game.pl[i].energy/ship.MAXENERGY),y+32,1,c1,c2,c3);

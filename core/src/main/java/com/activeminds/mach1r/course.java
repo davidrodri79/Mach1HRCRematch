@@ -132,7 +132,7 @@ public class course {
 
         if(info.quality==2)
             s = "scene/" + scenes.course_scenes.get(info.scene).name + ".png";
-        else s = "scene/%slr" + scenes.course_scenes.get(info.scene).name + "lr.png";
+        else s = "scene/" + scenes.course_scenes.get(info.scene).name + "lr.png";
         road= new texture(s,texture.TEX_PCX,true,false);
 
         for(int i=0; i<3; i++){

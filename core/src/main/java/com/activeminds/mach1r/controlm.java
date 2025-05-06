@@ -29,7 +29,8 @@ public class controlm implements InputProcessor {
 
 
 
-    int p_tec[][]={ {Input.Keys.UP, Input.Keys.DOWN, Input.Keys.LEFT, Input.Keys.RIGHT,  Input.Keys.SHIFT_RIGHT, Input.Keys.CONTROL_RIGHT, Input.Keys.ENTER, Input.Keys.INSERT}, {}};
+    int p_tec[][]={ {Input.Keys.UP, Input.Keys.DOWN, Input.Keys.LEFT, Input.Keys.RIGHT,  Input.Keys.SHIFT_RIGHT, Input.Keys.CONTROL_RIGHT, Input.Keys.ENTER, Input.Keys.INSERT},
+                    {Input.Keys.W, Input.Keys.S, Input.Keys.A, Input.Keys.D, Input.Keys.U, Input.Keys.I, Input.Keys.O, Input.Keys.P}};
     boolean carr[] = new boolean[CMET];
     boolean caba[] = new boolean[CMET];
     boolean cizq[] = new boolean[CMET];
@@ -91,20 +92,24 @@ public class controlm implements InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
 
-        if(keycode == p_tec[0][0])
-            carr[TEC1]= true;
-        if(keycode == p_tec[0][1])
-            caba[TEC1]= true;
-        if(keycode == p_tec[0][2]) {
-            cizq[TEC1] = true;
-            joy_xaxis[TEC1] = -750;
-        }if(keycode == p_tec[0][3]) {
-            cder[TEC1] = true;
-            joy_xaxis[TEC1] = 750;
-        }
-        for(int i=0;i<CMAXB;i++) {
-            if (keycode == p_tec[0][4 + i]) {
-                cboton[TEC1][i] = true;
+        for(int j = 0; j < 2; j++)
+        {
+            if (keycode == p_tec[j][0])
+                carr[TEC1 + j] = true;
+            if (keycode == p_tec[j][1])
+                caba[TEC1 + j] = true;
+            if (keycode == p_tec[j][2]) {
+                cizq[TEC1 + j] = true;
+                joy_xaxis[TEC1 + j] = -750;
+            }
+            if (keycode == p_tec[j][3]) {
+                cder[TEC1 + j] = true;
+                joy_xaxis[TEC1 + j] = 750;
+            }
+            for (int i = 0; i < CMAXB; i++) {
+                if (keycode == p_tec[j][4 + i]) {
+                    cboton[TEC1 + j][i] = true;
+                }
             }
         }
         return false;
@@ -112,21 +117,23 @@ public class controlm implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        if(keycode == p_tec[0][0])
-            carr[TEC1]= false;
-        if(keycode == p_tec[0][1])
-            caba[TEC1]= false;
-        if(keycode == p_tec[0][2]) {
-            cizq[TEC1] = false;
-            joy_xaxis[TEC1] = 0;
-        }
-        if(keycode == p_tec[0][3]) {
-            cder[TEC1] = false;
-            joy_xaxis[TEC1] = 0;
-        }
-        for(int i=0;i<CMAXB;i++) {
-            if (keycode == p_tec[0][4 + i]) {
-                cboton[TEC1][i] = false;
+        for(int j = 0; j < 2; j++) {
+            if (keycode == p_tec[j][0])
+                carr[TEC1 + j] = false;
+            if (keycode == p_tec[j][1])
+                caba[TEC1 + j] = false;
+            if (keycode == p_tec[j][2]) {
+                cizq[TEC1 + j] = false;
+                joy_xaxis[TEC1 + j] = 0;
+            }
+            if (keycode == p_tec[j][3]) {
+                cder[TEC1 + j] = false;
+                joy_xaxis[TEC1 + j] = 0;
+            }
+            for (int i = 0; i < CMAXB; i++) {
+                if (keycode == p_tec[j][4 + i]) {
+                    cboton[TEC1 + j][i] = false;
+                }
             }
         }
         return false;

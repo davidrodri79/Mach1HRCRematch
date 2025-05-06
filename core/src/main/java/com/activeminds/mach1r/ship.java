@@ -664,7 +664,7 @@ public class ship {
     {
         float dx=(x-cam.position.x), dy=(y-cam.position.y), dz=(z-cam.position.z);
 
-        float dist=(dx*dx)+(dy*dy)+(dz*dz);
+        dist=(dx*dx)+(dy*dy)+(dz*dz);
 
         //glEnable(GL_DEPTH_TEST);
 

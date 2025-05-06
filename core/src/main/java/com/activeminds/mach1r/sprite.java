@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class sprite {
 
-    Texture texture;
+    texture texture;
     float sx, sy;
 
     public sprite()
@@ -20,13 +20,12 @@ public class sprite {
         sx = x; sy = y;
         if(Gdx.files.internal(tfile).exists())
         {
-            texture = new Texture(tfile);
+            texture = new texture(tfile, com.activeminds.mach1r.texture.TEX_PCX, true, alpha);
         }
         else
         {
-            texture = new Texture((int) x, (int)y, Pixmap.Format.RGBA8888);
+            texture = null; //new Texture((int) x, (int)y, Pixmap.Format.RGBA8888);
         }
-        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     public sprite(float x, float y, String tfile)
@@ -34,13 +33,12 @@ public class sprite {
         sx = x; sy = y;
         if(Gdx.files.internal(tfile).exists())
         {
-            texture = new Texture(tfile);
+            texture = new texture(tfile, com.activeminds.mach1r.texture.TEX_PCX, true, false);
         }
         else
         {
-            texture = new Texture((int) x, (int)y, Pixmap.Format.RGBA8888);
+            texture = null; //new Texture((int) x, (int)y, Pixmap.Format.RGBA8888);
         }
-        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     void render2d(SpriteBatch batch, float ox, float oy, float ex, float ey, int px, int py, int pex, int pey, float a)
@@ -48,7 +46,7 @@ public class sprite {
         ey = sy - ey;
         oy = sy - oy;
         batch.setColor(1, 1, 1, a);
-        batch.draw(texture,px,py,pex-px,pey-py, ox/sx, oy/sy, ex/sx, ey/sy);
+        batch.draw(texture.gdxTexture,px,py,pex-px,pey-py, ox/sx, oy/sy, ex/sx, ey/sy);
         batch.setColor(1, 1, 1, 1);
     }
 
@@ -57,7 +55,7 @@ public class sprite {
         ey = sy - ey;
         oy = sy - oy;
         batch.setColor(r, g, b, a);
-        batch.draw(texture,px,py,pex-px,pey-py, ox/sx, oy/sy, ex/sx, ey/sy);
+        batch.draw(texture.gdxTexture,px,py,pex-px,pey-py, ox/sx, oy/sy, ex/sx, ey/sy);
         batch.setColor(1, 1, 1, 1);
     }
 

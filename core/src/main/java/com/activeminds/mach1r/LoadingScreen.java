@@ -20,7 +20,8 @@ public class LoadingScreen implements Screen {
         // LOGIC =======================================================================
 
         switch(game.game_mode){
-            case Main.SINGLE_R: game.startup_course(game.gdata.nlaps,game.gdata.dif,game.gdata.cour_type,game.gdata.scene); break;
+            case Main.SINGLE_R:
+            case Main.VERSUS_R: game.startup_course(game.gdata.nlaps,game.gdata.dif,game.gdata.cour_type,game.gdata.scene); break;
             case Main.DEMO:
                 game.startup_course(2,course.rand()%4,course.rand()%10,course.rand()%6);
                 game.pl[0].raceover=true;

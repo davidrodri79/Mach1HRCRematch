@@ -10,6 +10,7 @@ public class SelectNumPlayersScreen implements Screen {
 
     public SelectNumPlayersScreen(Main game)
     {
+        game.counter = 0;
         this.game = game;
     }
 
@@ -46,6 +47,8 @@ public class SelectNumPlayersScreen implements Screen {
                 game.nplayers=game.nhumans;
                 //game.reset_ranking();
                 //set_state(SHIP_SEL_VERSUS);
+                game.setScreen(new ShipSelectVersusScreen(game));
+                dispose();
             };
         };
 

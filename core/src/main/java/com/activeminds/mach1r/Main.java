@@ -40,14 +40,19 @@ public class Main extends Game {
         game_data()
         {
             controls[0] = controlm.TEC1;
-            controls[1] = controlm.NOTC;
-            controls[2] = controlm.NOTC;
-            controls[3] = controlm.NOTC;
+            controls[1] = controlm.TEC2;
+            controls[2] = controlm.TEC1;
+            controls[3] = controlm.TEC2;
             for(int i=0;i<NSHIPS;i++)
                 available[i] = 1;
             drawdist = 2;
             nlaps = 3;
             skygrfog = true;
+            icons[0] = 0;
+            icons[1] = 1;
+            icons[2] = 2;
+            icons[3] = 3;
+
         }
     }
 
@@ -64,7 +69,7 @@ public class Main extends Game {
 
     sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar, posnumber, speed, kmh,
         mini[] = new sprite[NSHIPS], power[] = new sprite[2], spower[] = new sprite[2], recover, start[] = new sprite[4], plcursor[] = new sprite[10],
-        arrow, oppico, preview[] = new sprite[6];
+        arrow, oppico, preview[] = new sprite[6], mistery;
     texture flame, shield, explos, smoke;
 
     ship pl[] = new ship[MAXPLAYERS];
