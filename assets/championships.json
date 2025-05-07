@@ -1,0 +1,36 @@
+{
+  "champ_events" : [
+    {
+      "name": "sunday's cup",
+      "minimum": 0,
+      "reward" : 4,
+      nraces : 4,
+      "races" : [
+        {
+          "type" : 0,
+          dif : 0,
+          "nlaps" : 2,
+          scene : 0
+        },
+        {
+          "type" : 1,
+          dif : 0,
+          "nlaps" : 2,
+          scene : 1
+        },
+        {
+          "type" : 2,
+          dif : 0,
+          "nlaps" : 2,
+          scene : 3
+        },
+        {
+          "type" : 0,
+          dif : 0,
+          "nlaps" : 2,
+          scene : 5
+        }
+      ]
+    }
+  ]
+}

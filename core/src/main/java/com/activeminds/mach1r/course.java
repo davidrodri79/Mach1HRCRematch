@@ -108,6 +108,25 @@ public class course {
             "mach 1 speedway"
     };
 
+    static class champ_race {
+
+        int type, dif, nlaps, scene;
+    };
+
+    static class champ_event{
+
+        String name;
+        int minimum, reward;
+        int nraces;
+        ArrayList<champ_race> races;
+    };
+
+    static class champJson
+    {
+        ArrayList<champ_event> champ_events;
+    }
+
+
     public course_info info;
     node[] nodes;
     int counter;
@@ -115,6 +134,7 @@ public class course {
     solid decorate[] = new solid[3], scube, ecube, bcube, power, mine;
 
     static course_sceneJson scenes;
+    static champJson championship;
 
     static void load_static_data()
     {
@@ -122,6 +142,10 @@ public class course {
         FileHandle file = Gdx.files.internal("course_scenes.json");
         String fileText = file.readString();
         scenes = json.fromJson(course_sceneJson.class, fileText);
+
+        file = Gdx.files.internal("championships.json");
+        fileText = file.readString();
+        championship = json.fromJson(champJson.class, fileText);
     }
 
     course(course_info ci)

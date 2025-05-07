@@ -155,14 +155,20 @@ public class ShipSelectSingleScreen implements Screen {
         if(((game.ctr.izq(controlm.TEC1)) /*|| (ctr->izq(gdata.controls[0]))*/) && (sel_dir==0)) {sel_dir=2;};
         if(((game.ctr.algun_boton(controlm.TEC1)) /*|| (ctr->algun_boton(gdata.controls[0]))*/) && (sel_dir==0) && (game.counter>30)) {
             /*wconfirm->playonce();
-            delete pl[0];
-            switch(game_mode) {
-                case SINGLE_R : set_state(SINGLE_RACE_SEL); break;
-                case ENDURANCE : set_state(ENDUR_SEL); break;
-                case CHAMPIONSHIP : random_ships(1); set_state(CHAMP_STAGE); break;
-            };*/
-            game.setScreen(new SingleRaceSelectScreen(game));
-            dispose();
+            delete pl[0];*/
+            switch(game.game_mode) {
+                case Main.SINGLE_R :
+                    game.setScreen(new SingleRaceSelectScreen(game));
+                    dispose();
+                    break;
+                case Main.ENDURANCE :
+                    //set_state(ENDUR_SEL);
+                    break;
+                case Main.CHAMPIONSHIP :
+                    game.random_ships(1);
+                    //set_state(CHAMP_STAGE);
+                    break;
+            };
         };
         if(sel_dir==1){
             sel_offset--;

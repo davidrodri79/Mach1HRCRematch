@@ -17,7 +17,13 @@ void main() {
     vec4 worldPos = u_mvp * vec4(a_position, 1.0);
     v_worldPos = worldPos.xyz;
 
-    v_normal = mat3(u_model) * a_normal;
+    mat3 rotation = mat3(
+        u_model[0].xyz,
+        u_model[1].xyz,
+        u_model[2].xyz
+    );
+    v_normal = rotation * a_normal;
+
     v_color = a_color;
     v_texCoord = a_texCoord0;
     v_textureID = a_textureID;

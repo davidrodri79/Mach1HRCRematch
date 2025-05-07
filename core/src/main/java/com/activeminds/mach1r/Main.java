@@ -82,6 +82,7 @@ public class Main extends Game {
     float counter;
 
     int nhumans = 1, game_mode, ranking[] = new int[MAXPLAYERS], scores[] = new int[MAXPLAYERS], champ_stage;
+    boolean abort_champ = false;
 
 
     @Override
