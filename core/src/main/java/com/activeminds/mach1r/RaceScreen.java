@@ -654,6 +654,8 @@ public class RaceScreen implements Screen {
             show_level_action(i, cameraSingle, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         } else if (state == DEMO) {
             show_level_action(0, cameraSingle, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        } else if (state == DISQUAL) {
+            show_level_action(0, cameraSingle, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         }
 
         // 2D Layer: HUD =================================================================================

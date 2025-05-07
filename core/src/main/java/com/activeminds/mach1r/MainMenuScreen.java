@@ -78,8 +78,12 @@ public class MainMenuScreen implements Screen {
                         game.nhumans=1;
                         game.pl[0]=new ship(game.gdata.sel_ship[0],0,null);
                         game.setScreen(new ShipSelectSingleScreen(game));
+                        dispose();
                         break;
-                    /*case 4 : set_state(OPTIONS); break;*/
+                    case 4 :
+                        game.setScreen(new OptionsScreen(game));
+                        dispose();
+                        break;
                 };
         };
 
