@@ -111,22 +111,6 @@ public class ChampionshipPrizeScreen implements Screen {
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
-        /*
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(45,1.3,0.1,ZFAR);
-        gluLookAt(0,0,1,0,0,0,0.0,1.0,0.0);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-        set_one_light();
-        cam.look_at(0,2,110,0,0,0);
-        if(ranking_position(0)<3){
-            cup->set_color_coef(cup_color[ranking_position(0)][0],cup_color[ranking_position(0)][1],cup_color[ranking_position(0)][2]);
-            if(counter<120) cup->render(&cam,0,0,120-float(counter),0,counter/100.0,0);
-		else cup->render(&cam,0,0,0,0,counter/100.0,0);
-        };*/
-
 
         // LOGIC =====================
 
@@ -138,16 +122,20 @@ public class ChampionshipPrizeScreen implements Screen {
                         case 1 : game.gdata.score_champ+=(int)(event.reward/2.0); break;
                         case 2 : game.gdata.score_champ+=(int)(event.reward/4.0); break;
                     };
-                /*if((gdata.score_champ>=15) && (!gdata.available[ICARUS])){
-                    new_ship=ICARUS; set_state(NEW_SHIP_AV);
-                }else if((gdata.score_champ>=150) && (!gdata.available[HYDRA])){
-                    new_ship=HYDRA; set_state(NEW_SHIP_AV);
-                }else if((gdata.score_champ>=1500) && (!gdata.available[TORNADO])){
-                    new_ship=TORNADO; set_state(NEW_SHIP_AV);
-                }else if((gdata.score_champ>=150000) && (!gdata.available[VERTIGO])){
-                    new_ship=VERTIGO; set_state(NEW_SHIP_AV);
+                if((game.gdata.score_champ>=15) && (game.gdata.available[ship.ICARUS]==0)){
+                    game.new_ship=ship.ICARUS;
+                    game.setScreen(new NewShipAvailableScreen(game));
+                }else if((game.gdata.score_champ>=150) && (game.gdata.available[ship.HYDRA]==0)){
+                    game.new_ship=ship.HYDRA;
+                    game.setScreen(new NewShipAvailableScreen(game));
+                }else if((game.gdata.score_champ>=1500) && (game.gdata.available[ship.TORNADO]==0)){
+                    game.new_ship=ship.TORNADO;
+                    game.setScreen(new NewShipAvailableScreen(game));
+                }else if((game.gdata.score_champ>=150000) && (game.gdata.available[ship.VERTIGO]==0)){
+                    game.new_ship=ship.VERTIGO;
+                    game.setScreen(new NewShipAvailableScreen(game));
                 }else
-                    */game.setScreen(new ChampionshipSelectScreen(game));
+                    game.setScreen(new ChampionshipSelectScreen(game));
                     dispose();
             };
             //if(ctr->tecla(DIK_ESCAPE)) set_state(CHAMP_SEL);

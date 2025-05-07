@@ -812,7 +812,7 @@ public class RaceScreen implements Screen {
             //else if ((ctr->algun_boton(TEC1)) || (ctr->algun_boton(gdata.controls[0]))) paused=FALSE;
             if(game.pl[0].raceover) set_state(FINISHED);
             if(game.pl[0].state==ship.DESTR) set_state(DISQUAL);
-            //if(ctr->tecla(DIK_ESCAPE)) {abort_champ=TRUE; set_state(RACE_RESULT);};
+            if(game.ctr.atr(controlm.TEC1)) {game.abort_champ=true; game.setScreen(new RaceResultScreen(game)); dispose();};
             //if((ctr->tecla(DIK_F5)) && (cour->counter>360)) {paused=TRUE;};
         }
         else if (state == VERSUS)
@@ -822,6 +822,7 @@ public class RaceScreen implements Screen {
             //else if ((ctr->algun_boton(TEC1)) || (ctr->algun_boton(gdata.controls[0]))) paused=FALSE;
             if(all_finished()) set_state(FINISHED);
             //if(ctr->tecla(DIK_ESCAPE)) {set_state(RACE_RESULT);};
+            if(game.ctr.atr(controlm.TEC1)) {game.abort_champ=true; game.setScreen(new RaceResultScreen(game)); dispose();};
             //if((ctr->tecla(DIK_F5)) && (cour->counter>360)) {paused=TRUE;};
         }
         else if (state == FINISHED || state == DISQUAL)

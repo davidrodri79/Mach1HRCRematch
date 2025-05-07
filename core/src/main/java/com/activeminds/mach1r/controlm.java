@@ -26,15 +26,17 @@ public class controlm implements InputProcessor {
     public static final int CBU4 = 7;
     public static final int CBU5 = 8;
     public static final int CBU6 = 9;
+    public static final int CATR = 10;
 
 
 
-    int p_tec[][]={ {Input.Keys.UP, Input.Keys.DOWN, Input.Keys.LEFT, Input.Keys.RIGHT,  Input.Keys.SHIFT_RIGHT, Input.Keys.CONTROL_RIGHT, Input.Keys.ENTER, Input.Keys.INSERT},
-                    {Input.Keys.W, Input.Keys.S, Input.Keys.A, Input.Keys.D, Input.Keys.U, Input.Keys.I, Input.Keys.O, Input.Keys.P}};
+    int p_tec[][]={ {Input.Keys.UP, Input.Keys.DOWN, Input.Keys.LEFT, Input.Keys.RIGHT,  Input.Keys.SHIFT_RIGHT, Input.Keys.CONTROL_RIGHT, Input.Keys.ENTER, Input.Keys.INSERT, Input.Keys.ESCAPE},
+                    {Input.Keys.W, Input.Keys.S, Input.Keys.A, Input.Keys.D, Input.Keys.U, Input.Keys.I, Input.Keys.O, Input.Keys.P, Input.Keys.ESCAPE}};
     boolean carr[] = new boolean[CMET];
     boolean caba[] = new boolean[CMET];
     boolean cizq[] = new boolean[CMET];
     boolean cder[] = new boolean[CMET];
+    boolean catr[] = new boolean[CMET];
     boolean cboton[][] = new boolean[CMET][CMAXB];
     int joy_xaxis[] = new int[CMET], joy_yaxis[] = new int[CMET];
 
@@ -61,6 +63,11 @@ public class controlm implements InputProcessor {
     boolean der(int t)
     {
         return cder[t];
+    }
+
+    boolean atr(int t)
+    {
+        return catr[t];
     }
 
     boolean boton(int t, int b) { return cboton[t][b]; }
@@ -111,6 +118,8 @@ public class controlm implements InputProcessor {
                     cboton[TEC1 + j][i] = true;
                 }
             }
+            if (keycode == p_tec[j][8])
+                catr[TEC1 + j] = true;
         }
         return false;
     }
@@ -135,6 +144,8 @@ public class controlm implements InputProcessor {
                     cboton[TEC1 + j][i] = false;
                 }
             }
+            if (keycode == p_tec[j][8])
+                catr[TEC1 + j] = false;
         }
         return false;
     }

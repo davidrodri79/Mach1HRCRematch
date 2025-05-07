@@ -76,8 +76,9 @@ public class RaceResultScreen implements Screen {
                         if((game.pl[0].raceover) && (game.position[0]==0)){
                         if(game.gdata.sel_endur==game.gdata.res_endur-1)
                             if(game.gdata.res_endur==15) {
-                                //new_ship=GOLDEN_QUEEN;
-                                //set_state(NEW_SHIP_AV);
+                                game.new_ship=ship.GOLDEN_QUEEN;
+                                game.setScreen(new NewShipAvailableScreen(game));
+                                dispose();
                             }
                             else {
                                 game.gdata.res_endur+=1;

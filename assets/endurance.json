@@ -1,0 +1,18 @@
+{
+  "races" : [
+    {
+      "type": 9,
+      "dif": 0,
+      "nlaps": 1,
+      "scene" : 5,
+      "op" : 9
+    },
+    {
+      "type": 9,
+      "dif": 0,
+      "nlaps": 5,
+      "scene" : 5,
+      "op" : 9
+    }
+  ]
+}

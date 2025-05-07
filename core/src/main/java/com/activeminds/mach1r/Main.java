@@ -52,7 +52,7 @@ public class Main extends Game {
             icons[1] = 1;
             icons[2] = 2;
             icons[3] = 3;
-
+            res_endur = 1;
         }
     }
 
@@ -81,7 +81,7 @@ public class Main extends Game {
 
     float counter;
 
-    int nhumans = 1, game_mode, ranking[] = new int[MAXPLAYERS], scores[] = new int[MAXPLAYERS], champ_stage;
+    int nhumans = 1, game_mode, ranking[] = new int[MAXPLAYERS], scores[] = new int[MAXPLAYERS], champ_stage, new_ship;
     boolean abort_champ = false;
 
     String  rank_str[]={"1ST","2ND","3RD","4TH","5TH","6TH"};

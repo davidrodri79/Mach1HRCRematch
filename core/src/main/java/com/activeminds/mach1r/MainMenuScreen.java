@@ -45,14 +45,14 @@ public class MainMenuScreen implements Screen {
         game.batch.end();
 
 
-        if(((game.ctr.aba(controlm.TEC1)) /*|| (ctr->aba(gdata.controls[0]))*/) && (cur_wait<=0)) {cursor=(cursor+1)%5; cur_wait=20/70f;};
-        if(((game.ctr.arr(controlm.TEC1)) /*|| (ctr->arr(gdata.controls[0]))*/) && (cur_wait<=0)) {cursor-=1; if(cursor<0) cursor=4; cur_wait=20/70f;};
+        if(((game.ctr.aba(controlm.TEC1)) || (game.ctr.aba(game.gdata.controls[0]))) && (cur_wait<=0)) {cursor=(cursor+1)%5; cur_wait=20/70f;};
+        if(((game.ctr.arr(controlm.TEC1)) || (game.ctr.arr(game.gdata.controls[0]))) && (cur_wait<=0)) {cursor-=1; if(cursor<0) cursor=4; cur_wait=20/70f;};
         if(game.counter>2700) {
             game.setScreen(new TitleScreen(game));
         }
         else if(game.counter>60){
             //if(ctr->tecla(DIK_ESCAPE)) softexit=TRUE;
-            if((game.ctr.algun_boton(controlm.TEC1)) /*|| (ctr->algun_boton(gdata.controls[0]))*/)
+            if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0])))
                 switch(cursor){
                     case 0 :
                         game.game_mode=Main.SINGLE_R;
@@ -73,8 +73,13 @@ public class MainMenuScreen implements Screen {
                         game.setScreen(new SelectNumPlayersScreen(game));
                         dispose();
                         break;
-                    /*case 3 : game_mode=ENDURANCE; nhumans=1; set_state(SHIP_SEL_SINGLE); pl[0]=new ship(gdata.sel_ship[0],0,NULL); break;
-                    case 4 : set_state(OPTIONS); break;*/
+                    case 3 :
+                        game.game_mode=Main.ENDURANCE;
+                        game.nhumans=1;
+                        game.pl[0]=new ship(game.gdata.sel_ship[0],0,null);
+                        game.setScreen(new ShipSelectSingleScreen(game));
+                        break;
+                    /*case 4 : set_state(OPTIONS); break;*/
                 };
         };
 

@@ -126,6 +126,14 @@ public class course {
         ArrayList<champ_event> champ_events;
     }
 
+    static class endur_race {
+        int type, dif, nlaps, scene, op;
+    }
+
+    static class enduranceJson {
+        ArrayList<endur_race> races;
+    }
+
 
     public course_info info;
     node[] nodes;
@@ -135,6 +143,7 @@ public class course {
 
     static course_sceneJson scenes;
     static champJson championship;
+    static enduranceJson endurance;
 
     static void load_static_data()
     {
@@ -146,6 +155,10 @@ public class course {
         file = Gdx.files.internal("championships.json");
         fileText = file.readString();
         championship = json.fromJson(champJson.class, fileText);
+
+        file = Gdx.files.internal("endurance.json");
+        fileText = file.readString();
+        endurance = json.fromJson(enduranceJson.class, fileText);
     }
 
     course(course_info ci)

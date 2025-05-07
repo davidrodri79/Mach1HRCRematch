@@ -151,9 +151,9 @@ public class ShipSelectSingleScreen implements Screen {
         // LOGIC ================================================
 
         //if(counter==5) play_voice("selectship.smp");
-        if(((game.ctr.der(controlm.TEC1)) /*|| (game.ctr.der(gdata.controls[0]))*/) && (sel_dir==0)) {sel_dir=1;};
-        if(((game.ctr.izq(controlm.TEC1)) /*|| (ctr->izq(gdata.controls[0]))*/) && (sel_dir==0)) {sel_dir=2;};
-        if(((game.ctr.algun_boton(controlm.TEC1)) /*|| (ctr->algun_boton(gdata.controls[0]))*/) && (sel_dir==0) && (game.counter>30)) {
+        if(((game.ctr.der(controlm.TEC1)) || (game.ctr.der(game.gdata.controls[0]))) && (sel_dir==0)) {sel_dir=1;};
+        if(((game.ctr.izq(controlm.TEC1)) || (game.ctr.izq(game.gdata.controls[0]))) && (sel_dir==0)) {sel_dir=2;};
+        if(((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))) && (sel_dir==0) && (game.counter>30)) {
             /*wconfirm->playonce();
             delete pl[0];*/
             switch(game.game_mode) {
@@ -162,7 +162,8 @@ public class ShipSelectSingleScreen implements Screen {
                     dispose();
                     break;
                 case Main.ENDURANCE :
-                    //set_state(ENDUR_SEL);
+                    game.setScreen(new EnduranceSelectScreen(game));
+                    dispose();
                     break;
                 case Main.CHAMPIONSHIP :
                     game.random_ships(1);

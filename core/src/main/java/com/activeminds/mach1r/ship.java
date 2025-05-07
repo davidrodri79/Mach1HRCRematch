@@ -36,6 +36,22 @@ public class ship {
         public static final int BIGEXPL=3;
         public static final int DESTR=4;
 
+    public static final int ZERO_64=0;
+    public static final int CRAZY_BIRD=1;
+    public static final int SAGITTA=2;
+    public static final int GEMINI=3;
+    public static final int VAMPIRE=4;
+    public static final int SHARK_III=5;
+    public static final int GREYHOUND=6;
+    public static final int TURBO_BULL=7;
+    public static final int TETRAFLY=8;
+    public static final int BLUE_LOTUS=9;
+    public static final int ICARUS=10;
+    public static final int HYDRA=11;
+    public static final int TORNADO=12;
+    public static final int VERTIGO=13;
+    public static final int GOLDEN_QUEEN=14;
+
     static class ship_model
     {
         String name, file;
