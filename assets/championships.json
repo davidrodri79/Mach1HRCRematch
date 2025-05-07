@@ -1,6 +1,20 @@
 {
   "champ_events" : [
     {
+      "name": "torneo de prueba",
+      "minimum": 0,
+      "reward" : 4,
+      nraces : 1,
+      "races" : [
+        {
+          "type" : 0,
+          dif : 0,
+          "nlaps" : 1,
+          scene : 0
+        }
+      ]
+    },
+    {
       "name": "sunday's cup",
       "minimum": 0,
       "reward" : 4,

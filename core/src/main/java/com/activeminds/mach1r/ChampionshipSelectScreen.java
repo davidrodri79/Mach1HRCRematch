@@ -25,7 +25,7 @@ public class ChampionshipSelectScreen implements Screen {
     public void render(float delta) {
 
         game.counter += delta * 70;
-        if(cur_wait > 0) cur_wait -= delta;
+        if(cur_wait > 0) cur_wait -= delta * 70;
 
         ScreenUtils.clear(0f, 0f, 0f, 1f);
         game.camera2d.update();
@@ -45,7 +45,7 @@ public class ChampionshipSelectScreen implements Screen {
         // LOGIC ===================================
 
         if((cur_wait<=0) && (game.counter>30)){
-            if(((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))) || (game.ctr.algun_boton(game.gdata.controls[0])))
+            if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0])))
             {
                 //set_state(CHAMP_PREVIEW);
                 game.setScreen(new ChampionshipPreviewScreen(game));

@@ -166,7 +166,8 @@ public class ShipSelectSingleScreen implements Screen {
                     break;
                 case Main.CHAMPIONSHIP :
                     game.random_ships(1);
-                    //set_state(CHAMP_STAGE);
+                    game.setScreen(new ChampionshipStageScreen(game));
+                    dispose();
                     break;
             };
         };

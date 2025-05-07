@@ -61,7 +61,7 @@ public class Main extends Game {
 
     font fuente;
 
-    solid brain;
+    solid brain, cup;
 
     controlm ctr;
 
@@ -83,6 +83,8 @@ public class Main extends Game {
 
     int nhumans = 1, game_mode, ranking[] = new int[MAXPLAYERS], scores[] = new int[MAXPLAYERS], champ_stage;
     boolean abort_champ = false;
+
+    String  rank_str[]={"1ST","2ND","3RD","4TH","5TH","6TH"};
 
 
     @Override
@@ -269,6 +271,13 @@ public class Main extends Game {
                     ranking[j+1]=k;
                 };
 
+    }
+
+    int ranking_position(int p)
+    {
+        int i=0;
+        while(ranking[i]!=p) i++;
+        return i;
     }
 
     @Override

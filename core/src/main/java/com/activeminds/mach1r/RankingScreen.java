@@ -53,9 +53,11 @@ public class RankingScreen implements Screen {
                 //    set_state(CHAMP_SEL);
                 if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))){
                     game.champ_stage++;
-                    /*if(game.champ_stage>=game.championship[gdata.sel_champ].nraces)
-                        set_state(CHAMP_PRIZE); //Cup
-                    else set_state(CHAMP_STAGE);*/
+                    if(game.champ_stage>=course.championship.champ_events.get(game.gdata.sel_champ).nraces)
+                        game.setScreen(new ChampionshipPrizeScreen(game)); //Cup
+                    else
+                        game.setScreen(new ChampionshipStageScreen(game));
+                    dispose();
                 };
             }else{
                 //if(ctr->tecla(DIK_ESCAPE)) set_state(MAIN_MENU);

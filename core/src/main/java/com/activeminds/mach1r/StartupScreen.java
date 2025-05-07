@@ -93,10 +93,10 @@ public class StartupScreen implements Screen {
                 con.add_mess("loading miscellaneous 3d models...");
                 /*burnt=new solid();
                 burnt->load_mesh("model\\burnt.msh");
-                burnt->centrate(TRUE,TRUE,TRUE);
-                cup=new solid();
-                cup->load_mesh("model\\cup.msh");
-                cup->centrate(TRUE,TRUE,TRUE);*/
+                burnt->centrate(TRUE,TRUE,TRUE);*/
+                game.cup=new solid();
+                game.cup.load_mesh("model/cup.msh", true);
+                game.cup.centrate(true,true,true);
                 game.brain=new solid();
                 game.brain.load_mesh("intro/brain.msh", true);
                 game.brain.centrate(true,true,true);

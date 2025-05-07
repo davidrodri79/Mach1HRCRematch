@@ -21,17 +21,20 @@ public class LoadingScreen implements Screen {
 
         switch(game.game_mode){
             case Main.SINGLE_R:
-            case Main.VERSUS_R: game.startup_course(game.gdata.nlaps,game.gdata.dif,game.gdata.cour_type,game.gdata.scene); break;
+            case Main.VERSUS_R:
+                game.startup_course(game.gdata.nlaps,game.gdata.dif,game.gdata.cour_type,game.gdata.scene);
+            break;
             case Main.DEMO:
                 game.startup_course(2,course.rand()%4,course.rand()%10,course.rand()%6);
                 game.pl[0].raceover=true;
                 break;
             /*default : startup_course(gdata.nlaps,gdata.dif,gdata.cour_type,gdata.scene); break;
-            case ENDURANCE : nplayers=2; racing_ship[1]=endurance[gdata.sel_endur].op; startup_course(endurance[gdata.sel_endur].nlaps,endurance[gdata.sel_endur].dif,endurance[gdata.sel_endur].type,endurance[gdata.sel_endur].scene); break;
-            case CHAMPIONSHIP : startup_course(championship[gdata.sel_champ].races[champ_stage].nlaps,
-                championship[gdata.sel_champ].races[champ_stage].dif,
-                championship[gdata.sel_champ].races[champ_stage].type,
-                championship[gdata.sel_champ].races[champ_stage].scene); break;*/
+            case ENDURANCE : nplayers=2; racing_ship[1]=endurance[gdata.sel_endur].op; startup_course(endurance[gdata.sel_endur].nlaps,endurance[gdata.sel_endur].dif,endurance[gdata.sel_endur].type,endurance[gdata.sel_endur].scene); break;*/
+            case Main.CHAMPIONSHIP :
+                course.champ_event event = course.championship.champ_events.get(game.gdata.sel_champ);
+                course.champ_race race = event.races.get(game.champ_stage);
+                game.startup_course(race.nlaps, race.dif, race.type, race.scene);
+                break;
         };
 
         RaceScreen scr = new RaceScreen(game);
