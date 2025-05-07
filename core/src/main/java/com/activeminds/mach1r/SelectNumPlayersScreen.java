@@ -45,7 +45,7 @@ public class SelectNumPlayersScreen implements Screen {
             if(((game.ctr.izq(controlm.TEC1)) || (game.ctr.izq(game.gdata.controls[0]))) && (game.nhumans>2)) {game.nhumans--; cur_wait=20;};
             if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))) {
                 game.nplayers=game.nhumans;
-                //game.reset_ranking();
+                game.reset_ranking();
                 //set_state(SHIP_SEL_VERSUS);
                 game.setScreen(new ShipSelectVersusScreen(game));
                 dispose();

@@ -43,7 +43,7 @@ public class RaceScreen implements Screen {
 
     int state;
     long counter;
-    float skyc[] = new float[4], fogc[] = new float[4];
+    float skyc[] = new float[4], fogc[] = new float[4], viewPortAspectRatio;
     vertex sun;
 
 
@@ -144,6 +144,15 @@ public class RaceScreen implements Screen {
         splitScreenBatch = new SpriteBatch();
         splitScreenCamera2d = new OrthographicCamera();
         splitScreenCamera2d.setToOrtho(false,  800, 600);
+
+        if(game.nhumans <= 1)
+            viewPortAspectRatio = (float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+        else if (game.nhumans == 2)
+            viewPortAspectRatio = (float) Gdx.graphics.getWidth() / (Gdx.graphics.getHeight() / 2f);
+        else if (game.nhumans > 2)
+            viewPortAspectRatio = (float) (Gdx.graphics.getWidth() / 2f) / (Gdx.graphics.getHeight() / 2f);
+
+
 
         // Shape Renderer
         shapeRenderer = new ShapeRenderer();
@@ -270,7 +279,9 @@ public class RaceScreen implements Screen {
         if(game.gdata.skygrfog){
 
             //glEnable(GL_FOG);
+            Gdx.gl.glDepthMask(false);
             show_sky(cam);
+            Gdx.gl.glDepthMask(true);
         };
         show_ground(cam);
 
@@ -637,6 +648,10 @@ public class RaceScreen implements Screen {
                     show_level_action(3, cameras4p[3], Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()/2);
                 }
             }
+        } else if (state == FINISHED) {
+            int i = 0;
+            if(game.nhumans==1) i=0; else i=game.position[0];
+            show_level_action(i, cameraSingle, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         } else if (state == DEMO) {
             show_level_action(0, cameraSingle, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         }
@@ -761,7 +776,27 @@ public class RaceScreen implements Screen {
                     show_map(320,240);
                 }
             };
-
+        }
+        else if (state == FINISHED)
+        {
+            int i = 0;
+            if(game.nhumans==1) i=0; else i=game.position[0];
+            game.batch.begin();
+            show_position( game.batch, 0,20,390);
+            show_speed(game.batch, game.pl[i].maxspeed,20,20);
+            game.fuente.show_text(game.batch, 20,80,"maximum speed:",0);
+            game.pl[i].logo.render2d(game.batch, 0,0,256,128,420,20,420+192,20+96,1.0f);
+            if(game.pl[i].state!=ship.DESTR) game.fuente.show_text(game.batch, 270,350,"FINISHED",1);
+            game.fuente.show_text(game.batch,400,420,"time :",0);
+            String s = game.pl[i].time_str(game.pl[i].totaltime);
+            game.fuente.show_text(game.batch, 500,420,s,0);
+            game.batch.end();
+        }
+        else if (state == DEMO)
+        {
+            game.batch.begin();
+            if((counter/20)%2==0) game.fuente.show_text(game.batch, 160,120,"push any button to play",0);
+            game.batch.end();
         }
 
         /*if(paused) fuente->show_text(280,230,"paused",0);*/
@@ -1029,7 +1064,7 @@ public class RaceScreen implements Screen {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        float aspect = (float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+        float aspect = viewPortAspectRatio;
 
         v1 = 1.f - v1; v2 = 1.f - v2;
 

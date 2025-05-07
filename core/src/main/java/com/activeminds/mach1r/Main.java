@@ -81,7 +81,7 @@ public class Main extends Game {
 
     float counter;
 
-    int nhumans = 1, game_mode;
+    int nhumans = 1, game_mode, ranking[] = new int[MAXPLAYERS], scores[] = new int[MAXPLAYERS], champ_stage;
 
 
     @Override
@@ -243,7 +243,32 @@ public class Main extends Game {
 
     }
 
+    void reset_ranking()
+    {
+        int i;
+        for(i=0; i<nplayers; i++){
+            ranking[i]=i;
+            scores[i]=0;
+        };
+    }
+    void update_ranking()
+    {
 
+        int prize[]={15,10,7,5,3,2,1,0}, i,j,k;
+
+        for(i=0; i<nplayers; i++)
+            scores[position[i]]+=prize[i+8-nplayers];
+
+        for(i=0; i<nplayers; i++)
+            for(j=0; j<nplayers-1; j++)
+                if(scores[ranking[j+1]]>scores[ranking[j]]){
+
+                    k=ranking[j];
+                    ranking[j]=ranking[j+1];
+                    ranking[j+1]=k;
+                };
+
+    }
 
     @Override
     public void render() {

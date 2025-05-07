@@ -47,7 +47,7 @@ public class RaceResultScreen implements Screen {
                 s = (j+1)+"."+game.pl[i].data.name+" - "+s2;
             };
             game.fuente.show_text(game.batch,135,380-40*j,s,0);
-            //if(i<nhumans) plcursor[gdata.icons[i]]->render2d(0,0,32,32,100,375-40*j,130,375+30-40*j,1.0);
+            if(i<game.nhumans) game.plcursor[game.gdata.icons[i]].render2d( game.batch,0,0,32,32,100,375-40*j,130,375+30-40*j,1.0f);
         };
         if((game.game_mode==Main.ENDURANCE) && (game.pl[0].raceover) && (game.position[0]==0))
             game.fuente.show_text(game.batch, 110,140,"CONGRATULATIONS,STAGE CLEARED!",0);
@@ -67,7 +67,10 @@ public class RaceResultScreen implements Screen {
                         dispose();
                     break;
                     case Main.CHAMPIONSHIP :
-                    //case game.VERSUS_R : set_state(RANKING); break;
+                    case Main.VERSUS_R :
+                        game.setScreen(new RankingScreen(game));
+                        dispose();
+                        break;
                     case Main.ENDURANCE :
                         // Winner
                         if((game.pl[0].raceover) && (game.position[0]==0)){
