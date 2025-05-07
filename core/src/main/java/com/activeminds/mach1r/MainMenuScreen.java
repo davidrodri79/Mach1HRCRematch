@@ -13,6 +13,7 @@ public class MainMenuScreen implements Screen {
     MainMenuScreen(Main game)
     {
         this.game = game;
+        game.save_game_data();
         game.counter = 0f;
     }
 

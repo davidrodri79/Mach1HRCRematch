@@ -1,8 +1,15 @@
 package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
@@ -39,14 +46,17 @@ public class Main extends Game {
 
         game_data()
         {
+            resol = 3;
             controls[0] = controlm.TEC1;
-            controls[1] = controlm.TEC2;
-            controls[2] = controlm.TEC1;
-            controls[3] = controlm.TEC2;
+            controls[1] = controlm.NOTC;
+            controls[2] = controlm.NOTC;
+            controls[3] = controlm.NOTC;
             for(int i=0;i<NSHIPS;i++)
-                available[i] = 1;
+                available[i] = i < ship.ICARUS ? 1 : 0;
             drawdist = 2;
             nlaps = 3;
+            music = true; sound = true;
+            music_volume = 75;
             skygrfog = true;
             icons[0] = 0;
             icons[1] = 1;
@@ -106,6 +116,7 @@ public class Main extends Game {
         camera2d.setToOrtho(false,  640, 480);
 
         gdata = new game_data();
+        load_game_data();
 
         ship.load_static_data();
         course.load_static_data();
@@ -278,6 +289,93 @@ public class Main extends Game {
         int i=0;
         while(ranking[i]!=p) i++;
         return i;
+    }
+
+    /*
+     int resol;
+        int dummy[] = new int[4];
+        int available[] = new int[NSHIPS];
+        short sel_ship[] = new short[MAXPLAYERS], dif, cour_type, scene, nlaps;
+        long score_champ;
+        int controls[] = new int[4];
+        boolean music, sound, skygrfog;
+        int music_volume, drawdist, daytime, icons[] = new int[4], sel_endur, res_endur, sel_champ;
+     */
+
+    void save_game_data()
+    {
+        FileHandle file = Gdx.files.local("data.dat");
+
+        ByteBuffer buffer = ByteBuffer.allocate(200);
+
+        buffer.putInt(gdata.resol);
+        for(int i = 0; i < 4; i++)
+            buffer.putInt(course.rand()%256);
+        for(int i = 0; i < NSHIPS; i++)
+            buffer.putInt(gdata.available[i]);
+        for(int i = 0; i < MAXPLAYERS; i++)
+            buffer.putShort(gdata.sel_ship[i]);
+        buffer.putShort(gdata.dif);
+        buffer.putShort(gdata.cour_type);
+        buffer.putShort(gdata.scene);
+        buffer.putShort(gdata.nlaps);
+        buffer.putLong(gdata.score_champ);
+        for(int i = 0; i < 4; i++)
+            buffer.putInt(gdata.controls[i]);
+        buffer.put((byte) (gdata.music ? 1 : 0));
+        buffer.put((byte) (gdata.sound ? 1 : 0));
+        buffer.put((byte) (gdata.skygrfog ? 1 : 0));
+        buffer.putInt(gdata.music_volume);
+        buffer.putInt(gdata.drawdist);
+        buffer.putInt(gdata.daytime);
+        for(int i = 0; i < 4; i++)
+            buffer.putInt(gdata.icons[i]);
+        buffer.putInt(gdata.sel_endur);
+        buffer.putInt(gdata.res_endur);
+        buffer.putInt(gdata.sel_champ);
+        buffer.put((byte) 255);
+
+        byte[] bytes = buffer.array();
+        file.writeBytes(bytes,false);
+    }
+
+
+
+    void load_game_data()
+    {
+        FileHandle file0 = Gdx.files.local("data.dat");
+        if(file0.exists()) {
+            byte[] bytes = file0.readBytes();
+
+            ByteBuffer buffer = ByteBuffer.wrap(bytes);
+
+            gdata.resol = buffer.getInt();
+            for (int i = 0; i < 4; i++)
+                gdata.dummy[i] = buffer.getInt();
+            for (int i = 0; i < NSHIPS; i++)
+                gdata.available[i] = buffer.getInt();
+            for (int i = 0; i < MAXPLAYERS; i++)
+                gdata.sel_ship[i] = buffer.getShort();
+            gdata.dif = buffer.getShort();
+            gdata.cour_type = buffer.getShort();
+            gdata.scene = buffer.getShort();
+            gdata.nlaps = buffer.getShort();
+            gdata.score_champ = buffer.getLong();
+            for (int i = 0; i < 4; i++)
+                gdata.controls[i] = buffer.getInt();
+            gdata.music = buffer.get() == 1;
+            gdata.sound = buffer.get() == 1;
+            gdata.skygrfog = buffer.get() == 1;
+            gdata.music_volume = buffer.getInt();
+            gdata.drawdist = buffer.getInt();
+            gdata.daytime = buffer.getInt();
+            for (int i = 0; i < 4; i++)
+                gdata.icons[i] = buffer.getInt();
+            gdata.sel_endur = buffer.getInt();
+            gdata.res_endur = buffer.getInt();
+            gdata.sel_champ = buffer.getInt();
+        }
+
     }
 
     @Override

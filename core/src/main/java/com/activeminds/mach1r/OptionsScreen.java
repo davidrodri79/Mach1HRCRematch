@@ -12,6 +12,7 @@ public class OptionsScreen implements Screen {
     public OptionsScreen(Main game)
     {
         this.game = game;
+        game.save_game_data();
         game.counter = 0;
         cur_wait = 0;
     }
@@ -60,8 +61,13 @@ public class OptionsScreen implements Screen {
                         game.setScreen(new ControlOptionsScreen(game));
                         dispose();
                         break;
-                    /*case 2 : set_state(SOUND_OP); break;
-                    case 3 : set_state(CREDITS); break;*/
+                    case 2 :
+                        game.setScreen(new SoundOptionsScreen(game));
+                        dispose();
+                        break;
+                    case 3 :
+                        game.setScreen(new CreditsScreen(game));
+                        dispose(); break;
                     case 4 :
                         game.setScreen(new MainMenuScreen(game));
                         dispose();
