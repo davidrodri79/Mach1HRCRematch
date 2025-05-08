@@ -231,6 +231,13 @@ public class RaceScreen implements Screen {
                     game.pl[game.position[j]].pos=j+1;
                     game.pl[game.position[j+1]].pos=j+2;
                 };
+
+        /*System.out.println("==========================================================");
+        for(int i=0; i<game.nplayers; i++)
+        {
+            ship pl = game.pl[game.position[i]];
+            System.out.println("Position: "+i+", player "+game.position[i]+" - Lap :"+pl.lap+", Next seg:"+pl.nextsegment+" Dist to next: "+game.cour.distance_to_segment(pl.renderx,pl.y,pl.renderz, pl.nextsegment));
+        }*/
     }
 
     void show_level_action(int follow, PerspectiveCamera cam, int vpx, int vpy, int vpw, int vph)
@@ -588,15 +595,18 @@ public class RaceScreen implements Screen {
     {
         if(s1.lap>s2.lap) return true;
         else if(s1.lap<s2.lap) return false;
-        else if(s1.lap==s2.lap){
+        else {
             if(s1.nextsegment>s2.nextsegment) return true;
-            else if(s1.nextsegment<s2.nextsegment) return true;
-            else if(game.cour.distance_to_segment(s1.renderx,s1.y,s1.renderz,s1.nextsegment)<
-                game.cour.distance_to_segment(s2.renderx,s2.y,s2.renderz,s2.nextsegment))
-                return true;
-            else return false;
-        };
-        return false;
+            else if(s1.nextsegment<s2.nextsegment) return false;
+            else {
+                if (game.cour.distance_to_segment(s1.renderx, s1.y, s1.renderz, s1.nextsegment) <
+                    game.cour.distance_to_segment(s2.renderx, s2.y, s2.renderz, s2.nextsegment))
+                    return true;
+                else return false;
+            }
+        }
+        //System.out.println("Should never reach this point!!!!!!");
+        //return false;
     }
 
     @Override
