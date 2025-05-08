@@ -188,7 +188,7 @@ public class ShipSelectVersusScreen implements Screen {
         if(game.counter==1) for(int i=0; i<4; i++) sel_confirm[i]=false;
         //if(game.counter==5) play_voice("selectship.smp");
         for(int i=0; i<game.nhumans; i++){
-            if(/*(game.counter%10==0) && */(game.counter>30) && (!sel_confirm[i])){
+            if(((int)game.counter%10==0) && (game.counter>30) && (!sel_confirm[i])){
 
                 if(game.ctr.der(game.gdata.controls[i])) game.gdata.sel_ship[i]+=1;
                 if(game.ctr.izq(game.gdata.controls[i])) game.gdata.sel_ship[i]-=1;
@@ -209,6 +209,10 @@ public class ShipSelectVersusScreen implements Screen {
             game.setScreen(new SingleRaceSelectScreen(game));
             dispose();
             //set_state(SINGLE_RACE_SEL);
+        }
+        if(game.ctr.atr(controlm.TEC1)) {
+            game.setScreen(new MainMenuScreen(game));
+            dispose();
         }
     }
 

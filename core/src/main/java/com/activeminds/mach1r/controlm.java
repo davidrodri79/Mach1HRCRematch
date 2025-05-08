@@ -3,8 +3,9 @@ package com.activeminds.mach1r;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.controllers.*;
 
-public class controlm implements InputProcessor {
+public class controlm implements InputProcessor, ControllerListener {
 
 
     public static final int NOTC=0;
@@ -43,6 +44,7 @@ public class controlm implements InputProcessor {
     public controlm()
     {
         Gdx.input.setInputProcessor(this);
+        Controllers.addListener(this);
     }
 
     boolean aba(int t)
@@ -155,13 +157,45 @@ public class controlm implements InputProcessor {
         return false;
     }
 
+    public static final int MOUSSENS = 100;
+    boolean mouseLeft = false, mouseRight = false;
+    int lastScreenX, lastScreenY;
+
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+
+        if(button == Input.Buttons.LEFT)
+        {
+            mouseLeft = true;
+        }
+        if(button == Input.Buttons.RIGHT)
+        {
+            mouseRight = true;
+        }
+
+        cboton[MOUS][0]=(mouseLeft && !mouseRight);
+        cboton[MOUS][1]=(!mouseLeft && mouseRight);
+        cboton[MOUS][2]=(mouseLeft && mouseRight);
+
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+
+        if(button == Input.Buttons.LEFT)
+        {
+            mouseLeft = false;
+        }
+        if(button == Input.Buttons.RIGHT)
+        {
+            mouseRight = false;
+        }
+
+        cboton[MOUS][0]=(mouseLeft && !mouseRight);
+        cboton[MOUS][1]=(!mouseLeft && mouseRight);
+        cboton[MOUS][2]=(mouseLeft && mouseRight);
+
         return false;
     }
 
@@ -177,11 +211,98 @@ public class controlm implements InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
+
+        int ix = screenX - lastScreenX, iy = screenY - lastScreenY;
+        lastScreenX = screenX; lastScreenY = screenY;
+
+        cizq[MOUS]=(ix<-10); cder[MOUS]=(ix>10);
+        carr[MOUS]=(iy<-10); caba[MOUS]=(iy>10);
+        if(ix>0) joy_xaxis[MOUS]=ix*MOUSSENS;
+        else if(ix<0) joy_xaxis[MOUS]=ix*MOUSSENS;
+        /*else if(joy_xaxis[MOUS]>0) joy_xaxis[MOUS]-=25;
+        else if(joy_xaxis[MOUS]<0) joy_xaxis[MOUS]+=25;*/
+        if(joy_xaxis[MOUS]<-1000) joy_xaxis[MOUS]=-1000;
+        if(joy_xaxis[MOUS]>1000) joy_xaxis[MOUS]=1000;
+
+        if(iy>0) joy_yaxis[MOUS]=iy*MOUSSENS;
+        else if(iy<0) joy_yaxis[MOUS]=iy*MOUSSENS;
+        else if(joy_yaxis[MOUS]>0) joy_yaxis[MOUS]-=25;
+        else if(joy_yaxis[MOUS]<0) joy_yaxis[MOUS]+=25;
+        if(joy_yaxis[MOUS]<-1000) joy_yaxis[MOUS]=-1000;
+        if(joy_yaxis[MOUS]>1000) joy_yaxis[MOUS]=1000;
+
         return false;
     }
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
+        return false;
+    }
+
+    @Override
+    public void connected(Controller controller) {
+
+    }
+
+    @Override
+    public void disconnected(Controller controller) {
+
+    }
+
+    @Override
+    public boolean buttonDown(Controller controller, int i)
+    {
+        if(i < CMAXB)
+            cboton[JOY1][i] = true;
+        return false;
+    }
+
+    @Override
+    public boolean buttonUp(Controller controller, int i)
+    {
+        if(i < CMAXB)
+            cboton[JOY1][i] = false;
+        return false;
+    }
+
+    @Override
+    public boolean axisMoved(Controller controller, int i, float v) {
+        if(i == 0)
+        {
+            if(v < -0.5f)
+            {
+                cizq[JOY1] = true; cder[JOY1] = false;
+            }
+            else if (v > 0.5f)
+            {
+                cder[JOY1] = true; cizq[JOY1] = false;
+            }
+            else
+            {
+                cder[JOY1] = false; cizq[JOY1] = false;
+            }
+
+            joy_xaxis[JOY1] = (int)(v*1000f);
+        }
+
+        if(i == 1)
+        {
+            if(v < -0.5f)
+            {
+                carr[JOY1] = true; caba[JOY1] = false;
+            }
+            else if (v > 0.5f)
+            {
+                caba[JOY1] = true; carr[JOY1] = false;
+            }
+            else
+            {
+                carr[JOY1] = false; caba[JOY1] = false;
+            }
+
+            joy_yaxis[JOY1] = (int)(v*1000f);
+        }
+        System.out.println("Se mueveeeeee");
         return false;
     }
 }
