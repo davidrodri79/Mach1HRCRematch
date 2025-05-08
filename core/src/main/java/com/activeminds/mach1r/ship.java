@@ -375,9 +375,9 @@ public class ship {
         // Manage states
         if((state==PLAY) && (energy==0)) {state=BURN; startup_expls(); counter=0;};
         if((state==STUN) && (counter>=stunforce)) {state=PLAY; counter=0;};
-        if((state==BURN) && (counter>=240)) {/*destroy_mesh();*/ state=BIGEXPL; counter=0;};
+        if((state==BURN) && (counter>=240)) {destroy_mesh(); state=BIGEXPL; counter=0;};
         if((state==BIGEXPL) && (counter>=100)) {state=DESTR; counter=0;};
-        if((outofcourse) && (y<=course.GROUNDY+2) && (state<BURN)) {/*destroy_mesh();*/ state=BIGEXPL; counter=0;};
+        if((outofcourse) && (y<=course.GROUNDY+2) && (state<BURN)) {destroy_mesh(); state=BIGEXPL; counter=0;};
 
         //if((state==BIGEXPL) && (counter==1)) cour.play_3d_sample(cam,x,y,z,bigexpl);
         //if((state==BURN) && (counter%20==0)) {litexpl->stop(); cour.play_3d_sample(cam,x,y,z,litexpl);};
@@ -720,6 +720,63 @@ public class ship {
     String time_str(long t)
     {
         //sprintf(s,"%d'%02d.%02d",int(t/3600.0),int((t%3600)/60.0),int((t%60)*1.6667));
-        return "00'00.00";
+        return String.format("%d'%02d.%02d",(int)(t/3600.0),(int)((t%3600)/60.0),(int)((t%60)*1.6667f ));
+        //return "00'00.00";
+    }
+
+    void destroy_mesh()
+    {
+        //triangle *t=mesh->triangle_by_number(0);
+        //vertex *v=mesh->vertex_by_number(0);
+        int i, j, k;
+        float dx, dy, dz;
+
+        //Paint to dark gray
+        for(k = 0; k < mesh.triangles.size(); k++) {
+            triangle t = mesh.triangles.get(k);
+            {
+                for (i = 0; i < 3; i++) {
+                    dx = (course.rand() % 1000) / 1000.0f;
+                    for (j = 0; j < 3; j++)
+                        t.rgb[i*3+j] *= dx;
+                }
+            }
+            ;
+        }
+
+        //Deformate the mesh
+        for(i = 0; i < mesh.vertexs.size(); i++) {
+            vertex v = mesh.vertexs.get(i);
+            dx=((course.rand()%500)/1000.0f)-0.25f;
+            dz=((course.rand()%500)/1000.0f)-0.25f;
+            dy=((course.rand()%500)/1000.0f)-0.25f;
+            v.x+=dx; v.y+=dy; v.z+=dz;
+        };
+
+        mesh.buildGdxMesh();
+
+        //Paint to dark gray
+        for(k = 0; k < lowres.triangles.size(); k++) {
+            triangle t = lowres.triangles.get(k);
+            {
+                for (i = 0; i < 3; i++) {
+                    dx = (course.rand() % 1000) / 1000.0f;
+                    for (j = 0; j < 3; j++)
+                        t.rgb[i*3+j] *= dx;
+                }
+            }
+            ;
+        }
+
+        //Deformate the mesh
+        for(i = 0; i < lowres.vertexs.size(); i++) {
+            vertex v = lowres.vertexs.get(i);
+            dx=((course.rand()%500)/1000.0f)-0.25f;
+            dz=((course.rand()%500)/1000.0f)-0.25f;
+            dy=((course.rand()%500)/1000.0f)-0.25f;
+            v.x+=dx; v.y+=dy; v.z+=dz;
+        };
+
+        lowres.buildGdxMesh();
     }
 }

@@ -183,7 +183,7 @@ public class StartupScreen implements Screen {
                         game.preview[i] = new sprite(128, 128, s);
                     }
                     ;
-                    /*shadow=new texture("sprite\\shade",TEX_PCX,FALSE,TRUE);*/
+                    game.shadow=new texture("sprite/shade.png",texture.TEX_PCX,false,true);
                     for (int i = 0; i < Main.NSHIPS; i++) {
                         s = "model/" + ship.models.ships.get(i).file + "sm.png";
                         game.mini[i] = new sprite(128, 128, s);

@@ -29,9 +29,9 @@ public class RaceScreen implements Screen {
     public static final float HYPER_COL[]={0.96f,0.85f,0.04f};
 
     Main game;
-    ShaderProgram shipShader, skyShader, billboardShader;
+    ShaderProgram shipShader, skyShader, billboardShader, shadowShader;
     solid groundMesh, skyMesh;
-    Mesh billboard;
+    Mesh billboard, shadow;
     texture ground;
 
     ShapeRenderer shapeRenderer;
@@ -80,6 +80,16 @@ public class RaceScreen implements Screen {
 
         if (!billboardShader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + billboardShader.getLog());
+        }
+
+        vertexShader = Gdx.files.internal("shader/shadow_vertex.glsl").readString();
+        fragmentShader = Gdx.files.internal("shader/shadow_fragment.glsl").readString();
+
+        ShaderProgram.pedantic = false;
+        shadowShader = new ShaderProgram(vertexShader, fragmentShader);
+
+        if (!shadowShader.isCompiled()) {
+            Gdx.app.error("Shader", "Error al compilar: " + shadowShader.getLog());
         }
 
         // Ground mesh
@@ -134,6 +144,25 @@ public class RaceScreen implements Screen {
 
         billboard.setVertices(vertices, 0 , 20);
         billboard.setIndices(indices);
+
+        // Shadow mesh
+        shadow = new Mesh(true, 4, 6,
+            new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+            new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0")
+        );
+
+        // Quad en XY (como un sprite 2D)
+        float[] vertices2 = new float[] {
+            -0.5f, 0f, -0.5f, 0f, 1f,
+            0.5f, 0f, -0.5f, 1f, 1f,
+            0.5f,  0f, 0.5f, 1f, 0f,
+            -0.5f,  0f, 0.5f, 0f, 0f
+        };
+
+        short[] indices2 = new short[] { 0, 2, 1, 2, 0, 3 };
+
+        shadow.setVertices(vertices2, 0 , 20);
+        shadow.setIndices(indices2);
 
         cameraSingle = new PerspectiveCamera(67,  Gdx.graphics.getWidth(),  Gdx.graphics.getHeight());
         for(int i = 0; i < 2; i++)
@@ -315,14 +344,20 @@ public class RaceScreen implements Screen {
 
         game.cour.render(shipShader,cam,game.pl[follow].segment, (long) game.counter,l);
 
-        /*//Ships
-        if(accelerated){
-            glDisable(GL_DEPTH_TEST);
+        //Ships
+        //if(accelerated){
+        //    glDisable(GL_DEPTH_TEST);
 
-            for(i=nplayers-1; i>=0; i--)
-                show_shadow(&cam,pl[i]);
-        };*/
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+        //Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            for(int i=game.nplayers-1; i>=0; i--)
+                show_shadow(cam,game.pl[i]);
+        //};
 
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         for(int i=game.nplayers-1; i>=0; i--)
             show_ship(cam,game.pl[i]);
 
@@ -589,6 +624,30 @@ public class RaceScreen implements Screen {
         for(i=0; i<s.data.nlights; i++)
             show_3d_sprite(cam,game.flame,0,0,1,1,s.light_x(i),s.light_y(i),s.light_z(i),s.lightcol[0],s.lightcol[1],s.lightcol[2],sx,sy,a);
 
+    }
+
+    void show_shadow(PerspectiveCamera cam, ship s)
+    {
+
+        float SX=s.data.sizex, SZ=s.data.sizez, y;
+
+        if(s.outofcourse) y=course.GROUNDY;
+        else y=game.cour.y_at_xz(s.renderx,s.renderz,s.segment);
+
+        Matrix4 model = new Matrix4().idt().translate(s.renderx,y,s.renderz)
+            .rotate(Vector3.Y, (float)(180f*s.ry/Math.PI) + 90)
+            .scale( SX, 1f, SZ);
+        Matrix4 view = cam.view;
+        Matrix4 proj = cam.projection;
+        Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
+
+        shadowShader.begin();
+        shadowShader.setUniformMatrix("u_mvp", MVP);
+        shadowShader.setUniformi("u_texture", 0);
+
+        game.shadow.gdxTexture.bind(0);
+        shadow.render(shadowShader, GL20.GL_TRIANGLES);
+        shadowShader.end();
     }
 
     boolean more_advanced(ship s1, ship s2)
