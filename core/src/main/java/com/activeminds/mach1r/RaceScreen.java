@@ -44,13 +44,20 @@ public class RaceScreen implements Screen {
     int state;
     long counter;
     float skyc[] = new float[4], fogc[] = new float[4], viewPortAspectRatio;
+    float accumulatedDelta;
+    int updatesPending;
     vertex sun;
+    boolean paused;
 
 
     public RaceScreen(Main game)
     {
         this.game = game;
         game.counter = 0;
+
+        accumulatedDelta = 0f;
+        updatesPending = 0;
+        counter = 0;
 
         // Crear shaders
         String vertexShader = Gdx.files.internal("shader/ship_vertex.glsl").readString();
@@ -189,6 +196,7 @@ public class RaceScreen implements Screen {
 
         sun = new vertex(0f,5000f,5000f);
 
+        paused = false;
     }
 
     void set_state(int s)
@@ -213,6 +221,8 @@ public class RaceScreen implements Screen {
             if(counter==480) wone->playonce();
             if(counter==560) wgo->playonce();
         };*/
+
+        counter++;
 
         //if(counter%1000==0)
             hour_environment();
@@ -408,7 +418,7 @@ public class RaceScreen implements Screen {
         for(int j=0; j<4; j++)
             if((game.cour.counter>360+(60*j)) && (game.cour.counter<=420+(60*j))){
 
-                long i=counter-(360+(60*j));
+                long i=game.cour.counter-(360+(60*j));
                 float size=2000f/(0.25f*i);
 
                 game.start[j].render2d(game.batch, 0,0,256,256,(int)(320-(size/2)),(int)(240-(size/2)),(int)(320+(size/2)),(int)(240+(size/2)),1f-(i*0.015f));
@@ -680,6 +690,14 @@ public class RaceScreen implements Screen {
         counter++;
         game.counter += delta * 70;
 
+        accumulatedDelta += delta;
+        float step = 1f / Main.FPS;
+        while(accumulatedDelta >= step)
+        {
+            updatesPending++;
+            accumulatedDelta -= step;
+        }
+
         // 3D Layer : Scene ====================================================
 
         /*
@@ -872,7 +890,11 @@ public class RaceScreen implements Screen {
             game.batch.end();
         }
 
-        /*if(paused) fuente->show_text(280,230,"paused",0);*/
+        if(paused) {
+            game.batch.begin();
+            game.fuente.show_text(game.batch,280,230,"paused",0);
+            game.batch.end();
+        }
 
 
 
@@ -880,23 +902,29 @@ public class RaceScreen implements Screen {
 
         if (state == SINGLE)
         {
-            //if(!paused)
-                update_level_action();
-            //else if ((ctr->algun_boton(TEC1)) || (ctr->algun_boton(gdata.controls[0]))) paused=FALSE;
+            while(updatesPending > 0) {
+                if(!paused)
+                    update_level_action();
+                updatesPending--;
+            }
+            if (paused && ((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0])))) paused=false;
             if(game.pl[0].raceover) set_state(FINISHED);
             if(game.pl[0].state==ship.DESTR) set_state(DISQUAL);
             if(game.ctr.atr(controlm.TEC1)) {game.abort_champ=true; game.setScreen(new RaceResultScreen(game)); dispose();};
-            //if((ctr->tecla(DIK_F5)) && (cour->counter>360)) {paused=TRUE;};
+            if((game.ctr.pau(controlm.TEC1)) && (game.cour.counter>360)) {paused=true;};
         }
         else if (state == VERSUS)
         {
-            //if(!paused)
-                update_level_action();
-            //else if ((ctr->algun_boton(TEC1)) || (ctr->algun_boton(gdata.controls[0]))) paused=FALSE;
+            while(updatesPending > 0) {
+                if(!paused)
+                    update_level_action();
+                updatesPending--;
+            }
+            if (paused && ((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0])))) paused=false;
             if(all_finished()) set_state(FINISHED);
             //if(ctr->tecla(DIK_ESCAPE)) {set_state(RACE_RESULT);};
             if(game.ctr.atr(controlm.TEC1)) {game.abort_champ=true; game.setScreen(new RaceResultScreen(game)); dispose();};
-            //if((ctr->tecla(DIK_F5)) && (cour->counter>360)) {paused=TRUE;};
+            if((game.ctr.pau(controlm.TEC1)) && (game.cour.counter>360)) {paused=true;};
         }
         else if (state == FINISHED || state == DISQUAL)
         {

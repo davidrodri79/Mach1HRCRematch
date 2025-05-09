@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
 
+    public static final int FPS = 70;
 
     public static final int MAXPLAYERS = 8;
     public static final int NSHIPS = 15;
