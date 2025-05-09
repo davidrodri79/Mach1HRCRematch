@@ -16,6 +16,7 @@ uniform vec3 u_ambientColor;
 uniform vec3 u_fogColor;
 uniform float u_fogStart;
 uniform float u_fogEnd;
+uniform float u_alpha;
 
 uniform vec3 u_colorCoef;
 
@@ -65,6 +66,6 @@ void main() {
     float fogFactor = clamp((u_fogEnd - dist) / (u_fogEnd - u_fogStart), 0.0, 1.0);
 
     vec3 colorWithFog = mix(u_fogColor, finalColor, fogFactor);
-    gl_FragColor = vec4(colorWithFog, texColor.a);
+    gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
 
 }

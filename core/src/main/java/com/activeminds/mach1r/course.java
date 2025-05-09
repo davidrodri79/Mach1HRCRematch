@@ -2,6 +2,7 @@ package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -200,27 +201,26 @@ public class course {
         solid cube=new solid();
 
         cube.vertexs = new ArrayList<>();
-        cube.vertexs.add(new vertex(side,side,side)); // 0
-        cube.vertexs.add(new vertex(0,side,side)); // 1
-        cube.vertexs.add(new vertex(0,0,side)); // 2
-        cube.vertexs.add(new vertex(side,0,side)); // 3
-        cube.vertexs.add(new vertex(side,side,0)); // side
-        cube.vertexs.add(new vertex(side,side,side)); // 5
-        cube.vertexs.add(new vertex(side,0,0)); // 6
-        cube.vertexs.add(new vertex(0,side,0)); // 7
-        cube.vertexs.add(new vertex(0,0,0)); // 8
+        cube.vertexs.add(new vertex(-side*0.5f,side*0.5f,-side*0.5f)); // 0
+        cube.vertexs.add(new vertex(-side*0.5f, side*0.5f, side*0.5f)); // 1
+        cube.vertexs.add(new vertex(side*0.5f,side*0.5f,side*0.5f)); // 2
+        cube.vertexs.add(new vertex(side*0.5f,side*0.5f,-side*0.5f)); // 3
+        cube.vertexs.add(new vertex(-side*0.5f,-side*0.5f,-side*0.5f)); // 0
+        cube.vertexs.add(new vertex(-side*0.5f, -side*0.5f, side*0.5f)); // 1
+        cube.vertexs.add(new vertex(side*0.5f,-side*0.5f,side*0.5f)); // 2
+        cube.vertexs.add(new vertex(side*0.5f,-side*0.5f,-side*0.5f)); // 3
 
         cube.triangles = new ArrayList<>();
         cube.textures = new Texture[1];
         cube.textures[0] = new Texture(texture);
         cube.addQuad(cube.vertexs.get(0), cube.vertexs.get(1), cube.vertexs.get(2), cube.vertexs.get(3),0,0, 0, 1,0, 1,1, 0,1);
-        cube.addQuad(cube.vertexs.get(4), cube.vertexs.get(5), cube.vertexs.get(3), cube.vertexs.get(6),0,0, 0, 1,0, 1,1, 0,1);
-        cube.addQuad(cube.vertexs.get(7), cube.vertexs.get(4), cube.vertexs.get(6), cube.vertexs.get(8),0,0, 0, 1,0, 1,1, 0,1);
-        cube.addQuad(cube.vertexs.get(1), cube.vertexs.get(7), cube.vertexs.get(8), cube.vertexs.get(2),0,0, 0, 1,0, 1,1, 0,1);
-        cube.addQuad(cube.vertexs.get(4), cube.vertexs.get(7), cube.vertexs.get(1), cube.vertexs.get(8),0,0, 0, 1,0, 1,1, 0,1);
-        cube.addQuad(cube.vertexs.get(3), cube.vertexs.get(2), cube.vertexs.get(8), cube.vertexs.get(6),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(4), cube.vertexs.get(0), cube.vertexs.get(3), cube.vertexs.get(7),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(3), cube.vertexs.get(2), cube.vertexs.get(6), cube.vertexs.get(7),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(7), cube.vertexs.get(6), cube.vertexs.get(5), cube.vertexs.get(4),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(1), cube.vertexs.get(0), cube.vertexs.get(4), cube.vertexs.get(5),0,0, 0, 1,0, 1,1, 0,1);
+        cube.addQuad(cube.vertexs.get(2), cube.vertexs.get(1), cube.vertexs.get(5), cube.vertexs.get(6),0,0, 0, 1,0, 1,1, 0,1);
 
-        cube.centrate(true, true, true);
+        //cube.centrate(true, true, true);
         cube.buildGdxMesh();
 
         return cube;
@@ -731,12 +731,15 @@ public class course {
             };
         };
 
-        //Item cubes
+        //Item cube
         /*
         glEnable(GL_LIGHTING);
         glEnable(GL_CULL_FACE);
         glEnable(GL_LIGHT0); glDisable(GL_LIGHT1); glDisable(GL_LIGHT2); glDisable(GL_LIGHT3);
         glDisable(GL_LIGHT4); glDisable(GL_LIGHT5); glDisable(GL_LIGHT6); glDisable(GL_LIGHT7);*/
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         for(s=0; s<range; s++){
             i=(startseg-(range/2)+s)%info.nsegments;
@@ -745,14 +748,18 @@ public class course {
             if(nodes[i].item!=NONE){
 
                 switch(nodes[i].item){
-                    case BOOST : bcube.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
-                    case ENERGY: ecube.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
-                    case SHIELD: scube.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
-                    case POWER : power.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
+                    default:
+                    case BOOST : bcube.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50f, counter/70f,0,nodes[i].itemfade); break;
+                    case ENERGY: ecube.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50f, counter/70f,0,nodes[i].itemfade); break;
+                    case SHIELD: scube.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50f, counter/70f,0,nodes[i].itemfade); break;
+                    case POWER : power.alpha_render(shader, cam,cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50f, counter/70f,0,nodes[i].itemfade); break;
                     case MINE  : mine.alpha_render(shader, cam,cube_x(i), (float) (cube_y(i)+3.5f+2f*Math.sin(counter/50.0f)),cube_z(i),counter/50.0f,counter/75.0f,0,nodes[i].itemfade); break;
                 };
             };
         };
+
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+
 
         /*glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight);
         glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight);*/

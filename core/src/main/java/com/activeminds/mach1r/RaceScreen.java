@@ -50,6 +50,7 @@ public class RaceScreen implements Screen {
     public RaceScreen(Main game)
     {
         this.game = game;
+        game.counter = 0;
 
         // Crear shaders
         String vertexShader = Gdx.files.internal("shader/ship_vertex.glsl").readString();
@@ -153,10 +154,10 @@ public class RaceScreen implements Screen {
 
         // Quad en XY (como un sprite 2D)
         float[] vertices2 = new float[] {
-            -0.5f, 0f, -0.5f, 0f, 1f,
-            0.5f, 0f, -0.5f, 1f, 1f,
-            0.5f,  0f, 0.5f, 1f, 0f,
-            -0.5f,  0f, 0.5f, 0f, 0f
+            -1f, 0f, -1f, 0f, 1f,
+            1f, 0f, -1f, 1f, 1f,
+            0.5f,  0f, 1f, 1f, 0f,
+            -1f,  0f, 1f, 0f, 0f
         };
 
         short[] indices2 = new short[] { 0, 2, 1, 2, 0, 3 };
@@ -677,6 +678,7 @@ public class RaceScreen implements Screen {
     public void render(float delta) {
 
         counter++;
+        game.counter += delta * 70;
 
         // 3D Layer : Scene ====================================================
 

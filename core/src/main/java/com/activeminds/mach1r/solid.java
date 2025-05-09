@@ -373,6 +373,7 @@ public class solid {
         shader.begin();
         shader.setUniformMatrix("u_mvp", MVP);
         shader.setUniformMatrix("u_model", model);
+        shader.setUniformf("u_alpha", 1f);
         shader.setUniformi("u_textures[0]", 0);
         shader.setUniformi("u_textures[1]", 1);
         shader.setUniformi("u_textures[2]", 2); // Dummy (no usamos)
@@ -401,6 +402,8 @@ public class solid {
 
         shader.begin();
         shader.setUniformMatrix("u_mvp", MVP);
+        shader.setUniformMatrix("u_model", model);
+        shader.setUniformf("u_alpha", alpha);
         shader.setUniformi("u_textures[0]", 0);
         shader.setUniformi("u_textures[1]", 1);
         shader.setUniformi("u_textures[2]", 2); // Dummy (no usamos)
