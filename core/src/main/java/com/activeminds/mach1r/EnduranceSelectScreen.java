@@ -14,8 +14,6 @@ public class EnduranceSelectScreen implements Screen {
         this.game = game;
         game.counter = 0;
         cur_wait = 0;
-
-        race = course.endurance.races.get(game.gdata.sel_endur);
     }
 
 
@@ -29,6 +27,8 @@ public class EnduranceSelectScreen implements Screen {
 
         game.counter += delta * 70;
         if(cur_wait > 0) cur_wait -= delta * 70;
+
+        race = course.endurance.races.get(game.gdata.sel_endur);
 
         ScreenUtils.clear(0f, 0f, 0f, 1f);
         game.camera2d.update();

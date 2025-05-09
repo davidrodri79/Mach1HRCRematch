@@ -1,20 +1,6 @@
 {
   "champ_events" : [
     {
-      "name": "torneo de prueba",
-      "minimum": 0,
-      "reward" : 4,
-      nraces : 1,
-      "races" : [
-        {
-          "type" : 0,
-          dif : 0,
-          "nlaps" : 1,
-          scene : 0
-        }
-      ]
-    },
-    {
       "name": "sunday's cup",
       "minimum": 0,
       "reward" : 4,
@@ -359,6 +345,279 @@
           dif : 2,
           "nlaps" : 6,
           scene : 3
+        }
+      ]
+    },
+    {
+      "name": "ancient god's tournament",
+      "minimum": 600,
+      "reward" : 700,
+      nraces : 5,
+      "races" : [
+        {
+          "type" : 4,
+          dif : 2,
+          "nlaps" : 6,
+          scene : 4
+        },
+        {
+          "type" : 2,
+          dif : 2,
+          "nlaps" : 6,
+          scene : 4
+        },
+        {
+          "type" : 7,
+          dif : 2,
+          "nlaps" : 6,
+          scene : 4
+        },
+        {
+          "type" : 8,
+          dif : 2,
+          "nlaps" : 6,
+          scene : 4
+        },
+        {
+          "type" : 9,
+          dif : 2,
+          "nlaps" : 6,
+          scene : 4
+        }
+      ]
+    }
+    ,
+    {
+      "name": "trial of jumps",
+      "minimum": 1500,
+      "reward" : 1550,
+      nraces : 4,
+      "races" : [
+        {
+          "type" : 5,
+          dif : 2,
+          "nlaps" : 7,
+          scene : 1
+        },
+        {
+          "type" : 2,
+          dif : 2,
+          "nlaps" : 7,
+          scene : 5
+        },
+        {
+          "type" : 6,
+          dif : 2,
+          "nlaps" : 7,
+          scene : 0
+        },
+        {
+          "type" : 8,
+          dif : 2,
+          "nlaps" : 7,
+          scene : 2
+        }
+      ]
+    },
+    {
+      "name": "marine trip",
+      "minimum": 1500,
+      "reward" : 1600,
+      nraces : 5,
+      "races" : [
+        {
+          "type" : 0,
+          dif : 2,
+          "nlaps" : 8,
+          scene : 5
+        },
+        {
+          "type" : 3,
+          dif : 2,
+          "nlaps" : 8,
+          scene : 5
+        },
+        {
+          "type" : 2,
+          dif : 2,
+          "nlaps" : 8,
+          scene : 5
+        },
+        {
+          "type" : 7,
+          dif : 2,
+          "nlaps" : 8,
+          scene : 5
+        },
+        {
+          "type" : 6,
+          dif : 2,
+          "nlaps" : 8,
+          scene : 5
+        }
+      ]
+    },
+    {
+      "name": "nightmare journey",
+      "minimum": 1500,
+      "reward" : 1700,
+      nraces : 4,
+      "races" : [
+        {
+          "type" : 8,
+          dif : 2,
+          "nlaps" : 8,
+          scene : 4
+        },
+        {
+          "type" : 8,
+          dif : 2,
+          "nlaps" : 8,
+          scene : 3
+        },
+        {
+          "type" : 8,
+          dif : 2,
+          "nlaps" : 8,
+          scene : 5
+        },
+        {
+          "type" : 8,
+          dif : 2,
+          "nlaps" : 8,
+          scene : 1
+        }
+      ]
+    },
+    {
+      "name": "risky edges",
+      "minimum": 1500,
+      "reward" : 2000,
+      nraces : 4,
+      "races" : [
+        {
+          "type" : 8,
+          dif : 3,
+          "nlaps" : 9,
+          scene : 4
+        },
+        {
+          "type" : 7,
+          dif : 3,
+          "nlaps" : 9,
+          scene : 1
+        },
+        {
+          "type" : 4,
+          dif : 3,
+          "nlaps" : 9,
+          scene : 2
+        },
+        {
+          "type" : 6,
+          dif : 3,
+          "nlaps" : 9,
+          scene : 0
+        }
+      ]
+    },
+    {
+      "name": "elite's final challenge",
+      "minimum": 3500,
+      "reward" : 4000,
+      nraces : 8,
+      "races" : [
+        {
+          "type" : 8,
+          dif : 3,
+          "nlaps" : 7,
+          scene : 4
+        },
+        {
+          "type" : 1,
+          dif : 3,
+          "nlaps" : 7,
+          scene : 0
+        },
+        {
+          "type" : 4,
+          dif : 3,
+          "nlaps" : 7,
+          scene : 1
+        },
+        {
+          "type" : 5,
+          dif : 3,
+          "nlaps" : 7,
+          scene : 2
+        },
+        {
+          "type" : 6,
+          dif : 3,
+          "nlaps" : 7,
+          scene : 3
+        },
+        {
+          "type" : 3,
+          dif : 3,
+          "nlaps" : 7,
+          scene : 5
+        },
+        {
+          "type" : 4,
+          dif : 3,
+          "nlaps" : 7,
+          scene : 4
+        },
+        {
+          "type" : 7,
+          dif : 3,
+          "nlaps" : 8,
+          scene : 0
+        }
+      ]
+    },
+    {
+      "name": "mach 1 hyper racing championship",
+      "minimum": 15000,
+      "reward" : 30000,
+      nraces : 6,
+      "races" : [
+        {
+          "type" : 9,
+          dif : 3,
+          "nlaps" : 10,
+          scene : 3
+        },
+        {
+          "type" : 9,
+          dif : 3,
+          "nlaps" : 10,
+          scene : 2
+        },
+        {
+          "type" : 9,
+          dif : 3,
+          "nlaps" : 10,
+          scene : 1
+        },
+        {
+          "type" : 9,
+          dif : 3,
+          "nlaps" : 10,
+          scene : 0
+        },
+        {
+          "type" : 9,
+          dif : 3,
+          "nlaps" : 10,
+          scene : 5
+        },
+        {
+          "type" : 9,
+          dif : 3,
+          "nlaps" : 10,
+          scene : 4
         }
       ]
     }

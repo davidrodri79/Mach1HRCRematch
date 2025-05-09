@@ -60,7 +60,10 @@ public class ChampionshipSelectScreen implements Screen {
                 if(game.gdata.sel_champ<course.championship.champ_events.size()-1) game.gdata.sel_champ++;
                 cur_wait=20;
             };
-            //if(game.ctr.tecla(DIK_ESCAPE)) set_state(MAIN_MENU);
+            if(game.ctr.atr(controlm.TEC1)) {
+                game.setScreen(new MainMenuScreen(game));
+                dispose();
+            }
         };
 
     }

@@ -32,6 +32,7 @@ public class NewShipAvailableScreen implements Screen
 
         game.gdata.available[game.new_ship]=1;
         game.pl[0]=new ship(game.new_ship,0,null);
+        game.save_game_data();
     }
 
     @Override

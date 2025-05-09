@@ -122,6 +122,7 @@ public class ChampionshipPrizeScreen implements Screen {
                         case 1 : game.gdata.score_champ+=(int)(event.reward/2.0); break;
                         case 2 : game.gdata.score_champ+=(int)(event.reward/4.0); break;
                     };
+                game.save_game_data();
                 if((game.gdata.score_champ>=15) && (game.gdata.available[ship.ICARUS]==0)){
                     game.new_ship=ship.ICARUS;
                     game.setScreen(new NewShipAvailableScreen(game));
