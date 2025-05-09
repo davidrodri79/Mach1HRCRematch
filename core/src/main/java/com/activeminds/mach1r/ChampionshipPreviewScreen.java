@@ -66,7 +66,10 @@ public class ChampionshipPreviewScreen implements Screen {
                     dispose();
                 };
             };
-            //if(ctr->tecla(DIK_ESCAPE)) set_state(CHAMP_SEL);
+            if(game.ctr.atr(controlm.TEC1)) {
+                game.setScreen(new ChampionshipSelectScreen(game));
+                dispose();
+            }
         };
 
     }
