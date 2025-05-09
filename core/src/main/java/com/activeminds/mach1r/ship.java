@@ -9,6 +9,9 @@ import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
 
+import static com.activeminds.mach1r.wave.DSBFREQUENCY_MAX;
+import static com.activeminds.mach1r.wave.DSBFREQUENCY_ORIGINAL;
+
 public class ship {
 
     public static final int MAX_LIGHTS = 3;
@@ -78,6 +81,7 @@ public class ship {
         backwards;
     String message;
     solid mesh, lowres;
+    wave takepow, takee, takes, takeb, scratch, engsound, colsound, litexpl, bigexpl, fullpower, burning, alarm, slide;
     ship_model data;
     sprite logo;
     vertex cam_pos, vrp;
@@ -98,6 +102,33 @@ public class ship {
         lowres.centrate(true,true,true);
 
         logo=new sprite(256,128,"sprite/"+data.file+"lg.png");
+
+        takepow=new wave();
+        takepow.load("sound/takepow.wav");
+        takee=new wave();
+        takee.load("sound/takee.wav");
+        takes=new wave();
+        takes.load("sound/takes.wav");
+        takeb=new wave();
+        takeb.load("sound/takeb.wav");
+        engsound=new wave();
+        engsound.load("sound/engine.wav");
+        colsound=new wave();
+        colsound.load("sound/collide.wav"); engwavplaying=false;
+        litexpl=new wave();
+        litexpl.load("sound/litexpl.wav");
+        bigexpl=new wave();
+        bigexpl.load("sound/bigexpl.wav");
+        fullpower=new wave();
+        fullpower.load("sound/fullpower.wav");
+        scratch=new wave();
+        scratch.load("sound/scratch.wav"); scrwavplaying=false;
+        burning=new wave();
+        burning.load("sound/burning.wav"); burwavplaying=false;
+        slide=new wave();
+        slide.load("sound/slide.wav"); sliwavplaying=false;
+        alarm=new wave();
+        alarm.load("sound/alarm.wav"); alawavplaying=false;
 
         cam_pos = new vertex();
         vrp = new vertex();
@@ -195,7 +226,7 @@ public class ship {
 
             if((ctr.boton(tc,1)) && (boost==0) && (nboosts>0)){
                 boost= (short) BOOSTDURATION; nboosts--;
-                //cour.play_3d_sample(cam,x,y,z,takeb);
+                cour.play_3d_sample(cam,x,y,z,takeb);
             }
 
         }else engine-=0.01f;
@@ -212,13 +243,13 @@ public class ship {
         ){
 
             frr[0]= 0.0f; frr[2]=0.0f; ftrac[0]*=0.33;	ftrac[1]*=0.33;
-            //if(!sliwavplaying) {sliwavplaying=true; slide->playlooped();};
-            //cour.update_3d_sample(cam,x,y,z,DSBFREQUENCY_ORIGINAL,slide);
+            if(!sliwavplaying) {sliwavplaying=true; slide.playlooped();};
+            cour.update_3d_sample(cam,x,y,z,DSBFREQUENCY_ORIGINAL,slide);
 
         }else{
 
             frr[0]= (float) (-30.0*vel[0]); frr[2]= (float) (-30.0*vel[2]);
-            //if(sliwavplaying) {sliwavplaying=false; slide->stop();};
+            if(sliwavplaying) {sliwavplaying=false; slide.stop();};
         };
 
         ry+=(omega/(20-(2*data.handling)));
@@ -243,16 +274,16 @@ public class ship {
         acceleration=module(acc[0],acc[1],acc[2]);
 
 
-        /*if((engwavplaying==false) && (velocity>0.1)) {engsound->playlooped(); engwavplaying=true;};
-        if((engwavplaying==true) && (velocity<=0.1)) {engsound->stop(); engwavplaying=false;};
-        if(engwavplaying) cour.update_3d_sample(cam,x,y,z,(velocity*DSBFREQUENCY_MAX/15.0),engsound);*/
+        if((engwavplaying==false) && (velocity>0.1)) {engsound.playlooped(); engwavplaying=true;};
+        if((engwavplaying==true) && (velocity<=0.1)) {engsound.stop(); engwavplaying=false;};
+        if(engwavplaying) cour.update_3d_sample(cam,x,y,z, (int) (velocity*DSBFREQUENCY_MAX/15.0f),engsound);
 
         if(velocity_kmh()>=MACH_1) new_message("       mach-1 speed reached!");
         if(velocity_kmh()>maxspeed) maxspeed= (int) velocity_kmh();
 
-        /*if((alawavplaying==false) && ((energy<(int)(MAXENERGY/4)) && (state<BURN))) {alarm->playlooped(); alawavplaying=true;};
-        if((alawavplaying==true) && ((energy>=(int)(MAXENERGY/4)) || (state>=BURN))) {alarm->stop(); alawavplaying=false;};
-        if(alawavplaying) cour.update_3d_sample(cam,x,y,z,int(((MAXENERGY/4)-energy)*DSBFREQUENCY_MAX/(MAXENERGY/4)),alarm);*/
+        if((alawavplaying==false) && ((energy<(int)(MAXENERGY/4)) && (state<BURN))) {alarm.playlooped(); alawavplaying=true;};
+        if((alawavplaying==true) && ((energy>=(int)(MAXENERGY/4)) || (state>=BURN))) {alarm.stop(); alawavplaying=false;};
+        if(alawavplaying) cour.update_3d_sample(cam,x,y,z,(int)(((MAXENERGY/4)-energy)*DSBFREQUENCY_MAX/(MAXENERGY/4)),alarm);
 
 
         // Care not to get out of the course
@@ -263,12 +294,12 @@ public class ship {
                 if((cour.nodes[segment].type==course.NOBORDER) || (cour.nodes[segment].type==course.NBICE))
                     outofcourse=true;
                 else{
-                    /*if (velocity_kmh()>550) cour.play_3d_sample(cam,x,y,z,colsound);
+                    if (velocity_kmh()>550) cour.play_3d_sample(cam,x,y,z,colsound);
                     else if(!scrwavplaying){
-                        scratch->playlooped();
+                        scratch.playlooped();
                         cour.update_3d_sample(cam,x,y,z,DSBFREQUENCY_ORIGINAL,scratch);
                         scrwavplaying=true;
-                    };*/
+                    };
                     Vector2 v = cour.edge_perpendicular_vector(segment,1,false);
                     x+=v.x*velocity; z+=v.y*velocity;
                     vel[0]*=0.5f; vel[1]*=0.5f; vel[2]*=0.5f;
@@ -287,12 +318,12 @@ public class ship {
                 if((cour.nodes[segment].type==course.NOBORDER) || (cour.nodes[segment].type==course.NBICE))
                     outofcourse=true;
                 else{
-                    /*if (velocity_kmh()>550) cour.play_3d_sample(cam,x,y,z,colsound);
+                    if (velocity_kmh()>550) cour.play_3d_sample(cam,x,y,z,colsound);
                     else if(!scrwavplaying){
-                        scratch->playlooped();
+                        scratch.playlooped();
                         cour.update_3d_sample(cam,x,y,z,DSBFREQUENCY_ORIGINAL,scratch);
                         scrwavplaying=true;
-                    };*/
+                    };
                     Vector2 v = cour.edge_perpendicular_vector(segment,2,true);
                     x+=v.x*velocity; z+=v.y*velocity;
                     vel[0]*=0.5; vel[1]*=0.5; vel[2]*=0.5;
@@ -310,14 +341,14 @@ public class ship {
 
         if((cour.nodes[segment].type==course.BOOSTER) && (boost==0)){
             boost= (short) (BOOSTDURATION/4);
-            //cour.play_3d_sample(cam,x,y,z,takeb);
+            cour.play_3d_sample(cam,x,y,z,takeb);
         };
 
         if((cour.distance_to_edge(renderx,y,renderz,segment,1)>6.0) &&
             (cour.distance_to_edge(renderx,y,renderz,segment,2)>6.0) &&
             (scrwavplaying)){
 
-            //scratch->stop(); scrwavplaying=false;
+            scratch.stop(); scrwavplaying=false;
         }
 
 
@@ -379,14 +410,14 @@ public class ship {
         if((state==BIGEXPL) && (counter>=100)) {state=DESTR; counter=0;};
         if((outofcourse) && (y<=course.GROUNDY+2) && (state<BURN)) {destroy_mesh(); state=BIGEXPL; counter=0;};
 
-        //if((state==BIGEXPL) && (counter==1)) cour.play_3d_sample(cam,x,y,z,bigexpl);
-        //if((state==BURN) && (counter%20==0)) {litexpl->stop(); cour.play_3d_sample(cam,x,y,z,litexpl);};
+        if((state==BIGEXPL) && (counter==1)) cour.play_3d_sample(cam,x,y,z,bigexpl);
+        if((state==BURN) && (counter%20==0)) {litexpl.stop(); cour.play_3d_sample(cam,x,y,z,litexpl);};
         if(state==DESTR){
             if(!burwavplaying){
-                //burning->playlooped();
+                burning.playlooped();
                 burwavplaying=true;
             };
-            //cour.update_3d_sample(cam,x,y,z,DSBFREQUENCY_ORIGINAL,burning);
+            cour.update_3d_sample(cam,x,y,z,DSBFREQUENCY_ORIGINAL,burning);
 
         };
         // Update of burning explosions
@@ -412,23 +443,23 @@ public class ship {
                     switch(cour.nodes[segment].item){
 
                         case course.ENERGY : gain_energy(50);
-                            //cour.play_3d_sample(cam,x,y,z,takee);
+                            cour.play_3d_sample(cam,x,y,z,takee);
                             break;
                         case course.BOOST  : nboosts++;
-                            //cour.play_3d_sample(cam,x,y,z,takee);
+                            cour.play_3d_sample(cam,x,y,z,takee);
                             break;
 
                         case course.SHIELD : shield= (short) SHIELDDURATION;
-                            //cour.play_3d_sample(cam,x,y,z,takes);
+                            cour.play_3d_sample(cam,x,y,z,takes);
                             break;
                         case course.POWER  : power++;
                             new_message("           power tank");
-                            //cour.play_3d_sample(cam,x,y,z,takepow);
+                            cour.play_3d_sample(cam,x,y,z,takepow);
                             break;
                         case course.MINE   : if((shield==0) && (hypermode==0)){
                                 lose_energy(75);
                                 counter=0; state=STUN; stunforce= (int) (velocity*40);
-                                //cour.play_3d_sample(cam,x,y,z,litexpl);
+                                cour.play_3d_sample(cam,x,y,z,litexpl);
                             };
                             break;
 
@@ -437,7 +468,7 @@ public class ship {
                     if(power==5) {
                         hypermode= (short) HYPERDURATION;
                         new_message("      hyper mode reached!");
-                        //cour.play_3d_sample(cam,x,y,z,fullpower);
+                        cour.play_3d_sample(cam,x,y,z,fullpower);
                         power=0;
                     };
                 };
@@ -629,7 +660,7 @@ public class ship {
             if((shield==0) && (hypermode==0) && ((s.shield>0) || (s.hypermode>0))){
                 lose_energy(25);
                 counter=0; state=STUN; stunforce= (int) ((velocity+s.velocity)*30);
-                //cour->play_3d_sample(cam,x,y,z,litexpl);
+                //cour.play_3d_sample(cam,x,y,z,litexpl);
             }
 
             // Other's reaction
@@ -642,7 +673,7 @@ public class ship {
             if((s.shield==0) && (s.hypermode==0) && ((shield>0) || (hypermode>0))){
                 s.lose_energy(25);
                 s.counter=0; s.state=STUN; s.stunforce= (int) ((velocity+s.velocity)*30);
-                //cour->play_3d_sample(cam,s->x,s->y,s->z,s->litexpl);
+                //cour.play_3d_sample(cam,s.x,s.y,s.z,s.litexpl);
             }
 
             lose_energy((int) (s.data.weight*velocity/100.0));

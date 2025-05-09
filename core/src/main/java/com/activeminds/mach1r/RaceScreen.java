@@ -928,7 +928,10 @@ public class RaceScreen implements Screen {
         }
         else if (state == FINISHED || state == DISQUAL)
         {
-            update_level_action();
+            while(updatesPending > 0) {
+                update_level_action();
+                updatesPending--;
+            }
             //if(counter==1) mus->stop();
             //if((counter==1) && (state==FINISHED)) play_voice("finished.smp");
             //if((counter==5) && (state==DISQUAL)) play_voice("badluck.smp");
@@ -941,7 +944,10 @@ public class RaceScreen implements Screen {
         }
         else if (state == DEMO)
         {
-            update_level_action();
+            while(updatesPending > 0) {
+                update_level_action();
+                updatesPending--;
+            }
             //ctr->actualiza();
             if((game.ctr.algun_boton(controlm.TEC1)) || (counter>7200) || (game.pl[0].state==ship.DESTR))
             {

@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
 
+import static com.activeminds.mach1r.wave.*;
+
 public class course {
 
     /*#define GROUNDY -40
@@ -942,5 +944,36 @@ public class course {
 
         nodes[i].item= (short) ((rand()%5)+1);
         nodes[i].itemfade=1.0f;
+    }
+
+    void play_3d_sample(PerspectiveCamera cam, float x, float y, float z, wave w)
+    {
+        update_3d_sample(cam,x,y,z,DSBFREQUENCY_ORIGINAL,w);
+        w.playonce();
+    }
+    void update_3d_sample(PerspectiveCamera cam, float x, float y, float z, int freq, wave w)
+    {
+
+        float dx, dy, dz, dist;
+        vertex pos = new vertex(x,y,z);
+
+        /*pos.reset();
+        pos.translate(-cam->x,-cam->y,-cam->z);
+        pos.rotate(-cam->rx,-cam->ry,-cam->rz);
+
+        if(pos.nx<-500) w.setpan(DSBPAN_LEFT);
+        else if(pos.nx>500) w.setpan(DSBPAN_RIGHT);
+        else w->setpan(pos.nx*DSBPAN_RIGHT/500);*/
+        w.setpan(0);
+
+        dx=cam.position.x-x; dy=cam.position.y-y; dz=cam.position.z-z;
+        dist=dx*dx+dy*dy+dz*dz;
+
+        if(dist>=500000)
+            w.setvolume(DSBVOLUME_MIN);
+        else
+            w.setvolume(DSBVOLUME_MAX-(int)((DSBVOLUME_MAX-DSBVOLUME_MIN)*dist/500000.0));
+
+        w.setfreq(freq);
     }
 }
