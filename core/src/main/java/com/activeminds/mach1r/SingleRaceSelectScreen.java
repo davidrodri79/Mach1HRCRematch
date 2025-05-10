@@ -71,8 +71,8 @@ public class SingleRaceSelectScreen implements Screen {
             if((game.ctr.arr(controlm.TEC1)) || (game.ctr.arr(game.gdata.controls[0]))){ if(cursor>0) cursor--; cur_wait=20;};
             if((game.ctr.aba(controlm.TEC1)) || (game.ctr.aba(game.gdata.controls[0]))){ if(cursor<3) cursor++; cur_wait=20;};
             if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))) {
-                /*wconfirm->playonce();
-                lock=TRUE;*/
+                game.wconfirm.playonce();
+                /*lock=TRUE;*/
                 game.random_ships(game.nhumans);
                 /*set_state(LOADING);*/
                 game.setScreen(new LoadingScreen(game));

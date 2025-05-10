@@ -68,7 +68,7 @@ public class SoundOptionsScreen implements Screen {
                     case 1 : if(game.gdata.music==false) game.gdata.music=true; else game.gdata.music=false; cur_wait=20; break;
                     case 2 : if((game.gdata.music_volume<100) && ((int)game.counter%2==0)) game.gdata.music_volume+=1; break;
                 };
-                //WAVE_ENABLE=game.gdata.sound;
+                wave.WAVE_ENABLE=game.gdata.sound;
             };
 
             if((game.ctr.izq(controlm.TEC1)) || (game.ctr.izq(game.gdata.controls[0]))){
@@ -77,7 +77,7 @@ public class SoundOptionsScreen implements Screen {
                     case 1 : if(game.gdata.music==false) game.gdata.music=true; else game.gdata.music=false; cur_wait=20; break;
                     case 2 : if((game.gdata.music_volume>0) && ((int)game.counter%2==0)) game.gdata.music_volume-=1; break;
                 };
-                //WAVE_ENABLE=game.gdata.sound;
+                wave.WAVE_ENABLE=game.gdata.sound;
             };
             if(game.ctr.atr(controlm.TEC1)) {
                 game.setScreen(new OptionsScreen(game));

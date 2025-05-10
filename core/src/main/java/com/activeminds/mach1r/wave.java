@@ -5,7 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 
 public class wave {
 
-    public static final int DSBFREQUENCY_ORIGINAL = 1000;
+    public static final int DSBFREQUENCY_ORIGINAL = 10000;
     public static final int DSBFREQUENCY_MIN = 100;
     public static final int DSBFREQUENCY_MAX = 100000;
     public static final int DSBVOLUME_MIN = -10000;
@@ -14,7 +14,7 @@ public class wave {
     public static boolean WAVE_ENABLE=true;
 
     Sound sound;
-    long soundId;
+    long soundId = -1;
 
     wave()
     {
@@ -49,23 +49,29 @@ public class wave {
     void stop()
     {
         if (WAVE_ENABLE)
-            sound.stop(soundId);
+            if(soundId >= 0) {
+                sound.stop(soundId);
+                soundId = -1;
+            }
 
     }
 
     void setpan(int pan)
     {
-        sound.setPan(soundId, pan, 1f);
+        if(soundId >= 0)
+            sound.setPan(soundId, pan, 1f);
     }
 
 
     void setvolume(int volume)
     {
-        sound.setVolume(soundId, (volume + 10000)/10000f);
+        if(soundId >= 0)
+            sound.setVolume(soundId, (volume + 10000)/10000f);
     }
 
     void setfreq(int freq)
     {
-        sound.setPitch(soundId, freq/1000f);
+        if(soundId >= 0)
+        sound.setPitch(soundId, freq/10000f);
     }
 }

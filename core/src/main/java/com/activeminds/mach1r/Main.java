@@ -82,6 +82,7 @@ public class Main extends Game {
         mini[] = new sprite[NSHIPS], power[] = new sprite[2], spower[] = new sprite[2], recover, start[] = new sprite[4], plcursor[] = new sprite[10],
         arrow, oppico, preview[] = new sprite[6], mistery;
     texture flame, shield, explos, smoke, shadow;
+    wave wthree, wtwo, wone, wgo, wconfirm, wvoice;
 
     ship pl[] = new ship[MAXPLAYERS];
     game_data gdata;
@@ -377,6 +378,19 @@ public class Main extends Game {
             gdata.sel_champ = buffer.getInt();
         }
 
+        wave.WAVE_ENABLE=gdata.sound;
+    }
+
+    void play_voice(String f)
+    {
+        if(wvoice != null){
+            wvoice.stop();
+            wvoice = null;
+        };
+        String s = "sound/"+f;
+        wvoice=new wave();
+        wvoice.load(s);
+        wvoice.playonce();
     }
 
     @Override

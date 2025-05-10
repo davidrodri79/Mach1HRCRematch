@@ -948,8 +948,8 @@ public class course {
 
     void play_3d_sample(PerspectiveCamera cam, float x, float y, float z, wave w)
     {
-        update_3d_sample(cam,x,y,z,DSBFREQUENCY_ORIGINAL,w);
         w.playonce();
+        update_3d_sample(cam,x,y,z,DSBFREQUENCY_ORIGINAL,w);
     }
     void update_3d_sample(PerspectiveCamera cam, float x, float y, float z, int freq, wave w)
     {
@@ -967,12 +967,12 @@ public class course {
         w.setpan(0);
 
         dx=cam.position.x-x; dy=cam.position.y-y; dz=cam.position.z-z;
-        dist=dx*dx+dy*dy+dz*dz;
+        dist= (float) Math.sqrt(dx*dx+dy*dy+dz*dz);
 
-        if(dist>=500000)
+        if(dist>=700)
             w.setvolume(DSBVOLUME_MIN);
         else
-            w.setvolume(DSBVOLUME_MAX-(int)((DSBVOLUME_MAX-DSBVOLUME_MIN)*dist/500000.0));
+            w.setvolume(DSBVOLUME_MAX-(int)((DSBVOLUME_MAX-DSBVOLUME_MIN)*dist/700f));
 
         w.setfreq(freq);
     }

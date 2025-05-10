@@ -59,7 +59,8 @@ public class EnduranceSelectScreen implements Screen {
 
         if((cur_wait<=0) && (game.counter>30)){
             if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))) {
-                //wconfirm->playonce(); lock=TRUE;
+                game.wconfirm.playonce();
+                //lock=TRUE;
                 game.random_ships(game.nhumans);
                 game.setScreen(new LoadingScreen(game));
                 dispose();

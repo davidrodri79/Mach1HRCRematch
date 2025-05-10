@@ -190,6 +190,24 @@ public class RaceScreen implements Screen {
             viewPortAspectRatio = (float) (Gdx.graphics.getWidth() / 2f) / (Gdx.graphics.getHeight() / 2f);
 
 
+        if(game.nhumans <= 1) {
+
+            for(int i = 0; i < game.nplayers; i++)
+            {
+                game.pl[i].soundCam = cameraSingle;
+            }
+        }
+        else if (game.nhumans == 2)
+        {
+            game.pl[0].soundCam = cameras2p[0];
+            game.pl[1].soundCam = cameras2p[1];
+        }
+        else if (game.nhumans > 2)
+        {
+            for(int i = 0; i < game.nhumans; i++)
+                game.pl[i].soundCam = cameras4p[i];
+        }
+
 
         // Shape Renderer
         shapeRenderer = new ShapeRenderer();
@@ -207,20 +225,20 @@ public class RaceScreen implements Screen {
 
     void update_level_action()
     {
-        /*int i, j, k, l;
+        /*int i, j, k, l;*/
 
         if((state==SINGLE) || (state==VERSUS)){
             if(counter==5)
-                switch(rand()%3){
-                    case 0 : play_voice("start1.smp"); break;
-                    case 1 : play_voice("start2.smp"); break;
-                    case 2 : play_voice("start3.smp"); break;
+                switch(course.rand()%3){
+                    case 0 : game.play_voice("start1.wav"); break;
+                    case 1 : game.play_voice("start2.wav"); break;
+                    case 2 : game.play_voice("start3.wav"); break;
                 };
-            if(counter==360) wthree->playonce();
-            if(counter==420) wtwo->playonce();
-            if(counter==480) wone->playonce();
-            if(counter==560) wgo->playonce();
-        };*/
+            if(counter==360) game.wthree.playonce();
+            if(counter==420) game.wtwo.playonce();
+            if(counter==480) game.wone.playonce();
+            if(counter==560) game.wgo.playonce();
+        };
 
         counter++;
 
@@ -240,10 +258,11 @@ public class RaceScreen implements Screen {
 
         for(int i=0; i<game.nhumans; i++){
             //cam.look_at(pl[i]->cam_pos.x,pl[i]->cam_pos.y,pl[i]->cam_pos.z,pl[i]->vrp.x,pl[i]->vrp.y,pl[i]->vrp.z);
-            if(game.pl[i].raceover) game.pl[i].ia_update(null,game.ctr);
-		else
-            game.pl[i].update(null,game.ctr,game.gdata.controls[i]);
-            //if(pl[i]->finallapflag) { play_voice("finallap.smp"); pl[i]->finallapflag=FALSE;};
+            if(game.pl[i].raceover)
+                game.pl[i].ia_update(null,game.ctr);
+		    else
+                game.pl[i].update(null,game.ctr,game.gdata.controls[i]);
+            if(game.pl[i].finallapflag) { game.play_voice("finallap.wav"); game.pl[i].finallapflag=false;};
         };
 
         for(int i=game.nhumans; i<game.nplayers; i++)
@@ -687,7 +706,6 @@ public class RaceScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        counter++;
         game.counter += delta * 70;
 
         accumulatedDelta += delta;
@@ -931,10 +949,10 @@ public class RaceScreen implements Screen {
             while(updatesPending > 0) {
                 update_level_action();
                 updatesPending--;
+                //if(counter==1) mus->stop();
+                if((counter==1) && (state==FINISHED)) game.play_voice("finished.wav");
+                if((counter==5) && (state==DISQUAL)) game.play_voice("badluck.wav");
             }
-            //if(counter==1) mus->stop();
-            //if((counter==1) && (state==FINISHED)) play_voice("finished.smp");
-            //if((counter==5) && (state==DISQUAL)) play_voice("badluck.smp");
             //ctr->actualiza();
             //ctr->actualiza();
             if((counter>=300) && (game.ctr.algun_boton(game.gdata.controls[0]))){
@@ -1220,5 +1238,10 @@ public class RaceScreen implements Screen {
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+
+        for(int i = 0; i < game.nplayers; i++)
+        {
+            game.pl[i].dispose();
+        }
     }
 }

@@ -207,19 +207,19 @@ public class StartupScreen implements Screen {
                 case 9:
                     delay(300);
                     con.add_mess("loading game samples...");
-                /*wthree=new wave();
-                wthree->load("sound\\trhee.smp");
-                wtwo=new wave();
-                wtwo->load("sound\\two.smp");
-                wone=new wave();
-                wone->load("sound\\one.smp");
-                wgo=new wave();
-                wgo->load("sound\\go.smp");
-                wconfirm=new wave();
-                wconfirm->load("sound\\takepow.smp");
+                    game.wthree=new wave();
+                    game.wthree.load("sound/trhee.wav");
+                    game.wtwo=new wave();
+                    game.wtwo.load("sound/two.wav");
+                    game.wone=new wave();
+                    game.wone.load("sound/one.wav");
+                    game.wgo=new wave();
+                    game.wgo.load("sound/go.wav");
+                    game.wconfirm=new wave();
+                    game.wconfirm.load("sound/takepow.wav");
 
                 // Load intro music
-                ZeroMemory(&XMParams, sizeof XMParams);
+                /*ZeroMemory(&XMParams, sizeof XMParams);
                 XMParams.classID = CLSID_TRACKERXM;
                 sprintf(s,"intro\\am.mus");
                 XMParams.fileName = s;

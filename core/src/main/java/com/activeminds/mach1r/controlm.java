@@ -313,7 +313,6 @@ public class controlm implements InputProcessor, ControllerListener {
 
             joy_yaxis[JOY1] = (int)(v*1000f);
         }
-        System.out.println("Se mueveeeeee");
         return false;
     }
 }

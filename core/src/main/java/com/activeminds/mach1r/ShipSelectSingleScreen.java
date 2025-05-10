@@ -28,6 +28,8 @@ public class ShipSelectSingleScreen implements Screen {
         if (!shader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + shader.getLog());
         }
+
+        game.play_voice("selectship.wav");
     }
 
 
@@ -154,8 +156,8 @@ public class ShipSelectSingleScreen implements Screen {
         if(((game.ctr.der(controlm.TEC1)) || (game.ctr.der(game.gdata.controls[0]))) && (sel_dir==0)) {sel_dir=1;};
         if(((game.ctr.izq(controlm.TEC1)) || (game.ctr.izq(game.gdata.controls[0]))) && (sel_dir==0)) {sel_dir=2;};
         if(((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))) && (sel_dir==0) && (game.counter>30)) {
-            /*wconfirm->playonce();
-            delete pl[0];*/
+            game.wconfirm.playonce();
+            /*delete pl[0];*/
             switch(game.game_mode) {
                 case Main.SINGLE_R :
                     game.setScreen(new SingleRaceSelectScreen(game));

@@ -19,6 +19,8 @@ public class ShipSelectVersusScreen implements Screen {
         shapeRenderer = new ShapeRenderer();
         sel_confirm = new boolean[4];
         Arrays.fill(sel_confirm, false);
+
+        game.play_voice("selectship.smp");
     }
 
 
@@ -200,7 +202,7 @@ public class ShipSelectVersusScreen implements Screen {
                 if(game.ctr.algun_boton(game.gdata.controls[i]))
                     if(game.gdata.available[game.gdata.sel_ship[i]]!=0){
                         sel_confirm[i]=true;
-                        //wconfirm->playonce();
+                        game.wconfirm.playonce();
                     }
             };
             if(sel_confirm[i]) j++;

@@ -1,5 +1,6 @@
 package com.activeminds.mach1r;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -52,7 +53,10 @@ public class MainMenuScreen implements Screen {
             game.setScreen(new TitleScreen(game));
         }
         else if(game.counter>60){
-            //if(ctr->tecla(DIK_ESCAPE)) softexit=TRUE;
+            if(game.ctr.atr(controlm.TEC1)) {
+                dispose();
+                Gdx.app.exit();
+            }
             if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0])))
                 switch(cursor){
                     case 0 :
