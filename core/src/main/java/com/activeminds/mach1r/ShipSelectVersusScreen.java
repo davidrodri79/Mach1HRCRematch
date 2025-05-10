@@ -20,7 +20,7 @@ public class ShipSelectVersusScreen implements Screen {
         sel_confirm = new boolean[4];
         Arrays.fill(sel_confirm, false);
 
-        game.play_voice("selectship.smp");
+        game.play_voice("selectship.wav");
     }
 
 
