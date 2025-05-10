@@ -951,7 +951,7 @@ public class RaceScreen implements Screen {
             while(updatesPending > 0) {
                 update_level_action();
                 updatesPending--;
-                //if(counter==1) mus->stop();
+                if(counter==1) game.stop_music();
                 if((counter==1) && (state==FINISHED)) game.play_voice("finished.wav");
                 if((counter==5) && (state==DISQUAL)) game.play_voice("badluck.wav");
             }
