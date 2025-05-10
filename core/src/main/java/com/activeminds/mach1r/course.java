@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
@@ -964,7 +966,13 @@ public class course {
         if(pos.nx<-500) w.setpan(DSBPAN_LEFT);
         else if(pos.nx>500) w.setpan(DSBPAN_RIGHT);
         else w->setpan(pos.nx*DSBPAN_RIGHT/500);*/
-        w.setpan(0);
+
+        // Dirección izquierda/derecha relativa
+        Vector3 sourcePos = new Vector3(x,y,z);
+        Vector3 direction = sourcePos.cpy().sub(cam.position);
+        float pan = MathUtils.clamp(direction.x / 700, -1f, 1f);
+
+        w.setpan(-pan);
 
         dx=cam.position.x-x; dy=cam.position.y-y; dz=cam.position.z-z;
         dist= (float) Math.sqrt(dx*dx+dy*dy+dz*dz);

@@ -56,7 +56,7 @@ public class wave {
 
     }
 
-    void setpan(int pan)
+    void setpan(float pan)
     {
         if(soundId >= 0)
             sound.setPan(soundId, pan, 1f);
