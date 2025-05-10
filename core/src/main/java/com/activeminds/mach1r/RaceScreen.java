@@ -215,6 +215,8 @@ public class RaceScreen implements Screen {
         sun = new vertex(0f,5000f,5000f);
 
         paused = false;
+
+        game.play_music("sound/song"+((game.cour.info.scene%3)+1)+".mp3");
     }
 
     void set_state(int s)
@@ -1234,6 +1236,8 @@ public class RaceScreen implements Screen {
 
     @Override
     public void dispose() {
+
+        game.stop_music();
 
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);

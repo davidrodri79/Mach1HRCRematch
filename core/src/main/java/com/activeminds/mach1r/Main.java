@@ -2,6 +2,7 @@ package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -83,6 +84,7 @@ public class Main extends Game {
         arrow, oppico, preview[] = new sprite[6], mistery;
     texture flame, shield, explos, smoke, shadow;
     wave wthree, wtwo, wone, wgo, wconfirm, wvoice;
+    Music mus;
 
     ship pl[] = new ship[MAXPLAYERS];
     game_data gdata;
@@ -391,6 +393,24 @@ public class Main extends Game {
         wvoice=new wave();
         wvoice.load(s);
         wvoice.playonce();
+    }
+    void play_music(String f)
+    {
+        if(gdata.music) {
+            mus = Gdx.audio.newMusic(Gdx.files.internal(f));
+            mus.setLooping(true);
+            mus.setVolume(gdata.music_volume / 100f);
+            mus.play();
+        }
+    }
+
+    void stop_music()
+    {
+        if(mus != null)
+        {
+            mus.stop();
+            mus = null;
+        }
     }
 
     @Override

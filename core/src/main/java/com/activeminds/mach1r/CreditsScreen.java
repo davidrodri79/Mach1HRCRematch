@@ -15,6 +15,8 @@ public class CreditsScreen implements Screen {
         this.game = game;
         game.counter = 0;
         cur_wait = 0;
+
+        game.play_music("sound/song4.mp3");
     }
 
     @Override
@@ -97,6 +99,8 @@ public class CreditsScreen implements Screen {
 
     @Override
     public void dispose() {
+
+        game.stop_music();
 
     }
 }

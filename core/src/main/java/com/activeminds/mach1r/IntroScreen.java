@@ -29,6 +29,8 @@ public class IntroScreen implements Screen {
         if (!shader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + shader.getLog());
         }
+
+        game.play_music("sound/am.mp3");
     }
 
     @Override
@@ -94,6 +96,7 @@ public class IntroScreen implements Screen {
         if((game.ctr.algun_boton(controlm.TEC1)) || (counter>=1680)){
             //mus->stop(); mus->release();
             game.setScreen(new TitleScreen(game));
+            dispose();
         }
 
 
@@ -122,5 +125,6 @@ public class IntroScreen implements Screen {
     @Override
     public void dispose() {
 
+        game.stop_music();
     }
 }
