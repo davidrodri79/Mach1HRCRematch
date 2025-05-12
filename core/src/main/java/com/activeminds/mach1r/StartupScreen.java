@@ -149,7 +149,8 @@ public class StartupScreen implements Screen {
                 case 7:
                     delay(300);
                     con.add_mess("initializing input devices...");
-                    game.ctr = new controlm();
+                    game.ctr = new controlm(game.camera2d, game.manager);
+                    game.ctr.loadButtonLayoutFromJson("joypad.json");
                     for (int i = 0; i < Controllers.getControllers().size; i++) {
                         con.add_mess(Controllers.getControllers().get(i).getName().toLowerCase() + " found.");
                     }

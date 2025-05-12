@@ -45,6 +45,9 @@ public class SingleRaceSelectScreen implements Screen {
         game.show_menu_cursor(85,362-(70*cursor));
         game.batch.end();
 
+        game.ctr.renderButtonLayout(game.shapeRenderer);
+
+
 
 
         // LOGIC ========================================================================

@@ -2,10 +2,12 @@ package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,6 +16,9 @@ import java.nio.ByteBuffer;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
+
+    public static final int SCREENX = 854;
+    public static final int SCREENY = 480;
 
     public static final int FPS = 70;
 
@@ -49,7 +54,7 @@ public class Main extends Game {
         game_data()
         {
             resol = 3;
-            controls[0] = controlm.TEC1;
+            controls[0] = controlm.TOUC;
             controls[1] = controlm.NOTC;
             controls[2] = controlm.NOTC;
             controls[3] = controlm.NOTC;
@@ -69,6 +74,7 @@ public class Main extends Game {
     }
 
     public SpriteBatch batch;
+    public ShapeRenderer shapeRenderer;
     Texture image;
 
     font fuente;
@@ -93,6 +99,8 @@ public class Main extends Game {
     PerspectiveCamera camera;
     OrthographicCamera camera2d;
 
+    AssetManager manager;
+
     float counter;
 
     int nhumans = 1, game_mode, ranking[] = new int[MAXPLAYERS], scores[] = new int[MAXPLAYERS], champ_stage, new_ship;
@@ -104,7 +112,8 @@ public class Main extends Game {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+        //image = new Texture("libgdx.png");
+        shapeRenderer = new ShapeRenderer();
 
         fuente = new font("sprite/FONT.png",16,16,14);
 
@@ -117,7 +126,9 @@ public class Main extends Game {
         camera.update();
 
         camera2d = new OrthographicCamera();
-        camera2d.setToOrtho(false,  640, 480);
+        camera2d.setToOrtho(false,  853, 480);
+
+        manager = new AssetManager();
 
         gdata = new game_data();
         load_game_data();
@@ -132,7 +143,7 @@ public class Main extends Game {
     void show_scrolling_wallp()
     {
         int i,j;
-        for(i=0; i<5; i++)
+        for(i=0; i<7; i++)
             for(j=-1; j<5; j++)
                 wallp.render2d(batch, 0,0,128,128,128*i,(int)(-(counter%128)+((i%2)*64)+128*j),128*(i+1),(int)(-(counter%128)+((i%2)*64)+128*(j+1)),1.0f);
 

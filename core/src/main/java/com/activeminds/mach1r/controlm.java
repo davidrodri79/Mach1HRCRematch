@@ -1,9 +1,21 @@
 package com.activeminds.mach1r;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.*;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Json;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class controlm implements InputProcessor, ControllerListener {
 
@@ -13,8 +25,10 @@ public class controlm implements InputProcessor, ControllerListener {
     public static final int TEC2=2;
     public static final int JOY1=3;
     public static final int MOUS=4;
+    public static final int TOUC=5;
 
-    public static final int CMET=5;
+
+    public static final int CMET=6;
     public static final int CMAXB=4;
 
     public static final int CARR = 0;
@@ -43,11 +57,166 @@ public class controlm implements InputProcessor, ControllerListener {
     boolean cboton[][] = new boolean[CMET][CMAXB];
     int joy_xaxis[] = new int[CMET], joy_yaxis[] = new int[CMET];
 
-    public controlm()
+
+    // TActile ==================================
+    class Button {
+
+        Rectangle rect;
+        String action;
+        String text;
+        String imageOn, imageOff;
+        boolean pressed;
+        int keyboard = -1, pushes, releases;
+
+        Button(int x, int y, int sx, int sy, String action, int keyboard, String text, String on, String off)
+        {
+            rect = new Rectangle(x, y, sx, sy);
+            this.action = action;
+            this.text = text;
+            this.imageOn = on;
+            this.imageOff = off;
+            this.keyboard = keyboard;
+            pressed = false;
+            pushes = 0;
+            releases = 0;
+        }
+    }
+
+    Map<String,Button> buttons;
+    Map<Integer,Button> pointers;
+    final OrthographicCamera camera;
+    AssetManager manager;
+
+    public controlm(OrthographicCamera camera, AssetManager manager)
     {
+        this.camera = camera;
+        this.manager = manager;
+        //this.font = font;
+        buttons = new HashMap<>();
+        pointers = new HashMap<>();
+
+
         Gdx.input.setInputProcessor(this);
         Controllers.addListener(this);
     }
+
+    public void loadButtonLayoutFromJson(String fileName)
+    {
+        Json json = new Json();
+        FileHandle file = Gdx.files.internal(fileName);
+        String fileText = file.readString();
+        ButtonLayoutJson l = json.fromJson(ButtonLayoutJson.class, fileText);
+
+        for(ButtonJson b : l.buttons)
+        {
+            addButton(b.x, b.y, b.width, b.height, b.action, b.keyboard, b.text, b.image_on, b.image_off);
+        }
+    }
+
+    public void addButton(int x, int y, int sx, int sy, String action, int keyboard, String text, String imageOn, String imageOff)
+    {
+        Button b = new Button(x, y, sx, sy, action, keyboard, text, imageOn, imageOff);
+        buttons.put(action, b);
+    }
+
+    void pressButton(Button b)
+    {
+        if(b.action.equals("Up"))
+        {
+            carr[TOUC] = true;
+        }
+        else if(b.action.equals("Down"))
+        {
+            caba[TOUC] = true;
+        }
+        else if(b.action.equals("Left"))
+        {
+            cizq[TOUC] = true;
+            joy_xaxis[TOUC] = -750;
+        }
+        else if(b.action.equals("Right"))
+        {
+            cder[TOUC] = true;
+            joy_xaxis[TOUC] = 750;
+        }
+        else if(b.action.equals("Button1"))
+        {
+            cboton[TOUC][0] = true;
+        }
+        else if(b.action.equals("Button2"))
+        {
+            cboton[TOUC][1] = true;
+        }
+        else if(b.action.equals("Button3"))
+        {
+            cboton[TOUC][2] = true;
+        }
+        else if(b.action.equals("Button4"))
+        {
+            cboton[TOUC][3] = true;
+        }
+        else if(b.action.equals("Back"))
+        {
+            catr[TOUC] = true;
+        }
+    }
+
+    void releaseButton(Button b)
+    {
+        if(b.action.equals("Up"))
+        {
+            carr[TOUC] = false;
+        }
+        else if(b.action.equals("Down"))
+        {
+            caba[TOUC] = false;
+        }
+        else if(b.action.equals("Left"))
+        {
+            cizq[TOUC] = false;
+            joy_xaxis[TOUC] = 0;
+        }
+        else if(b.action.equals("Right"))
+        {
+            cder[TOUC] = false;
+            joy_xaxis[TOUC] = 0;
+        }
+        else if(b.action.equals("Button1"))
+        {
+            cboton[TOUC][0] = false;
+        }
+        else if(b.action.equals("Button2"))
+        {
+            cboton[TOUC][1] = false;
+        }
+        else if(b.action.equals("Button3"))
+        {
+            cboton[TOUC][2] = false;
+        }
+        else if(b.action.equals("Button4"))
+        {
+            cboton[TOUC][3] = false;
+        }
+        else if(b.action.equals("Back"))
+        {
+            catr[TOUC] = false;
+        }
+    }
+
+        public void renderButtonLayout(ShapeRenderer shapeRenderer)
+        {
+            shapeRenderer.setAutoShapeType(true);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+            for(String i:buttons.keySet())
+            {
+                Button b = buttons.get(i);
+                shapeRenderer.setColor(b.pressed ? Color.YELLOW : Color.BLACK);
+                shapeRenderer.ellipse(b.rect.x, b.rect.y, b.rect.width, b.rect.height, 2);
+                shapeRenderer.rect(b.rect.x, b.rect.y, b.rect.width, b.rect.height);
+            }
+            shapeRenderer.end();
+        }
 
     boolean aba(int t)
     {
@@ -188,7 +357,26 @@ public class controlm implements InputProcessor, ControllerListener {
         cboton[MOUS][1]=(!mouseLeft && mouseRight);
         cboton[MOUS][2]=(mouseLeft && mouseRight);
 
-        return false;
+        //if(Gdx.app.getType() == Application.ApplicationType.Desktop)
+        //    return true;
+
+        Vector3 touchPos = new Vector3();
+        touchPos.set(screenX, screenY, 0);
+        camera.unproject(touchPos);
+
+        for(String i:buttons.keySet())
+        {
+            if(buttons.get(i).rect.contains(touchPos.x,touchPos.y))
+            {
+                // Button has been pressed
+                pressButton(buttons.get(i));
+                pointers.put(pointer,buttons.get(i));
+                buttons.get(i).pressed = true;
+                buttons.get(i).pushes ++;
+            }
+        }
+
+        return true; // return true to indicate the event was handled
     }
 
     @Override
@@ -207,7 +395,18 @@ public class controlm implements InputProcessor, ControllerListener {
         cboton[MOUS][1]=(!mouseLeft && mouseRight);
         cboton[MOUS][2]=(mouseLeft && mouseRight);
 
-        return false;
+        //if(Gdx.app.getType() == Application.ApplicationType.Desktop)
+        //    return true;
+
+        if(pointers.get(pointer) != null)
+        {
+            // This pointer was linked to a button, so release it
+            releaseButton(pointers.get(pointer));
+            pointers.get(pointer).pressed = false;
+            pointers.get(pointer).releases++;
+            pointers.remove(pointer);
+        }
+        return true; // return true to indicate the event was handled
     }
 
     @Override
@@ -217,7 +416,30 @@ public class controlm implements InputProcessor, ControllerListener {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
+        if(Gdx.app.getType() == Application.ApplicationType.Desktop)
+            return true;
+
+        // Get screen camera coordinates of touch
+        Vector3 touchPos = new Vector3();
+        touchPos.set(screenX, screenY, 0);
+        camera.unproject(touchPos);
+
+        for(String i:buttons.keySet())
+        {
+            // Pointer is now inside a new button; release previous button
+            if(buttons.get(i).rect.contains(touchPos.x,touchPos.y))
+            {
+                if(pointers.get(pointer) != null)
+                {
+                    releaseButton(pointers.get(pointer));
+                    pointers.get(pointer).pressed = false;
+                }
+                pointers.put(pointer,buttons.get(i));
+                buttons.get(i).pressed = true;
+                pressButton(buttons.get(i));
+            }
+        }
+        return true;
     }
 
     @Override

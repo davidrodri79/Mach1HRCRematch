@@ -34,7 +34,6 @@ public class RaceScreen implements Screen {
     Mesh billboard, shadow;
     texture ground;
 
-    ShapeRenderer shapeRenderer;
     PerspectiveCamera cameraSingle;
     PerspectiveCamera cameras2p[] = new PerspectiveCamera[2];
     PerspectiveCamera cameras4p[] = new PerspectiveCamera[4];
@@ -174,7 +173,7 @@ public class RaceScreen implements Screen {
 
         cameraSingle = new PerspectiveCamera(67,  Gdx.graphics.getWidth(),  Gdx.graphics.getHeight());
         for(int i = 0; i < 2; i++)
-            cameras2p[i] = new PerspectiveCamera(67,  Gdx.graphics.getWidth(),  (float) Gdx.graphics.getHeight() / 2);
+            cameras2p[i] = new PerspectiveCamera(67,  (float) Gdx.graphics.getWidth() / 2,  (float) Gdx.graphics.getHeight() );
         for(int i = 0; i < 4; i++)
             cameras4p[i] = new PerspectiveCamera(67,  (float) Gdx.graphics.getWidth() / 2,  (float) Gdx.graphics.getHeight() / 2);
 
@@ -210,7 +209,6 @@ public class RaceScreen implements Screen {
 
 
         // Shape Renderer
-        shapeRenderer = new ShapeRenderer();
 
         sun = new vertex(0f,5000f,5000f);
 
@@ -744,8 +742,8 @@ public class RaceScreen implements Screen {
             show_level_action(0, cameraSingle, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         } else if (state == VERSUS) {
             if (game.nhumans == 2) {
-                show_level_action(0, cameras2p[0], 0, Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()/2);
-                show_level_action(1, cameras2p[1], 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()/2);
+                show_level_action(0, cameras2p[0], 0, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
+                show_level_action(1, cameras2p[1], Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
             }
             else if (game.nhumans >= 3)
             {
@@ -876,10 +874,10 @@ public class RaceScreen implements Screen {
 
                 if(game.nhumans==3)
                 {
-                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                    shapeRenderer.setColor(0f,0f,0f, 1f);
-                    shapeRenderer.rect(Gdx.graphics.getWidth()/2, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
-                    shapeRenderer.end();
+                    game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                    game.shapeRenderer.setColor(0f,0f,0f, 1f);
+                    game.shapeRenderer.rect(Gdx.graphics.getWidth()/2, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+                    game.shapeRenderer.end();
                     show_map(480,120);
                 }
                 else
@@ -930,8 +928,8 @@ public class RaceScreen implements Screen {
             if (paused && ((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0])))) paused=false;
             if(game.pl[0].raceover) set_state(FINISHED);
             if(game.pl[0].state==ship.DESTR) set_state(DISQUAL);
-            if(game.ctr.atr(controlm.TEC1)) {game.abort_champ=true; game.setScreen(new RaceResultScreen(game)); dispose();};
-            if((game.ctr.pau(controlm.TEC1)) && (game.cour.counter>360)) {paused=true;};
+            if(game.ctr.atr(controlm.TEC1) || game.ctr.atr(game.gdata.controls[0])) {game.abort_champ=true; game.setScreen(new RaceResultScreen(game)); dispose();};
+            if((game.ctr.pau(controlm.TEC1) || game.ctr.pau(game.gdata.controls[0])) && (game.cour.counter>360)) {paused=true;};
         }
         else if (state == VERSUS)
         {
@@ -943,7 +941,7 @@ public class RaceScreen implements Screen {
             if (paused && ((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0])))) paused=false;
             if(all_finished()) set_state(FINISHED);
             //if(ctr->tecla(DIK_ESCAPE)) {set_state(RACE_RESULT);};
-            if(game.ctr.atr(controlm.TEC1)) {game.abort_champ=true; game.setScreen(new RaceResultScreen(game)); dispose();};
+            if(game.ctr.atr(controlm.TEC1) || game.ctr.atr(game.gdata.controls[0])) {game.abort_champ=true; game.setScreen(new RaceResultScreen(game)); dispose();};
             if((game.ctr.pau(controlm.TEC1)) && (game.cour.counter>360)) {paused=true;};
         }
         else if (state == FINISHED || state == DISQUAL)
@@ -976,6 +974,9 @@ public class RaceScreen implements Screen {
                 dispose();
             };
         }
+
+        game.ctr.renderButtonLayout(game.shapeRenderer);
+
     }
 
     boolean all_finished()
@@ -1118,20 +1119,20 @@ public class RaceScreen implements Screen {
         };
         */
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1,1,1,1);
+        game.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        game.shapeRenderer.setColor(1,1,1,1);
         // Starting line
-        shapeRenderer.line(x-8-((game.cour.nodes[0].x[1]+game.cour.nodes[0].x[2])/(MAPSCALE*2.0f)),
+        game.shapeRenderer.line(x-8-((game.cour.nodes[0].x[1]+game.cour.nodes[0].x[2])/(MAPSCALE*2.0f)),
             y+((game.cour.nodes[0].z[1]+game.cour.nodes[0].z[2])/(MAPSCALE*2.0f)),
             x+8-((game.cour.nodes[0].x[1]+game.cour.nodes[0].x[2])/(MAPSCALE*2.0f)),
             y+((game.cour.nodes[0].z[1]+game.cour.nodes[0].z[2])/(MAPSCALE*2.0f)));
 
         for(i=0; i< game.cour.info.nsegments; i++)
-            shapeRenderer.line(x-((game.cour.nodes[i].x[1]+game.cour.nodes[i].x[2])/(MAPSCALE*2.0f)),
+            game.shapeRenderer.line(x-((game.cour.nodes[i].x[1]+game.cour.nodes[i].x[2])/(MAPSCALE*2.0f)),
                                 y+((game.cour.nodes[i].z[1]+game.cour.nodes[i].z[2])/(MAPSCALE*2.0f)),
                                 x-((game.cour.nodes[(i+1)%game.cour.info.nsegments].x[1]+game.cour.nodes[(i+1)%game.cour.info.nsegments].x[2])/(MAPSCALE*2.0f)),
                                 y+((game.cour.nodes[(i+1)%game.cour.info.nsegments].z[1]+game.cour.nodes[(i+1)%game.cour.info.nsegments].z[2])/(MAPSCALE*2.0f)));
-        shapeRenderer.end();
+        game.shapeRenderer.end();
 
         game.batch.begin();
         for(i=game.nplayers-1; i>=0; i--){

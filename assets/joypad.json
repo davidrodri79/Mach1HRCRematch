@@ -1,0 +1,94 @@
+{
+  "buttons" : [
+    {
+      x: 100
+      y: 280
+      width: 80
+      height: 80,
+      action: Up,
+      "keyboard": 20,
+      image_on: "gui/SOUTH_ON.png",
+      image_off: "gui/SOUTH.png"
+    },
+    {
+      x: 180
+      y: 200
+      width: 80
+      height: 80
+      action: Right,
+      "keyboard": 22,
+      image_on: "gui/EAST_ON.png",
+      image_off: "gui/EAST.png"
+    },
+    {
+      x: 20
+      y: 200
+      width: 80
+      height: 80,
+      action: Left,
+      "keyboard": 21,
+      image_on: "gui/WEST_ON.png",
+      image_off: "gui/WEST.png"
+    },
+    {
+      x: 100
+      y: 120
+      width: 80
+      height: 80,
+      action: Down,
+      "keyboard": 19,
+      image_on: "gui/NORTH_ON.png",
+      image_off: "gui/NORTH.png"
+    },
+    {
+      x: 750
+      y: 60
+      width: 80
+      height: 80
+      action: Button1,
+      keyboard: 67,
+      image_on: "gui/WEAPON_ON.png",
+      image_off: "gui/WEAPON.png"
+    }
+    {
+      x: 750
+      y: 160
+      width: 80
+      height: 80
+      action: Button2,
+      keyboard: 62,
+      image_on: "gui/SWITCH_ON.png",
+      image_off: "gui/SWITCH.png"
+    }
+    {
+      x: 750
+      y: 260
+      width: 80
+      height: 80
+      action: Button3,
+      keyboard: 130,
+      image_on: "gui/ATTACK_ON.png",
+      image_off: "gui/ATTACK.png"
+    }
+    {
+      x: 750
+      y: 360
+      width: 80
+      height: 80
+      action: Button4,
+      "keyboard": 60,
+      image_on: "gui/STRAFE_ON.png",
+      image_off: "gui/STRAFE.png"
+    }
+    {
+      x: 10
+      y: 10
+      width: 40
+      height: 40
+      action: Back,
+      "keyboard": 61,
+      image_on: "gui/MAP_ON.png",
+      image_off: "gui/MAP.png"
+    }
+  ]
+}

@@ -94,6 +94,9 @@ public class ShipSelectSingleScreen implements Screen {
         game.fuente.show_text(game.batch,30,30,"MAX.SPEED",0); game.statbar.render2d(game.batch, 0,0,25*(sp+1),16,175,30,(int)(175+50*(sp+1)),30+16,1-0);
         game.batch.end();
 
+        game.ctr.renderButtonLayout(game.shapeRenderer);
+
+
         /*
         char car[5][10]={"LOW","MEDIUM","HIGH","VERY HIGH","AWESOME"}, s[30];
         int sp;

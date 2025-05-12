@@ -46,6 +46,8 @@ public class MainMenuScreen implements Screen {
         game.show_menu_cursor(195,252-(40*cursor));
         game.batch.end();
 
+        game.ctr.renderButtonLayout(game.shapeRenderer);
+
 
         if(((game.ctr.aba(controlm.TEC1)) || (game.ctr.aba(game.gdata.controls[0]))) && (cur_wait<=0)) {cursor=(cursor+1)%5; cur_wait=20/70f;};
         if(((game.ctr.arr(controlm.TEC1)) || (game.ctr.arr(game.gdata.controls[0]))) && (cur_wait<=0)) {cursor-=1; if(cursor<0) cursor=4; cur_wait=20/70f;};
