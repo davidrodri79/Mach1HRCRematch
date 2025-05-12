@@ -205,6 +205,8 @@ public class controlm implements InputProcessor, ControllerListener {
 
         public void renderButtonLayout(ShapeRenderer shapeRenderer)
         {
+            camera.update();
+            shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.setAutoShapeType(true);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 

@@ -93,7 +93,7 @@ public class IntroScreen implements Screen {
             game.presents.render2d(game.batch,0,0,256,64,200,50,440,85,(counter-1050)/350f);
         game.batch.end();
 
-        if((game.ctr.algun_boton(controlm.TEC1)) || (counter>=1680)){
+        if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0])) || (counter>=1680)){
             //mus->stop(); mus->release();
             game.setScreen(new TitleScreen(game));
             dispose();

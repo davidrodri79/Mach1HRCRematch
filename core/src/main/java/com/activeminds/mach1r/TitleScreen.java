@@ -38,7 +38,7 @@ public class TitleScreen implements Screen {
 
         //ctr->actualiza();
         if (counter>60)
-            if((game.ctr.algun_boton(controlm.TEC1)) /*|| (ctr->algun_boton(gdata.controls[0]))*/) {
+            if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))) {
                 game.setScreen(new MainMenuScreen(game));
                 dispose();
             }

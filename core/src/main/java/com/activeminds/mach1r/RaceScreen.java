@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 public class RaceScreen implements Screen {
 
+    public static final int HUD_START_X = (Main.SCREENX - 640) / 2;
     public static final float GROUNDWIDTH = 4900.0f;
     public static final float SKYWIDTH = 6000.0f;
     public static final float GROUNDTILE = 12.0f;
@@ -775,23 +776,23 @@ public class RaceScreen implements Screen {
         if(state == SINGLE)
         {
             game.batch.begin();
-            show_position(game.batch,0, 20, 400);
+            show_position(game.batch,0, HUD_START_X+20, 400);
 
-            show_speed(game.batch, (int) game.pl[0].velocity_kmh(), 20, 10);
+            show_speed(game.batch, (int) game.pl[0].velocity_kmh(), HUD_START_X+20, 10);
 
-            show_power(game.batch,0, 400, 340, 0);
+            show_power(game.batch,0, HUD_START_X+400, 340, 0);
 
             //Lap count
             String s = "LAP " + game.pl[0].lap + "/" + game.cour.info.nlaps;
-            game.fuente.show_text(game.batch, 200, 400, s, 1);
+            game.fuente.show_text(game.batch, HUD_START_X+200, 400, s, 1);
             s = "BOOST " + game.pl[0].nboosts;
-            game.fuente.show_text(game.batch, 500, 345, s, 1);
+            game.fuente.show_text(game.batch, HUD_START_X+500, 345, s, 1);
 
             show_icon_rank();
 
             game.batch.end();
 
-            show_map(550, 70);
+            show_map(HUD_START_X+550, 70);
         }
         else if(state == VERSUS)
         {
@@ -967,7 +968,7 @@ public class RaceScreen implements Screen {
                 updatesPending--;
             }
             //ctr->actualiza();
-            if((game.ctr.algun_boton(controlm.TEC1)) || (counter>7200) || (game.pl[0].state==ship.DESTR))
+            if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))|| (counter>7200) || (game.pl[0].state==ship.DESTR))
             {
                 //destroy_course();
                 game.setScreen(new TitleScreen(game));
@@ -1069,10 +1070,10 @@ public class RaceScreen implements Screen {
         for(i=0; i<game.nplayers; i++){
 
             if(i<3) s=1.4f-(0.2f*i); else s=1.0f;
-            x=70; y=300-40*i;
+            x=HUD_START_X+70; y=300-40*i;
             if(game.pl[game.position[i]].state==ship.DESTR) c=0.1f; else c=1.0f;
             game.mini[game.racing_ship[game.position[i]]].render2dcolor(game.batch, 0,0,128,128,x,y,(int)(x+61*s),(int)(y+46*s),1.0f,c,c,c);
-            x=30; y=310-40*i;
+            x=HUD_START_X+30; y=310-40*i;
             game.posnumber.render2d(game.batch, (i%4)*16,64-(16*((int)(i/4)+1)),((i%4)+1)*16,64-(16*(int)(i/4)),x,y,x+32,y+32,1);
         };
 
