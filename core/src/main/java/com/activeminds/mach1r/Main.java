@@ -59,7 +59,7 @@ public class Main extends Game {
             controls[2] = controlm.NOTC;
             controls[3] = controlm.NOTC;
             for(int i=0;i<NSHIPS;i++)
-                available[i] = i < ship.ICARUS ? 1 : 0;
+                available[i] = 1;//i < ship.ICARUS ? 1 : 0;
             drawdist = 2;
             nlaps = 3;
             music = true; sound = true;

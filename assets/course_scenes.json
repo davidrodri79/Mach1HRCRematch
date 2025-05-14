@@ -3,6 +3,7 @@
     {
       "name" : "city",
       "descr" : "sceneName0",
+      "modelGouraud" : [false, true, true],
       "fogcolor" : [0.9,0.9,0.9],
       "skycolor" : [0.0,0.749,0.98],
       "roadcolor" : [0.184,0.271,0.357]
@@ -11,6 +12,7 @@
     {
       "name" : "desert",
       "descr" : "sceneName1",
+      "modelGouraud" : [true, true, true],
       "fogcolor" : [0.961, 0.823, 0.412],
       "skycolor" : [0.972, 0.027, 0.004],
       "roadcolor" : [0.451, 0.388, 0.251]
@@ -19,6 +21,7 @@
     {
       "name" : "volcano",
       "descr" : "sceneName2",
+      "modelGouraud" : [true, true, true],
       "fogcolor" : [0.3, 0.3, 0.3],
       "skycolor" : [1, 0, 0],
       "roadcolor" : [0, 0, 0]
@@ -27,6 +30,7 @@
     {
       "name" : "indust",
       "descr" : "sceneName3",
+      "modelGouraud" : [true, true, false],
       "fogcolor" : [0.54, 0.627, 0.545],
       "skycolor" : [0.227, 0.812, 0.569],
       "roadcolor" : [0.580, 0.620, 0.580]
@@ -35,6 +39,7 @@
     {
       "name" : "ruins",
       "descr" : "sceneName4",
+      "modelGouraud" : [false, true, true],
       "fogcolor" : [0.769, 0.620, 0.533],
       "skycolor" : [0.227, 0.812, 0.569],
       "roadcolor" : [0.937, 0.871, 0.839]
@@ -43,6 +48,7 @@
     {
       "name" : "sea",
       "descr" : "sceneName5",
+      "modelGouraud" : [true, true, true],
       "fogcolor" : [0.9, 0.9, 0.9],
       "skycolor" : [0, 0, 0],
       "roadcolor" : [0.259, 0.223, 0.259]

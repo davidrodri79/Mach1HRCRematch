@@ -74,6 +74,7 @@ public class course {
     public static class course_scene {
             String name;
             String descr;
+            boolean modelGouraud[] = new boolean[3];
             float fogcolor[] = new float[3];
             float skycolor[] = new float[3];
             float roadcolor[] = new float[3];
@@ -179,7 +180,7 @@ public class course {
 
         for(int i=0; i<3; i++){
             decorate[i]=new solid();
-            decorate[i].load_mesh("scene/"+scenes.course_scenes.get(ci.scene).name+(i+1)+".msh", true);
+            decorate[i].load_mesh("scene/"+scenes.course_scenes.get(ci.scene).name+(i+1)+".msh", scenes.course_scenes.get(ci.scene).modelGouraud[i]);
             decorate[i].centrate(true,false,true);
         };
 

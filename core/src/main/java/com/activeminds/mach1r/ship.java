@@ -61,6 +61,7 @@ public class ship {
     static class ship_model
     {
         String name, file;
+        boolean gouraud;
         float light[] = new float[3];
         int nlights;
         float lsize, lpos[][] = new float[MAX_LIGHTS][3];
@@ -100,11 +101,11 @@ public class ship {
 
         data = models.ships.get(model);
         mesh = new solid();
-        mesh.load_mesh("model/"+data.file+".msh", true);
+        mesh.load_mesh("model/"+data.file+".msh", data.gouraud);
         mesh.centrate(true,true,true);
 
         lowres = new solid();
-        lowres.load_mesh("model/"+data.file+"lr.msh", true);
+        lowres.load_mesh("model/"+data.file+"lr.msh", data.gouraud);
         lowres.centrate(true,true,true);
 
         logo=new sprite(256,128,"sprite/"+data.file+"lg.png");
