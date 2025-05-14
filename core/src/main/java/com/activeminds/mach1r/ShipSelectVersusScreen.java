@@ -33,7 +33,12 @@ public class ShipSelectVersusScreen implements Screen {
     public void render(float delta) {
 
 
-        String car[]={"L","M","H","VH","A"};
+        String car[]={Main.loc.get("statsShort0"),
+            Main.loc.get("statsShort1"),
+            Main.loc.get("statsShort2"),
+            Main.loc.get("statsShort3"),
+            Main.loc.get("statsShort4")
+        };
 
         game.counter += delta*70f;
         //if (cur_wait > 0) cur_wait--;
@@ -53,25 +58,25 @@ public class ShipSelectVersusScreen implements Screen {
             }
         };
 
-        game.fuente.show_text(game.batch, 150,450,"PLEASE SELECT YOUR SHIP",1);
+        game.fuente.show_text(game.batch, 150,450, Main.loc.get("selectShip"),1);
         for(int i=0; i<game.nhumans; i++){
             int x=20+150*i;
 
             if(sel_confirm[i]){
 
                 game.fuente.show_text(game.batch, x,100,ship.models.ships.get(game.gdata.sel_ship[i]).file,0);
-                game.fuente.show_text(game.batch,x,60,"get",0);
-                game.fuente.show_text(game.batch,x,40,"  ready!",0);
+                game.fuente.show_text(game.batch,x,60, Main.loc.get("getReady1"),0);
+                game.fuente.show_text(game.batch,x,40, Main.loc.get("getReady2"),0);
 
             }else if(game.gdata.available[game.gdata.sel_ship[i]] != 0){
 
                 game.fuente.show_text(game.batch, x,100,ship.models.ships.get(game.gdata.sel_ship[i]).file,0);
                 String s = ship.models.ships.get(game.gdata.sel_ship[i]).weight + " KG";
                 game.fuente.show_text(game.batch, x,80,s,0);
-                game.fuente.show_text(game.batch, x,60,"BOOST :",0); game.fuente.show_text(game.batch, x+105,60,car[ship.models.ships.get(game.gdata.sel_ship[i]).enginef],0);
-                game.fuente.show_text(game.batch, x,40,"HANDL.:",0); game.fuente.show_text(game.batch, x+105,40,car[ship.models.ships.get(game.gdata.sel_ship[i]).handling],0);
+                game.fuente.show_text(game.batch, x,60, Main.loc.get("boostShort"),0); game.fuente.show_text(game.batch, x+105,60,car[ship.models.ships.get(game.gdata.sel_ship[i]).enginef],0);
+                game.fuente.show_text(game.batch, x,40, Main.loc.get("handlingShort"),0); game.fuente.show_text(game.batch, x+105,40,car[ship.models.ships.get(game.gdata.sel_ship[i]).handling],0);
                 int sp=ship.models.ships.get(game.gdata.sel_ship[i]).enginef-(int)(ship.models.ships.get(game.gdata.sel_ship[i]).weight/500)+1;
-                game.fuente.show_text(game.batch, x,20,"SPEED :",0); game.fuente.show_text(game.batch, x+105,20,car[sp],0);
+                game.fuente.show_text(game.batch, x,20, Main.loc.get("speedShort"),0); game.fuente.show_text(game.batch, x+105,20,car[sp],0);
 
             }else{
                 game.fuente.show_text(game.batch, x,100,"????",0);

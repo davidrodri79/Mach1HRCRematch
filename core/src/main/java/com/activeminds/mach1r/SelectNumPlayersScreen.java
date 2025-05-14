@@ -31,9 +31,9 @@ public class SelectNumPlayersScreen implements Screen {
         game.batch.setProjectionMatrix(game.camera2d.combined);
         game.batch.begin();
         game.show_scrolling_wallp();
-        game.fuente.show_text(game.batch, 150,440,"MULTIPLAYER VERSUS RACE",1);
-        game.fuente.show_text(game.batch, 100,400,"PLEASE SELECT NUMBER OF PLAYERS",1);
-        game.fuente.show_text(game.batch, 40,30,"PUSH ANY BUTTON OF PLAYER ONE TO PROCEED",1);
+        game.fuente.show_text(game.batch, 150,440,Main.loc.get("multiplayerVersus"),1);
+        game.fuente.show_text(game.batch, 100,400,Main.loc.get("selectNumPlayers"),1);
+        game.fuente.show_text(game.batch, 40,30,Main.loc.get("pushAnyButton1p"),1);
         int j=80;
         game.posnumber.render2d(game.batch,((game.nhumans-1)%4)*16,64-(16*((int)((game.nhumans-1)/4)+1)),(((game.nhumans-1)%4)+1)*16,64-(16*(int)((game.nhumans-1)/4)),320-j,240-j,320+j,240+j,1);
         game.batch.end();

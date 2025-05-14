@@ -35,14 +35,14 @@ public class EnduranceSelectScreen implements Screen {
         game.batch.setProjectionMatrix(game.camera2d.combined);
         game.batch.begin();
         game.show_scrolling_wallp();
-        game.fuente.show_text(game.batch,190,440,"ENDURANCE CHALLENGE",1);
-        String s = "stage "+(game.gdata.sel_endur+1);
+        game.fuente.show_text(game.batch,190,440,Main.loc.get("enduranceChallenge"),1);
+        String s = Main.loc.get("stage")+" "+(game.gdata.sel_endur+1);
         game.fuente.show_text(game.batch, 40,390,s,0);
-        s = game.dif_name[race.dif] +"'s "+
-            course.ctype_name[race.type]+" at "+
-            course.scenes.course_scenes.get(race.scene).descr;
+        s = Main.loc.get(game.dif_name[race.dif]) +Main.loc.get("diff_s")+" "+
+            Main.loc.get(course.ctype_name[race.type])+" "+Main.loc.get("at")+" "+
+            Main.loc.get(course.scenes.course_scenes.get(race.scene).descr);
         game.fuente.show_text(game.batch,40,350,s,0);
-        s = "racing for "+race.nlaps +" laps versus "+
+        s = Main.loc.get("racingFor1")+" "+race.nlaps +Main.loc.get("racingFor2")+" "+
             ship.models.ships.get(race.op).name;
         game.fuente.show_text(game.batch, 40,310,s,0);
         game.preview[course.endurance.races.get(game.gdata.sel_endur).scene].render2d(game.batch,0,0,128,128,224,140,224+192,140+144,1);
@@ -50,9 +50,9 @@ public class EnduranceSelectScreen implements Screen {
         if(game.gdata.sel_endur>0) game.fuente.show_text(game.batch,80,190,"<<",0);
         if(game.gdata.sel_endur<game.gdata.res_endur-1) {
             game.fuente.show_text(game.batch, 540,190,">>",0);
-            game.fuente.show_text(game.batch,230,100,"STAGE CLEARED",1);
+            game.fuente.show_text(game.batch,230,100,Main.loc.get("stageCleared"),1);
         };
-        game.fuente.show_text(game.batch,150,30,"PUSH ANY BUTTON TO RACE",1);
+        game.fuente.show_text(game.batch,150,30,Main.loc.get("pushAnyButtonRace"),1);
         game.batch.end();
 
         // LOGIC ============================

@@ -33,15 +33,15 @@ public class RaceResultScreen implements Screen {
         game.batch.begin();
         game.show_scrolling_wallp();
 
-        game.fuente.show_text(game.batch, 250,440,"RACE RESULTS",1);
+        game.fuente.show_text(game.batch, 250,440,Main.loc.get("raceResults"),1);
         for(int j=0; j<game.nplayers; j++){
 
             int i=game.position[j];
             String s;
             if(game.pl[i].state==ship.DESTR)
-            s=(j+1)+"."+game.pl[i].data.name+" - DISQUALIFIED";
+            s=(j+1)+"."+game.pl[i].data.name+" - "+Main.loc.get("disqualifiedShort");
 		    else if(!game.pl[i].raceover)
-                s=(j+1)+"."+game.pl[i].data.name+" - NOT FINISHED";
+                s=(j+1)+"."+game.pl[i].data.name+" - "+Main.loc.get("notFinished");
 		    else{
                 String s2=game.pl[i].time_str(game.pl[i].totaltime);
                 s = (j+1)+"."+game.pl[i].data.name+" - "+s2;
@@ -50,9 +50,9 @@ public class RaceResultScreen implements Screen {
             if(i<game.nhumans) game.plcursor[game.gdata.icons[i]].render2d( game.batch,0,0,32,32,100,375-40*j,130,375+30-40*j,1.0f);
         };
         if((game.game_mode==Main.ENDURANCE) && (game.pl[0].raceover) && (game.position[0]==0))
-            game.fuente.show_text(game.batch, 110,140,"CONGRATULATIONS,STAGE CLEARED!",0);
+            game.fuente.show_text(game.batch, 110,140,Main.loc.get("congratsStageClear"),0);
 
-        game.fuente.show_text(game.batch, 40,30,"PUSH ANY BUTTON OF PLAYER ONE TO PROCEED",1);
+        game.fuente.show_text(game.batch, 40,30,Main.loc.get("pushAnyButton1p"),1);
 
         game.batch.end();
 

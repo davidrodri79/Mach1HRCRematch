@@ -1,7 +1,7 @@
 {
   "champ_events" : [
     {
-      "name": "sunday's cup",
+      "name": "championshipName0",
       "minimum": 0,
       "reward" : 4,
       nraces : 4,
@@ -33,7 +33,7 @@
       ]
     },
     {
-      "name": "urban trip",
+      "name": "championshipName1",
       "minimum": 3,
       "reward" : 8,
       nraces : 5,
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "name": "sliding challenge",
+      "name": "championshipName2",
       "minimum": 3,
       "reward" : 10,
       nraces : 5,
@@ -109,7 +109,7 @@
       ]
     },
     {
-      "name": "amateur's contest",
+      "name": "championshipName3",
       "minimum": 15,
       "reward" : 20,
       nraces : 5,
@@ -147,7 +147,7 @@
       ]
     },
     {
-      "name": "dusty trial",
+      "name": "championshipName4",
       "minimum": 35,
       "reward" : 40,
       nraces : 5,
@@ -185,7 +185,7 @@
       ]
     },
     {
-      "name": "race of the fire storm",
+      "name": "championshipName5",
       "minimum": 35,
       "reward" : 40,
       nraces : 5,
@@ -223,7 +223,7 @@
       ]
     },
     {
-      "name": "mach 1 little racing championship",
+      "name": "championshipName6",
       "minimum": 150,
       "reward" : 175,
       nraces : 6,
@@ -267,7 +267,7 @@
       ]
     },
     {
-      "name": "industrial adventure",
+      "name": "championshipName7",
       "minimum": 600,
       "reward" : 610,
       nraces : 5,
@@ -305,7 +305,7 @@
       ]
     },
     {
-      "name": "professional prix",
+      "name": "championshipName8",
       "minimum": 600,
       "reward" : 650,
       nraces : 6,
@@ -349,7 +349,7 @@
       ]
     },
     {
-      "name": "ancient god's tournament",
+      "name": "championshipName9",
       "minimum": 600,
       "reward" : 700,
       nraces : 5,
@@ -388,7 +388,7 @@
     }
     ,
     {
-      "name": "trial of jumps",
+      "name": "championshipName10",
       "minimum": 1500,
       "reward" : 1550,
       nraces : 4,
@@ -420,7 +420,7 @@
       ]
     },
     {
-      "name": "marine trip",
+      "name": "championshipName11",
       "minimum": 1500,
       "reward" : 1600,
       nraces : 5,
@@ -458,7 +458,7 @@
       ]
     },
     {
-      "name": "nightmare journey",
+      "name": "championshipName12",
       "minimum": 1500,
       "reward" : 1700,
       nraces : 4,
@@ -490,7 +490,7 @@
       ]
     },
     {
-      "name": "risky edges",
+      "name": "championshipName13",
       "minimum": 1500,
       "reward" : 2000,
       nraces : 4,
@@ -522,7 +522,7 @@
       ]
     },
     {
-      "name": "elite's final challenge",
+      "name": "championshipName14",
       "minimum": 3500,
       "reward" : 4000,
       nraces : 8,
@@ -578,7 +578,7 @@
       ]
     },
     {
-      "name": "mach 1 hyper racing championship",
+      "name": "championshipName15",
       "minimum": 15000,
       "reward" : 30000,
       nraces : 6,

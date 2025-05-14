@@ -33,12 +33,12 @@ public class ChampionshipSelectScreen implements Screen {
         game.batch.begin();
         game.show_scrolling_wallp();
 
-        game.fuente.show_text(game.batch,40,440,"CHAMPIONSHIP EVENTS",1);
-        game.fuente.show_text(game.batch,450,440,"SCORE:"+game.gdata.score_champ,1);
+        game.fuente.show_text(game.batch,40,440,Main.loc.get("championshipEvents"),1);
+        game.fuente.show_text(game.batch,450,440,Main.loc.get("score")+game.gdata.score_champ,1);
         for(int i=0; i< course.championship.champ_events.size(); i++)
-            game.fuente.show_text(game.batch, 60,400-20*i,course.championship.champ_events.get(i).name,0);
+            game.fuente.show_text(game.batch, 60,400-20*i,Main.loc.get(course.championship.champ_events.get(i).name),0);
         game.show_menu_cursor(5,392-(20*game.gdata.sel_champ));
-        game.fuente.show_text(game.batch,70,30,"PUSH ANY BUTTON TO VIEW DESCRIPTION",1);
+        game.fuente.show_text(game.batch,70,30,Main.loc.get("pushAnyButtonDescr"),1);
         game.batch.end();
 
 

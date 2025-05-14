@@ -40,7 +40,7 @@ public class LocalizationManager {
         }
         catch(MissingResourceException e)
         {
-            text = key+"_MISSING_TEXT";
+            text = key+"_missing_text";
         }
         return text;
     }

@@ -30,17 +30,17 @@ public class RankingScreen implements Screen {
         game.batch.setProjectionMatrix(game.camera2d.combined);
         game.batch.begin();
         game.show_scrolling_wallp();
-        game.fuente.show_text(game.batch,220,440,"CURRENT RANKING",1);
+        game.fuente.show_text(game.batch,220,440,Main.loc.get("currentRanking"),1);
         for(int j=0; j<game.nplayers; j++){
 
             int i=game.ranking[j];
 
-            String s = (j+1)+"."+ship.models.ships.get(game.racing_ship[i]).name+" - "+game.scores[i]+" POINTS";
+            String s = (j+1)+"."+ship.models.ships.get(game.racing_ship[i]).name+" - "+game.scores[i]+" "+Main.loc.get("points");
             game.fuente.show_text(game.batch, 135,380-40*j,s,0);
             if(i<game.nhumans) game.plcursor[game.gdata.icons[i]].render2d( game.batch,0,0,32,32,100,375-40*j,130,375+30-40*j,1.0f);
         };
-        game.fuente.show_text(game.batch, 30,60,"PUSH ANY BUTTON OF PLAYER ONE TO CONTINUE",1);
-        game.fuente.show_text(game.batch, 180,30,"OR ESCAPE TO FINISH",1);
+        game.fuente.show_text(game.batch, 30,60,Main.loc.get("pushAnyButton1p"),1);
+        game.fuente.show_text(game.batch, 180,30,Main.loc.get("orEscToFinish"),1);
         game.batch.end();
 
         // LOGIC =============================================
