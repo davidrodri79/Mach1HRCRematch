@@ -35,18 +35,18 @@ public class ChampionshipStageScreen implements Screen {
         game.batch.setProjectionMatrix(game.camera2d.combined);
         game.batch.begin();
         game.show_scrolling_wallp();
-        game.fuente.show_text(game.batch,40,440,event.name,0);
-        s ="RACE "+(game.champ_stage+1)+" OF "+event.nraces;
+        game.fuente.show_text(game.batch,40,440,Main.loc.get(event.name),0);
+        s =Main.loc.get("race")+" "+(game.champ_stage+1)+" "+Main.loc.get("of")+" "+event.nraces;
         game.fuente.show_text(game.batch,240,390,s,1);
-        s = game.dif_name[race.dif]+"'s "+
-            course.ctype_name[race.type]+" at "+
-            course.scenes.course_scenes.get(race.scene).descr;
+        s = Main.loc.get(game.dif_name[race.dif])+Main.loc.get("diff_s")+" "+
+            Main.loc.get(course.ctype_name[race.type])+" "+Main.loc.get("at")+" "+
+            Main.loc.get(course.scenes.course_scenes.get(race.scene).descr);
         game.fuente.show_text(game.batch,40,350,s,0);
-        s = "RACING FOR "+race.nlaps+" LAPS";
+        s = Main.loc.get("racingFor")+" "+race.nlaps+" "+Main.loc.get("laps");
         game.fuente.show_text(game.batch, 200,310,s,1);
         game.preview[race.scene].render2d(game.batch,0,0,128,128,224,140,224+192,140+144,1);
 
-        game.fuente.show_text(game.batch,150,30,"PUSH ANY BUTTON TO RACE",1);
+        game.fuente.show_text(game.batch,150,30,Main.loc.get("pushAnyButtonRace"),1);
         game.batch.end();
 
         // LOGIC ===========================================

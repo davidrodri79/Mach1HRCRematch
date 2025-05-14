@@ -9,7 +9,7 @@ public class ControlOptionsScreen implements Screen {
     float cur_wait = 0;
     int cursor = 0;
 
-    String[] ctr_str={"       disabled","cursor+shft+ctrl+enter","    wasduiop keys","   joystick/joypad","       mouse", "    tactile"};
+    String[] ctr_str={"controlStr0", "controlStr1", "controlStr2", "controlStr3", "controlStr4", "controlStr5"};
 
 
     public ControlOptionsScreen(Main game)
@@ -37,18 +37,18 @@ public class ControlOptionsScreen implements Screen {
         game.show_scrolling_wallp();
 
         for(int i=0; i<4; i++){
-            String s = "control pl "+(i+1);
+            String s = Main.loc.get("controlPl")+" "+(i+1);
             game.fuente.show_text(game.batch,100,350-40*i,s,0);
-            game.fuente.show_text(game.batch,300,350-40*i,ctr_str[game.gdata.controls[i]],0);
+            game.fuente.show_text(game.batch,300,350-40*i,Main.loc.get(ctr_str[game.gdata.controls[i]]),0);
         };
         for(int i=0; i<4; i++){
-            String s = "player "+(i+1)+" versus icon";
+            String s = Main.loc.get("player")+" "+(i+1)+" "+Main.loc.get("versusIcon");
             game.fuente.show_text(game.batch,100,190-40*i,s,0);
             game.plcursor[game.gdata.icons[i]].render2d(game.batch, 0,0,32,32,440,184-40*i,468,212-40*i,1.0f);
 
         };
-        game.fuente.show_text(game.batch,100,30,"back to options menu",0);
-        game.fuente.show_text(game.batch,210,440,"CONTROL OPTIONS",1);
+        game.fuente.show_text(game.batch,100,30,Main.loc.get("backToOptions"),0);
+        game.fuente.show_text(game.batch,210,440,Main.loc.get("controlOptionsTitle"),1);
 
         game.show_menu_cursor(55,342-(40*cursor));
 

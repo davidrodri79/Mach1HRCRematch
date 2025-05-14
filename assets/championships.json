@@ -4,6 +4,20 @@
       "name": "championshipName0",
       "minimum": 0,
       "reward" : 4,
+      nraces : 1,
+      "races" : [
+        {
+          "type" : 0,
+          dif : 0,
+          "nlaps" : 1,
+          scene : 0
+        }
+      ]
+    },
+    {
+      "name": "championshipName0",
+      "minimum": 0,
+      "reward" : 4,
       nraces : 4,
       "races" : [
         {

@@ -49,7 +49,7 @@ public class Main extends Game {
         long score_champ;
         int controls[] = new int[4];
         boolean music, sound, skygrfog;
-        int music_volume, drawdist, daytime, icons[] = new int[4], sel_endur, res_endur, sel_champ;
+        int music_volume, drawdist, daytime, icons[] = new int[4], sel_endur, res_endur, sel_champ, language;
 
         game_data()
         {
@@ -70,6 +70,7 @@ public class Main extends Game {
             icons[2] = 2;
             icons[3] = 3;
             res_endur = 1;
+            language=0;
         }
     }
 
@@ -106,7 +107,7 @@ public class Main extends Game {
     int nhumans = 1, game_mode, ranking[] = new int[MAXPLAYERS], scores[] = new int[MAXPLAYERS], champ_stage, new_ship;
     boolean abort_champ = false;
 
-    String  rank_str[]={"1ST","2ND","3RD","4TH","5TH","6TH"};
+    String  rank_str[]={"rank1", "rank2", "rank3", "rank4", "rank5" ,"rank6"};
 
     static LocalizationManager loc;
 
@@ -136,7 +137,7 @@ public class Main extends Game {
         load_game_data();
 
         loc = new LocalizationManager();
-        loc.loadLanguage(0);
+        loc.loadLanguage(gdata.language);
 
         ship.load_static_data();
         course.load_static_data();
@@ -353,6 +354,7 @@ public class Main extends Game {
         buffer.putInt(gdata.sel_endur);
         buffer.putInt(gdata.res_endur);
         buffer.putInt(gdata.sel_champ);
+        buffer.putInt(gdata.language);
         buffer.put((byte) 255);
 
         byte[] bytes = buffer.array();
@@ -394,6 +396,7 @@ public class Main extends Game {
             gdata.sel_endur = buffer.getInt();
             gdata.res_endur = buffer.getInt();
             gdata.sel_champ = buffer.getInt();
+            gdata.language = buffer.getInt();
         }
 
         wave.WAVE_ENABLE=gdata.sound;
@@ -437,6 +440,5 @@ public class Main extends Game {
     @Override
     public void dispose() {
         batch.dispose();
-        image.dispose();
     }
 }

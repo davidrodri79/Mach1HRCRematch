@@ -55,9 +55,9 @@ public class ChampionshipPrizeScreen implements Screen {
         game.batch.begin();
         game.show_scrolling_wallp();
 
-        game.fuente.show_text(game.batch, 40,440,event.name,0);
-        game.fuente.show_text(game.batch, 230,400,"final results",0);
-        String s = "YOU PLACED "+game.rank_str[game.ranking_position(0)];
+        game.fuente.show_text(game.batch, 40,440,Main.loc.get(event.name),0);
+        game.fuente.show_text(game.batch, 230,400,Main.loc.get("finalResults"),0);
+        String s = Main.loc.get("youPlaced")+" "+Main.loc.get(game.rank_str[game.ranking_position(0)]);
         game.fuente.show_text(game.batch, 220,360,s,1);
         if(game.ranking_position(0)<3){
             switch(game.ranking_position(0)){
@@ -65,12 +65,12 @@ public class ChampionshipPrizeScreen implements Screen {
                 case 1 : p=(int)(event.reward/2.0); break;
                 case 2 : p=(int)(event.reward/4.0); break;
             };
-            game.fuente.show_text(game.batch, 200,110,"congratulations!",0);
-            s = "RECEIVED A PRIZE OF "+p+" POINTS";
+            game.fuente.show_text(game.batch, 200,110,Main.loc.get("congratulations"),0);
+            s = Main.loc.get("receivedAPrizeOf")+" "+p+" "+Main.loc.get("points");
             game.fuente.show_text(game.batch,110,80,s,1);
-        }else game.fuente.show_text(game.batch,175,80,"SORRY NO PRIZE EARNED",1);
+        }else game.fuente.show_text(game.batch,175,80,Main.loc.get("sorryNoPrize"),1);
 
-        game.fuente.show_text(game.batch,150,30,"PUSH ANY BUTTON TO ACCEPT",1);
+        game.fuente.show_text(game.batch,150,30,Main.loc.get("pushAnyButtonAccept"),1);
         game.batch.end();
 
         // 3D Layer

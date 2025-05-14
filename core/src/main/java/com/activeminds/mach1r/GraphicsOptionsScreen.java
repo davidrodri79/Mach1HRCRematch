@@ -12,8 +12,8 @@ public class GraphicsOptionsScreen implements Screen {
 
 
     String resol_str[]={"320x200","400x300","512x384","640x480","800x600","1024x768"},
-           dist_str[]={"near","medium"," far"},
-            time_str[]={"real","day","dawn","night"};
+           dist_str[]={"distStr0","distStr1","distStr2"},
+            time_str[]={"timeStr0","timeStr1","timeStr2","timeStr3"};
 
     public GraphicsOptionsScreen(Main game)
     {
@@ -39,19 +39,21 @@ public class GraphicsOptionsScreen implements Screen {
         game.batch.begin();
         game.show_scrolling_wallp();
 
-        game.fuente.show_text(game.batch,100,350,"resolution",0);
+        game.fuente.show_text(game.batch,100,350,Main.loc.get("resolution"),0);
         game.fuente.show_text(game.batch,400,350,resol_str[game.gdata.resol],0);
-        game.fuente.show_text(game.batch,100,310,"drawing distance",0);
-        game.fuente.show_text(game.batch,420,310,dist_str[game.gdata.drawdist],0);
-        game.fuente.show_text(game.batch,100,270,"sky and fog",0);
-        if(game.gdata.skygrfog) game.fuente.show_text(game.batch,440,270,"on",0);
-        else game.fuente.show_text(game.batch,440,270,"off",0);
-        game.fuente.show_text(game.batch,100,230,"day hour",0);
-        game.fuente.show_text(game.batch,420,230,time_str[game.gdata.daytime],0);
+        game.fuente.show_text(game.batch,100,310,Main.loc.get("drawingDistance"),0);
+        game.fuente.show_text(game.batch,420,310,Main.loc.get(dist_str[game.gdata.drawdist]),0);
+        game.fuente.show_text(game.batch,100,270,Main.loc.get("skyAndFog"),0);
+        if(game.gdata.skygrfog) game.fuente.show_text(game.batch,440,270,Main.loc.get("on"),0);
+        else game.fuente.show_text(game.batch,440,270,Main.loc.get("off"),0);
+        game.fuente.show_text(game.batch,100,230,Main.loc.get("dayHour"),0);
+        game.fuente.show_text(game.batch,420,230,Main.loc.get(time_str[game.gdata.daytime]),0);
+        game.fuente.show_text(game.batch,100,190,Main.loc.get("language"),0);
+        game.fuente.show_text(game.batch,420,190,Main.loc.get("currentLanguage"),0);
 
-        game.fuente.show_text(game.batch,100,190,"back to options menu",0);
-        game.fuente.show_text(game.batch,210,440,"GRAPHICS OPTIONS",1);
-        game.fuente.show_text(game.batch,30,30,"SOME OPTIONS MUST RESTART TO TAKE EFFECT",1);
+        game.fuente.show_text(game.batch,100,150,Main.loc.get("backToOptions"),0);
+        game.fuente.show_text(game.batch,210,440,Main.loc.get("gfxOptionsTitle"),1);
+        game.fuente.show_text(game.batch,30,30,Main.loc.get("someOptionsMustRestart"),1);
 
         game.show_menu_cursor(55,342-(40*cursor));
 
@@ -62,9 +64,9 @@ public class GraphicsOptionsScreen implements Screen {
         //game.ctr.actualiza();
         if((cur_wait<=0) && (game.counter>30)){
             if((game.ctr.arr(controlm.TEC1)) || (game.ctr.arr(game.gdata.controls[0]))){ if(cursor>0) cursor--; cur_wait=20;};
-            if((game.ctr.aba(controlm.TEC1)) || (game.ctr.aba(game.gdata.controls[0]))){ if(cursor<4) cursor++; cur_wait=20;};
+            if((game.ctr.aba(controlm.TEC1)) || (game.ctr.aba(game.gdata.controls[0]))){ if(cursor<5) cursor++; cur_wait=20;};
             if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0])))
-                if(cursor==4) {
+                if(cursor==5) {
                     game.setScreen(new OptionsScreen(game));
                     dispose();
                 }
@@ -75,6 +77,7 @@ public class GraphicsOptionsScreen implements Screen {
                     case 1 : if(game.gdata.drawdist<2) {game.gdata.drawdist++; cur_wait=20;}; break;
                     case 2 : if(game.gdata.skygrfog==false) game.gdata.skygrfog=false; else game.gdata.skygrfog=false; cur_wait=20; break;
                     case 3 : if(game.gdata.daytime<3) {game.gdata.daytime++; cur_wait=20;}; break;
+                    case 4 : game.gdata.language = (game.gdata.language + 1) % 2; Main.loc.loadLanguage(game.gdata.language); cur_wait=20; break;
                 };
             };
 
@@ -84,6 +87,7 @@ public class GraphicsOptionsScreen implements Screen {
                     case 1 : if(game.gdata.drawdist>0) {game.gdata.drawdist--; cur_wait=20;}; break;
                     case 2 : if(game.gdata.skygrfog==false) game.gdata.skygrfog=true; else game.gdata.skygrfog=false; cur_wait=20; break;
                     case 3 : if(game.gdata.daytime>0) {game.gdata.daytime--; cur_wait=20;}; break;
+                    case 4 : game.gdata.language = (game.gdata.language - 1 + 2) % 2; Main.loc.loadLanguage(game.gdata.language); cur_wait=20; break;
                 };
             };
             if(game.ctr.atr(controlm.TEC1)) {

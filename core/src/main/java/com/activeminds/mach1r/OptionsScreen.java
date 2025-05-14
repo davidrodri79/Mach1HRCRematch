@@ -34,12 +34,12 @@ public class OptionsScreen implements Screen {
         game.batch.begin();
         game.show_scrolling_wallp();
 
-        game.fuente.show_text(game.batch,150,350,"graphics options",0);
-        game.fuente.show_text(game.batch,150,310,"control options",0);
-        game.fuente.show_text(game.batch,150,270,"sound options",0);
-        game.fuente.show_text(game.batch,150,230,"view credits",0);
-        game.fuente.show_text(game.batch,150,190,"back to main menu",0);
-        game.fuente.show_text(game.batch,280,440,"OPTIONS",1);
+        game.fuente.show_text(game.batch,150,350,Main.loc.get("gfxOptions"),0);
+        game.fuente.show_text(game.batch,150,310,Main.loc.get("controlOptions"),0);
+        game.fuente.show_text(game.batch,150,270,Main.loc.get("soundOptions"),0);
+        game.fuente.show_text(game.batch,150,230,Main.loc.get("viewCredits"),0);
+        game.fuente.show_text(game.batch,150,190,Main.loc.get("backToMainMenu"),0);
+        game.fuente.show_text(game.batch,280,440,Main.loc.get("optionsTitle"),1);
 
         game.show_menu_cursor(85,342-(40*cursor));
 

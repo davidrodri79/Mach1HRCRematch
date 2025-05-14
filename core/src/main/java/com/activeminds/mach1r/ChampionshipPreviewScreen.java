@@ -35,23 +35,23 @@ public class ChampionshipPreviewScreen implements Screen {
         game.batch.setProjectionMatrix(game.camera2d.combined);
         game.batch.begin();
         game.show_scrolling_wallp();
-        game.fuente.show_text(game.batch, 60,440,event.name,0);
-        game.fuente.show_text(game.batch, 20,400,"EVENT OF "+event.nraces+" RACES WITH PRIZE OF "+event.reward+" POINTS",1);
+        game.fuente.show_text(game.batch, 60,440,Main.loc.get(event.name),0);
+        game.fuente.show_text(game.batch, 20,400,Main.loc.get("eventOf")+" "+event.nraces+" "+Main.loc.get("racesWithPrizeOf")+" "+event.reward+" "+Main.loc.get("points"),1);
         for(int i=0; i<event.nraces; i++){
 
             s = i+1+"-"+
-                game.dif_name[event.races.get(i).dif]+"'s "+
-                course.ctype_name[event.races.get(i).type]+" at "+
-                course.scenes.course_scenes.get(event.races.get(i).scene).descr;
+                Main.loc.get(game.dif_name[event.races.get(i).dif])+Main.loc.get("diff_s")+" "+
+                Main.loc.get(course.ctype_name[event.races.get(i).type])+" "+Main.loc.get("at")+" "+
+                Main.loc.get(course.scenes.course_scenes.get(event.races.get(i).scene).descr);
 
             game.fuente.show_text(game.batch,20,360-(30*i),s,0);
         };
-        s = "need "+event.minimum+" or more points to play";
+        s = Main.loc.get("need")+" "+event.minimum+" "+Main.loc.get("orMorePoints");
         game.fuente.show_text(game.batch, 120,100,s,0);
 
         if(game.gdata.score_champ>=event.minimum)
-            game.fuente.show_text(game.batch,150,50,"PUSH ANY BUTTON TO ENTER",1);
-        game.fuente.show_text(game.batch,190,20,"ESCAPE TO GO BACK",1);
+            game.fuente.show_text(game.batch,150,50,Main.loc.get("pushAnyButtonEnter"),1);
+        game.fuente.show_text(game.batch,190,20,Main.loc.get("escapeGoBack"),1);
 
         game.batch.end();
 

@@ -18,14 +18,14 @@ public class LocalizationManager {
         Locale locale;
         if(lang == 0)
             locale = new Locale("en");
+        /*else if(lang == 1)
+            locale = new Locale("fr");*/
         else if(lang == 1)
-            locale = new Locale("fr");
-        else if(lang == 2)
             locale = new Locale("es");
-        else if(lang == 3)
+        /*else if(lang == 3)
             locale = new Locale("de");
         else if(lang == 4)
-            locale = new Locale("it");
+            locale = new Locale("it");*/
         else
             locale = Locale.getDefault();
 

@@ -34,17 +34,17 @@ public class SoundOptionsScreen implements Screen {
         game.batch.begin();
         game.show_scrolling_wallp();
 
-       game.fuente.show_text(game.batch,100,350,"sound effects",0);
-        if(game.gdata.sound)game.fuente.show_text(game.batch,400,350,"on",0);
-        else game.fuente.show_text(game.batch,400,350,"off",0);
-       game.fuente.show_text(game.batch,100,310,"background music",0);
-        if(game.gdata.music)game.fuente.show_text(game.batch,400,310,"on",0);
-        else game.fuente.show_text(game.batch,400,310,"off",0);
-       game.fuente.show_text(game.batch,100,270,"music volume",0);
+       game.fuente.show_text(game.batch,100,350,Main.loc.get("soundEffects"),0);
+        if(game.gdata.sound)game.fuente.show_text(game.batch,400,350,Main.loc.get("on"),0);
+        else game.fuente.show_text(game.batch,400,350,Main.loc.get("off"),0);
+       game.fuente.show_text(game.batch,100,310,Main.loc.get("backgroundMusic"),0);
+        if(game.gdata.music)game.fuente.show_text(game.batch,400,310,Main.loc.get("on"),0);
+        else game.fuente.show_text(game.batch,400,310,Main.loc.get("off"),0);
+       game.fuente.show_text(game.batch,100,270,Main.loc.get("musicVolume"),0);
        game.fuente.show_text(game.batch,400,270,""+game.gdata.music_volume,1);
 
-       game.fuente.show_text(game.batch,100,230,"back to options menu",0);
-       game.fuente.show_text(game.batch,210,440,"SOUND OPTIONS",1);
+       game.fuente.show_text(game.batch,100,230, Main.loc.get("backToOptions"),0);
+       game.fuente.show_text(game.batch,210,440, Main.loc.get("soundOptionsTitle"),1);
 
         game.show_menu_cursor(55,342-(40*cursor));
 
