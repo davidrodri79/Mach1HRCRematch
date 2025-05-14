@@ -9,7 +9,7 @@ public class ControlOptionsScreen implements Screen {
     float cur_wait = 0;
     int cursor = 0;
 
-    String[] ctr_str={"       disabled","cursor+shft+ctrl+enter","    wasduiop keys","   joystick/joypad","       mouse"};
+    String[] ctr_str={"       disabled","cursor+shft+ctrl+enter","    wasduiop keys","   joystick/joypad","       mouse", "    tactile"};
 
 
     public ControlOptionsScreen(Main game)

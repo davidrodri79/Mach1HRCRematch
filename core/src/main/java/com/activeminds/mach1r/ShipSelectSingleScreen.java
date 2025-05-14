@@ -75,7 +75,7 @@ public class ShipSelectSingleScreen implements Screen {
         shader.setUniformf("u_fogEnd", 1000.0f);
 
 
-	    game.pl[0].mesh.render(shader, game.camera,sel_offset,0,0,0,game.counter/100.0f,0);
+	    game.pl[0].mesh.render(shader, game.camera, (float) sel_offset, (float) 0,0,0f,game.counter/100.0f,0);
         shader.end();
 
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);

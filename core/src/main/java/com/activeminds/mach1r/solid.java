@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 import java.io.DataInputStream;
@@ -361,10 +362,21 @@ public class solid {
 
     void render(ShaderProgram shader, PerspectiveCamera camera, float px, float py, float pz, float rx, float ry, float rz)
     {
+        Quaternion qx = new Quaternion();
+        Quaternion qy = new Quaternion();
+        Quaternion qz = new Quaternion();
+
+        qx.setEulerAnglesRad(0, 0, rx);
+        qy.setEulerAnglesRad(ry, 0, 0);
+        qz.setEulerAnglesRad(0, rz, 0);
+
+        Quaternion combined = qx.mul(qy).mul(qz);
+        Matrix4 rot = new Matrix4().set(combined);
+
+
+
         Matrix4 model = new Matrix4().idt().translate(px,py,pz)
-                                            .rotate(Vector3.X, (float)(180f*rx/Math.PI))
-                                            .rotate(Vector3.Y, (float)(180f*ry/Math.PI))
-                                            .rotate(Vector3.Z, (float)(180f*rz/Math.PI))
+                                            .mul(rot)
                                             .scale( scale[0], scale[1], scale[2]);
         Matrix4 view = camera.view;
         Matrix4 proj = camera.projection;
@@ -391,10 +403,19 @@ public class solid {
 
     void alpha_render(ShaderProgram shader, PerspectiveCamera camera, float px, float py, float pz, float rx, float ry, float rz, float alpha)
     {
+        Quaternion qx = new Quaternion();
+        Quaternion qy = new Quaternion();
+        Quaternion qz = new Quaternion();
+
+        qx.setEulerAnglesRad(0, 0, rx);
+        qy.setEulerAnglesRad(ry, 0, 0);
+        qz.setEulerAnglesRad(0, rz, 0);
+
+        Quaternion combined = qx.mul(qy).mul(qz);
+        Matrix4 rot = new Matrix4().set(combined);
+
         Matrix4 model = new Matrix4().idt().translate(px,py,pz)
-            .rotate(Vector3.X, (float)(180f*rx/Math.PI))
-            .rotate(Vector3.Y, (float)(180f*ry/Math.PI))
-            .rotate(Vector3.Z, (float)(180f*rz/Math.PI))
+            .mul(rot)
             .scale( scale[0], scale[1], scale[2]);
         Matrix4 view = camera.view;
         Matrix4 proj = camera.projection;

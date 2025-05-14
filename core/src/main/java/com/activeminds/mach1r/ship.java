@@ -4,7 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
@@ -14,7 +17,7 @@ import static com.activeminds.mach1r.wave.DSBFREQUENCY_ORIGINAL;
 
 public class ship {
 
-    public static final int MAX_LIGHTS = 3;
+    public static final int MAX_LIGHTS = 4;
     public static final int MAXENERGY = 1000;
     public static final int NEXPLS = 5;
 
@@ -86,6 +89,7 @@ public class ship {
     sprite logo;
     vertex cam_pos, vrp;
     course cour;
+    Vector3 lightPos[] = new Vector3[MAX_LIGHTS];
 
     public PerspectiveCamera soundCam;
 
@@ -141,6 +145,7 @@ public class ship {
         segment=0; nextsegment=0; lap=1; pos=0; camtype=0; camchwait=0;
         energy=MAXENERGY; shield=0; boost=0; power=0; maxspeed=0; hypermode=0;
         messcount=0; finallapflag=false; backwards=false; nboosts=3;
+        for(int i = 0; i < MAX_LIGHTS; i++) lightPos[i] = new Vector3();
 
         this.cour = cour;
 
@@ -189,7 +194,7 @@ public class ship {
         int seg, i;
         String s, t;
 
-        rx=0.0f; rz=0.0f; accangle=0.0f; driveangle=0.0f; backwards=false;
+        rx=0.0f; accangle=0.0f; driveangle=0.0f; backwards=false;
 
         if(state!=PLAY) counter++;
         if(messcount>0) messcount-=1;
@@ -199,6 +204,13 @@ public class ship {
             driveangle= (float) (-(Math.PI/2.0)*(ctr.joy_xaxis[tc]/1500.0));
         };
         accangle=ry+driveangle;
+        if(rz < ctr.joy_xaxis[tc] * 0.001f * Math.PI / 6)
+        {
+            rz += 0.025f;
+        }
+        if(rz > ctr.joy_xaxis[tc] * 0.001f * Math.PI / 6) {
+            rz -= 0.025f;
+        }
 
         radius= (float) (7/Math.sin(driveangle));
         omega=velocity/radius;
@@ -502,6 +514,31 @@ public class ship {
 
         calc_light_color();
 
+        // Calc light positions
+        Quaternion qx = new Quaternion();
+        Quaternion qy = new Quaternion();
+        Quaternion qz = new Quaternion();
+
+        qx.setEulerAnglesRad(0, 0, rx);
+        qy.setEulerAnglesRad(ry, 0, 0);
+        qz.setEulerAnglesRad(0, -rz, 0);
+
+        Quaternion combined = qx.mul(qy).mul(qz);
+        Matrix4 rot = new Matrix4().set(combined);
+
+        for(i = 0; i < data.nlights; i++)
+        {
+            lightPos[i].x = -data.lpos[i][2];
+            lightPos[i].y = data.lpos[i][1];
+            lightPos[i].z = data.lpos[i][0];
+
+            Matrix4 model = new Matrix4().idt().translate(renderx,y,renderz)
+                .mul(rot);
+
+            lightPos[i].mul(model);
+
+        }
+
         //Camera change
         if(camchwait>0) camchwait--;
 
@@ -527,19 +564,21 @@ public class ship {
         //ctr->reset();
         // Turn
 
-        if(da>0.03) ctr.activa(controlm.NOTC,controlm.CDER);
-        if(da<-0.03) ctr.activa(controlm.NOTC,controlm.CIZQ);
-        // Rear gear
-        if((da>0.15) || (da<-0.15)) ctr.activa(controlm.NOTC,controlm.CBU3);
-            // Brake
-        else if(((da>0.03) || (da<-0.03)) && (velocity>0.0)) ctr.activa(controlm.NOTC,controlm.CABA);
+        if(state != BURN && state != DESTR) {
+            if (da > 0.03) ctr.activa(controlm.NOTC, controlm.CDER);
+            if (da < -0.03) ctr.activa(controlm.NOTC, controlm.CIZQ);
+            // Rear gear
+            if ((da > 0.15) || (da < -0.15)) ctr.activa(controlm.NOTC, controlm.CBU3);
+                // Brake
+            else if (((da > 0.03) || (da < -0.03)) && (velocity > 0.0)) ctr.activa(controlm.NOTC, controlm.CABA);
 
-        // Accelerate
-        if((da<0.15) && (da>-0.15)){
-            ctr.activa(controlm.NOTC,controlm.CBU1);
-            if((course.rand()%600==0) && (nboosts>0)) ctr.activa(controlm.NOTC,controlm.CBU2);
+            // Accelerate
+            if ((da < 0.15) && (da > -0.15)) {
+                ctr.activa(controlm.NOTC, controlm.CBU1);
+                if ((course.rand() % 600 == 0) && (nboosts > 0)) ctr.activa(controlm.NOTC, controlm.CBU2);
+            }
+            if (velocity < 1.0) ctr.activa(controlm.NOTC, controlm.CBU1);
         }
-        if(velocity<1.0) ctr.activa(controlm.NOTC,controlm.CBU1);
 
         //ry=an;
 
@@ -737,28 +776,31 @@ public class ship {
         // Ship. at three diferent quality levels
         if(dist<DRAWNEAR){
             //if(l) glEnable(GL_LIGHTING);
-            mesh.render(shader, cam,renderx,y,renderz,rx, (float) (ry+Math.PI),0);
+            mesh.render(shader, cam,renderx,y,renderz,rx, (float) (ry+Math.PI),rz);
         }else if(dist<DRAWMEDIUM){
             //if(l) glEnable(GL_LIGHTING);
-            lowres.render(shader, cam,renderx,y,renderz,rx, (float) (ry+Math.PI),0);
+            lowres.render(shader, cam,renderx,y,renderz,rx, (float) (ry+Math.PI),rz);
         }else if(dist<DRAWFAR){
             //glDisable(GL_LIGHTING);
-            lowres.render(shader, cam, renderx,y,renderz,rx, (float) (ry+Math.PI),0);
+            lowres.render(shader, cam, renderx,y,renderz,rx, (float) (ry+Math.PI),rz);
         };
 
     }
 
     float light_x(int c)
     {
-        return (float) (renderx+((data.lpos[c][0]*Math.cos(-ry+Math.PI/2f))+(data.lpos[c][2]*Math.sin(ry-Math.PI/2f))));
+        //return (float) (renderx+((data.lpos[c][0]*Math.cos(-ry+Math.PI/2f))+(data.lpos[c][2]*Math.sin(ry-Math.PI/2f))));
+        return lightPos[c].x;
     }
     float light_y(int c)
     {
-        return y+data.lpos[c][1];
+        //return y+data.lpos[c][1];
+        return lightPos[c].y;
     }
     float light_z(int c)
     {
-        return (float) (renderz+((data.lpos[c][0]*Math.sin(-ry+Math.PI/2f))+(data.lpos[c][2]*Math.cos(ry-Math.PI/2f))));
+        //return (float) (renderz+((data.lpos[c][0]*Math.sin(-ry+Math.PI/2f))+(data.lpos[c][2]*Math.cos(ry-Math.PI/2f))));
+        return lightPos[c].z;
     }
 
     void new_message(String t)
