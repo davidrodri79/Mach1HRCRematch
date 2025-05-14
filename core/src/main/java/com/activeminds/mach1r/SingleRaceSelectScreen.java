@@ -31,17 +31,17 @@ public class SingleRaceSelectScreen implements Screen {
         game.batch.setProjectionMatrix(game.camera2d.combined);
         game.batch.begin();
         game.show_scrolling_wallp();
-        game.fuente.show_text(game.batch, 160,440,"SINGLE RACE SELECTION",1);
-        game.fuente.show_text(game.batch,100,400,"DIFFICULTY",1);
-        game.fuente.show_text(game.batch,150,370, game.dif_name[game.gdata.dif],0);
-        game.fuente.show_text(game.batch,100,330,"EVENT",1);
-        game.fuente.show_text(game.batch,150,300,course.ctype_name[game.gdata.cour_type],0);
-        game.fuente.show_text(game.batch,100,260,"SCENE",1);
-        game.fuente.show_text(game.batch,150,230,course.scenes.course_scenes.get(game.gdata.scene).descr,0);
-        game.fuente.show_text(game.batch,100,190,"NUMBER OF LAPS",1);
+        game.fuente.show_text(game.batch, 160,440,game.loc.get("singleRaceSelect"),1);
+        game.fuente.show_text(game.batch,100,400,game.loc.get("difficulty"),1);
+        game.fuente.show_text(game.batch,150,370, game.loc.get(game.dif_name[game.gdata.dif]),0);
+        game.fuente.show_text(game.batch,100,330,game.loc.get("event"),1);
+        game.fuente.show_text(game.batch,150,300,game.loc.get(course.ctype_name[game.gdata.cour_type]),0);
+        game.fuente.show_text(game.batch,100,260,game.loc.get("scene"),1);
+        game.fuente.show_text(game.batch,150,230,game.loc.get(course.scenes.course_scenes.get(game.gdata.scene).descr),0);
+        game.fuente.show_text(game.batch,100,190,game.loc.get("numberOfLaps"),1);
         game.fuente.show_text(game.batch,150,160,""+game.gdata.nlaps,1);
         game.preview[game.gdata.scene].render2d(game.batch, 0,0,128,128,390,160,390+192,160+144,1);
-        game.fuente.show_text(game.batch, 40,30,"PUSH ANY BUTTON OF PLAYER ONE TO PROCEED",1);
+        game.fuente.show_text(game.batch, 40,30,game.loc.get("pushAnyButton1p"),1);
         game.show_menu_cursor(85,362-(70*cursor));
         game.batch.end();
 

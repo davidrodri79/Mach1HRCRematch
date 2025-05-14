@@ -37,12 +37,12 @@ public class MainMenuScreen implements Screen {
         game.show_scrolling_wallp();
         game.title[0].render2d(game.batch, 0,0,256,256,192,460-128,192+128,460,1.0f);
         game.title[1].render2d(game.batch, 0,0,256,256,192+128,460-128,192+256,460,1.0f);
-        game.fuente.show_text(game.batch, 240,260,"single race",0);
-        game.fuente.show_text(game.batch, 240,220,"championship",0);
-        game.fuente.show_text(game.batch, 240,180,"versus battle",0);
-        game.fuente.show_text(game.batch, 240,140,"endurance",0);
-        game.fuente.show_text(game.batch, 240,100,"options",0);
-        game.fuente.show_text(game.batch, 110,40,"A GAME CREATED BY ACTIVE MINDS",1);
+        game.fuente.show_text(game.batch, 240,260,game.loc.get("singleRace"),0);
+        game.fuente.show_text(game.batch, 240,220,game.loc.get("championship"),0);
+        game.fuente.show_text(game.batch, 240,180,game.loc.get("versusBattle"),0);
+        game.fuente.show_text(game.batch, 240,140,game.loc.get("endurance"),0);
+        game.fuente.show_text(game.batch, 240,100,game.loc.get("options"),0);
+        game.fuente.show_text(game.batch, 110,40,game.loc.get("aGameCreated"),1);
         game.show_menu_cursor(195,252-(40*cursor));
         game.batch.end();
 

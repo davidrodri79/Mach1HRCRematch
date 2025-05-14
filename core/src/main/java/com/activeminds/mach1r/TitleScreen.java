@@ -31,8 +31,8 @@ public class TitleScreen implements Screen {
         game.batch.begin();
         game.title[0].render2d(game.batch, 0,0,256,256,50,200,320,460,1.0f);
         game.title[1].render2d(game.batch, 0,0,256,256,320,200,590,460,1.0f);
-        if(((int)counter/20)%2==0) game.fuente.show_text(game.batch, 160,120,"push any button to begin",0);
-        game.fuente.show_text(game.batch, 200,40,"ACTIVE MINDS 2003",1);
+        if(((int)counter/20)%2==0) game.fuente.show_text(game.batch, 160,120,game.loc.get("pushAnyBut"),0);
+        game.fuente.show_text(game.batch, 200,40,game.loc.get("activeMindsYear"),1);
         game.batch.end();
 
 

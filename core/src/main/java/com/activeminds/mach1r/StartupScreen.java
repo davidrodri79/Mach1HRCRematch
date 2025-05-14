@@ -54,11 +54,11 @@ public class StartupScreen implements Screen {
             switch (counter) {
 
                 case 1:
-                    con.add_mess("mach 1 hrc rematch                 -  v1.0");
-                    con.add_mess("by active minds, 2003-2025");
-                    con.add_mess("coded by nhsp - last update : 2025 april 5");
+                    con.add_mess(game.loc.get("consStart1")+"1.0");
+                    con.add_mess(game.loc.get("consStart2"));
+                    con.add_mess(game.loc.get("consStart3")+"2025 april 5");
                     con.add_mess("-------------------------------------------");
-                    con.add_mess("starting system...");
+                    con.add_mess(game.loc.get("startSystem"));
                     //changed=TRUE;
                     break;
 
@@ -93,10 +93,10 @@ public class StartupScreen implements Screen {
                             break;
                     }
                     ;
-                    s = "graphics mode " + SCREENX + "x" + SCREENY + "x16b initialized.";
+                    s = game.loc.get("gfxMode")+" " + SCREENX + "x" + SCREENY + "x16b "+game.loc.get("initialized");
                     //s = "graphics mode "+Gdx.graphics.getDisplayMode().width+"x"+Gdx.graphics.getDisplayMode().height+"x"+Gdx.graphics.getDisplayMode().bitsPerPixel+"b initialized.";
                     con.add_mess(s);
-                    s = "using z-buffer depth of 24b";
+                    s = game.loc.get("usingZbuffer")+"24b";
                     con.add_mess(s);
                     /*changed=TRUE;*/
                     break;
@@ -120,7 +120,7 @@ public class StartupScreen implements Screen {
 
                 case 5:
                     delay(300);
-                    con.add_mess("loading miscellanous textures...");
+                    con.add_mess(game.loc.get("loadMiscText"));
                     game.flame = new texture("sprite/light.png", texture.TEX_PCX, false, true);
                     game.shield = new texture("sprite/shield.png", texture.TEX_PCX, false, true);
                     game.explos = new texture("sprite/explos.png", texture.TEX_PCX, false, true);
@@ -130,7 +130,7 @@ public class StartupScreen implements Screen {
 
                 case 6:
                     delay(300);
-                    con.add_mess("loading miscellaneous 3d models...");
+                    con.add_mess(game.loc.get("loadMiscModel"));
                 /*burnt=new solid();
                 burnt->load_mesh("model\\burnt.msh");
                 burnt->centrate(TRUE,TRUE,TRUE);*/
@@ -148,11 +148,11 @@ public class StartupScreen implements Screen {
 
                 case 7:
                     delay(300);
-                    con.add_mess("initializing input devices...");
+                    con.add_mess(game.loc.get("initInput"));
                     game.ctr = new controlm(game.camera2d, game.manager);
                     game.ctr.loadButtonLayoutFromJson("joypad.json");
                     for (int i = 0; i < Controllers.getControllers().size; i++) {
-                        con.add_mess(Controllers.getControllers().get(i).getName().toLowerCase() + " found.");
+                        con.add_mess(Controllers.getControllers().get(i).getName().toLowerCase() + game.loc.get("found."));
                     }
                 /*ctr->initialize(hwnd);
                 if(ctr->joystick_available())
@@ -162,7 +162,7 @@ public class StartupScreen implements Screen {
 
                 case 8:
                     delay(300);
-                    con.add_mess("loading game sprites...");
+                    con.add_mess(game.loc.get("loadGameSprites"));
                     /*light=new sprite(2,2,"sprite\\light");*/
                     game.posnumber = new sprite(64, 64, "sprite/position.png");
                     game.speed = new sprite(64, 64, "sprite/speed.png");
@@ -207,7 +207,7 @@ public class StartupScreen implements Screen {
 
                 case 9:
                     delay(300);
-                    con.add_mess("loading game samples...");
+                    con.add_mess(game.loc.get("loadGameSamples"));
                     game.wthree=new wave();
                     game.wthree.load("sound/trhee.wav");
                     game.wtwo=new wave();

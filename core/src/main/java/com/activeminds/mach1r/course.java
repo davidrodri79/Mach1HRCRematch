@@ -101,16 +101,16 @@ public class course {
     }
 
     public static final String ctype_name[]={
-        "slippery run",
-            "jumping run",
-            "leap and slide",
-            "highway run",
-            "sliding highway",
-            "blind jumps",
-            "tracherous course",
-            "fatal slides",
-            "nightmare run",
-            "mach 1 speedway"
+        "courseType0",
+        "courseType1",
+        "courseType2",
+        "courseType3",
+        "courseType4",
+        "courseType5",
+        "courseType6",
+        "courseType7",
+        "courseType8",
+        "courseType9"
     };
 
     static class champ_race {

@@ -430,8 +430,8 @@ public class RaceScreen implements Screen {
             game.fuente.show_text( game.batch, 100,320,game.pl[follow].message,0);
 
         if(game.pl[follow].state==ship.DESTR){
-            game.fuente.show_text(game.batch, 180,350,"DISQUALIFIED FROM RACE",1);
-            game.fuente.show_text(game.batch, 270,100,"GAME OVER",1);
+            game.fuente.show_text(game.batch, 180,350,game.loc.get("disqualified"),1);
+            game.fuente.show_text(game.batch, 270,100,game.loc.get("gameOver"),1);
         };
 
         //Start countdown
@@ -894,10 +894,10 @@ public class RaceScreen implements Screen {
             game.batch.begin();
             show_position( game.batch, 0,20,390);
             show_speed(game.batch, game.pl[i].maxspeed,20,20);
-            game.fuente.show_text(game.batch, 20,80,"maximum speed:",0);
+            game.fuente.show_text(game.batch, 20,80,game.loc.get("maximumSpeed"),0);
             game.pl[i].logo.render2d(game.batch, 0,0,256,128,420,20,420+192,20+96,1.0f);
-            if(game.pl[i].state!=ship.DESTR) game.fuente.show_text(game.batch, 270,350,"FINISHED",1);
-            game.fuente.show_text(game.batch,400,420,"time :",0);
+            if(game.pl[i].state!=ship.DESTR) game.fuente.show_text(game.batch, 270,350,game.loc.get("finished"),1);
+            game.fuente.show_text(game.batch,400,420,game.loc.get("time"),0);
             String s = game.pl[i].time_str(game.pl[i].totaltime);
             game.fuente.show_text(game.batch, 500,420,s,0);
             game.batch.end();
@@ -905,13 +905,13 @@ public class RaceScreen implements Screen {
         else if (state == DEMO)
         {
             game.batch.begin();
-            if((counter/20)%2==0) game.fuente.show_text(game.batch, 160,120,"push any button to play",0);
+            if((counter/20)%2==0) game.fuente.show_text(game.batch, 160,120,game.loc.get("pushAnyButtonPlay"),0);
             game.batch.end();
         }
 
         if(paused) {
             game.batch.begin();
-            game.fuente.show_text(game.batch,280,230,"paused",0);
+            game.fuente.show_text(game.batch,280,230,game.loc.get("paused"),0);
             game.batch.end();
         }
 

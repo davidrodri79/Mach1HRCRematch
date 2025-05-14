@@ -33,10 +33,10 @@ public class Main extends Game {
 
 
     String dif_name[]={
-        "beginner",
-        "amateur",
-        "professional",
-        "elite"
+        "diffName0",
+        "diffName1",
+        "diffName2",
+        "diffName3"
     };
 
 
@@ -108,6 +108,8 @@ public class Main extends Game {
 
     String  rank_str[]={"1ST","2ND","3RD","4TH","5TH","6TH"};
 
+    static LocalizationManager loc;
+
 
     @Override
     public void create() {
@@ -132,6 +134,9 @@ public class Main extends Game {
 
         gdata = new game_data();
         load_game_data();
+
+        loc = new LocalizationManager();
+        loc.loadLanguage(0);
 
         ship.load_static_data();
         course.load_static_data();
