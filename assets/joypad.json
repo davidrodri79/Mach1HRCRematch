@@ -1,45 +1,13 @@
 {
+  "sticks" : [
+    {
+      "x": 150,
+      "y": 150,
+      "radius": 100
+    }
+  ],
   "buttons" : [
-    {
-      x: 100
-      y: 280
-      width: 80
-      height: 80,
-      action: Up,
-      "keyboard": 20,
-      image_on: "gui/SOUTH_ON.png",
-      image_off: "gui/SOUTH.png"
-    },
-    {
-      x: 180
-      y: 200
-      width: 80
-      height: 80
-      action: Right,
-      "keyboard": 22,
-      image_on: "gui/EAST_ON.png",
-      image_off: "gui/EAST.png"
-    },
-    {
-      x: 20
-      y: 200
-      width: 80
-      height: 80,
-      action: Left,
-      "keyboard": 21,
-      image_on: "gui/WEST_ON.png",
-      image_off: "gui/WEST.png"
-    },
-    {
-      x: 100
-      y: 120
-      width: 80
-      height: 80,
-      action: Down,
-      "keyboard": 19,
-      image_on: "gui/NORTH_ON.png",
-      image_off: "gui/NORTH.png"
-    },
+
     {
       x: 750
       y: 60

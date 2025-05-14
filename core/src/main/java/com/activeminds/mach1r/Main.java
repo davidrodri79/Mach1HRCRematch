@@ -17,7 +17,7 @@ import java.nio.ByteBuffer;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
 
-    public static final int SCREENX = 854;
+    public static final int SCREENX = 960;
     public static final int SCREENY = 480;
 
     public static final int FPS = 70;
@@ -126,7 +126,7 @@ public class Main extends Game {
         camera.update();
 
         camera2d = new OrthographicCamera();
-        camera2d.setToOrtho(false,  853, 480);
+        camera2d.setToOrtho(false,  SCREENX, SCREENY);
 
         manager = new AssetManager();
 
@@ -143,7 +143,7 @@ public class Main extends Game {
     void show_scrolling_wallp()
     {
         int i,j;
-        for(i=0; i<7; i++)
+        for(i=0; i<8; i++)
             for(j=-1; j<5; j++)
                 wallp.render2d(batch, 0,0,128,128,128*i,(int)(-(counter%128)+((i%2)*64)+128*j),128*(i+1),(int)(-(counter%128)+((i%2)*64)+128*(j+1)),1.0f);
 

@@ -68,7 +68,7 @@ public class ControlOptionsScreen implements Screen {
 
             if(cursor<4){
                 if((game.ctr.der(controlm.TEC1)) || (game.ctr.der(game.gdata.controls[0])))
-                    if(game.gdata.controls[cursor]<controlm.MOUS) {game.gdata.controls[cursor]=(game.gdata.controls[cursor]+1); cur_wait=20;};
+                    if(game.gdata.controls[cursor]<controlm.TOUC) {game.gdata.controls[cursor]=(game.gdata.controls[cursor]+1); cur_wait=20;};
 
                 if((game.ctr.izq(controlm.TEC1)) || (game.ctr.izq(game.gdata.controls[0])))
                     if(game.gdata.controls[cursor]>controlm.NOTC) {game.gdata.controls[cursor]=(game.gdata.controls[cursor]-1); cur_wait=20;};

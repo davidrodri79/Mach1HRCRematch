@@ -11,9 +11,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,13 +61,34 @@ public class controlm implements InputProcessor, ControllerListener {
 
 
     // TActile ==================================
-    class Button {
+    class Widget {
+        boolean pressed;
+    }
+
+    class Stick extends Widget {
+
+        int x;
+        int y;
+        int radius;
+        int stickx;
+        int sticky;
+
+        Stick(int x, int y, int radius)
+        {
+            this.x = x;
+            this.y = y;
+            stickx = x;
+            sticky = y;
+            this.radius = radius;
+            pressed = false;
+        }
+    }
+    class Button extends Widget {
 
         Rectangle rect;
         String action;
         String text;
         String imageOn, imageOff;
-        boolean pressed;
         int keyboard = -1, pushes, releases;
 
         Button(int x, int y, int sx, int sy, String action, int keyboard, String text, String on, String off)
@@ -82,8 +105,9 @@ public class controlm implements InputProcessor, ControllerListener {
         }
     }
 
+    ArrayList<Stick> sticks;
     Map<String,Button> buttons;
-    Map<Integer,Button> pointers;
+    Map<Integer,Widget> pointers;
     final OrthographicCamera camera;
     AssetManager manager;
 
@@ -92,6 +116,7 @@ public class controlm implements InputProcessor, ControllerListener {
         this.camera = camera;
         this.manager = manager;
         //this.font = font;
+        sticks = new ArrayList<>();
         buttons = new HashMap<>();
         pointers = new HashMap<>();
 
@@ -107,10 +132,39 @@ public class controlm implements InputProcessor, ControllerListener {
         String fileText = file.readString();
         ButtonLayoutJson l = json.fromJson(ButtonLayoutJson.class, fileText);
 
+        for(StickJson s : l.sticks)
+        {
+            addStick(s.x, s.y, s.radius);
+        }
+
         for(ButtonJson b : l.buttons)
         {
             addButton(b.x, b.y, b.width, b.height, b.action, b.keyboard, b.text, b.image_on, b.image_off);
         }
+    }
+
+    public void addStick(int x, int y, int radius)
+    {
+        Stick s = new Stick(x, y, radius);
+        sticks.add(s);
+    }
+
+    public void updateStick(Stick s)
+    {
+        if(s.pressed)
+        {
+            joy_xaxis[TOUC] = (int) (((s.stickx - s.x) / (float)s.radius) * 1000);
+            joy_yaxis[TOUC] = (int) (((s.sticky - s.y) / (float)s.radius) * 1000);;
+        }
+        else
+        {
+            joy_xaxis[TOUC] = 0;
+            joy_yaxis[TOUC] = 0;
+        }
+        cder[TOUC] = joy_xaxis[TOUC] > 500;
+        cizq[TOUC] = joy_xaxis[TOUC] < -500;
+        carr[TOUC] = joy_yaxis[TOUC] > 500;
+        caba[TOUC] = joy_yaxis[TOUC] < -500;
     }
 
     public void addButton(int x, int y, int sx, int sy, String action, int keyboard, String text, String imageOn, String imageOff)
@@ -208,7 +262,23 @@ public class controlm implements InputProcessor, ControllerListener {
             camera.update();
             shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.setAutoShapeType(true);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+            for(int i = 0; i < sticks.size(); i++)
+            {
+                Stick s = sticks.get(i);
+                shapeRenderer.setColor(Color.WHITE);
+                shapeRenderer.circle(s.x, s.y, s.radius);
+            }
+            shapeRenderer.end();
+
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            for(int i = 0; i < sticks.size(); i++)
+            {
+                Stick s = sticks.get(i);
+                shapeRenderer.setColor(s.pressed ? Color.YELLOW : Color.BLACK);
+                shapeRenderer.circle(s.stickx,  s.sticky, 50);
+            }
 
             for(String i:buttons.keySet())
             {
@@ -366,6 +436,19 @@ public class controlm implements InputProcessor, ControllerListener {
         touchPos.set(screenX, screenY, 0);
         camera.unproject(touchPos);
 
+        for(Stick s: sticks)
+        {
+            Vector2 v = new Vector2(touchPos.x - s.x, touchPos.y -s.y);
+            if(v.len() < s.radius)
+            {
+                pointers.put(pointer, s);
+                s.stickx = screenX;
+                s.sticky = Gdx.graphics.getHeight() - screenY;
+                s.pressed = true;
+                updateStick(s);
+            }
+        }
+
         for(String i:buttons.keySet())
         {
             if(buttons.get(i).rect.contains(touchPos.x,touchPos.y))
@@ -403,10 +486,22 @@ public class controlm implements InputProcessor, ControllerListener {
         if(pointers.get(pointer) != null)
         {
             // This pointer was linked to a button, so release it
-            releaseButton(pointers.get(pointer));
-            pointers.get(pointer).pressed = false;
-            pointers.get(pointer).releases++;
-            pointers.remove(pointer);
+            if(pointers.get(pointer).getClass() == Stick.class)
+            {
+                pointers.get(pointer).pressed = false;
+                ((Stick)pointers.get(pointer)).stickx = ((Stick)pointers.get(pointer)).x;
+                ((Stick)pointers.get(pointer)).sticky = ((Stick)pointers.get(pointer)).y;
+                updateStick((Stick)pointers.get(pointer));
+                pointers.remove(pointer);
+
+            }
+            else if(pointers.get(pointer).getClass() == Button.class)
+            {
+                releaseButton((Button)pointers.get(pointer));
+                pointers.get(pointer).pressed = false;
+                ((Button)pointers.get(pointer)).releases++;
+                pointers.remove(pointer);
+            }
         }
         return true; // return true to indicate the event was handled
     }
@@ -426,6 +521,20 @@ public class controlm implements InputProcessor, ControllerListener {
         touchPos.set(screenX, screenY, 0);
         camera.unproject(touchPos);
 
+        if(pointers.get(pointer).getClass() == Stick.class)
+        {
+            Stick s = (Stick)pointers.get(pointer);
+            Vector2 v = new Vector2(screenX - s.x, Gdx.graphics.getHeight() - screenY - s.y);
+            if(v.len() > s.radius)
+            {
+                v = v.limit(s.radius);
+            }
+            s.stickx = (int) (s.x + v.x);
+            s.sticky = (int) (s.y + v.y);
+
+            updateStick(s);
+        }
+
         for(String i:buttons.keySet())
         {
             // Pointer is now inside a new button; release previous button
@@ -433,7 +542,8 @@ public class controlm implements InputProcessor, ControllerListener {
             {
                 if(pointers.get(pointer) != null)
                 {
-                    releaseButton(pointers.get(pointer));
+                    if(pointers.get(pointer).getClass() == Button.class)
+                        releaseButton((Button)pointers.get(pointer));
                     pointers.get(pointer).pressed = false;
                 }
                 pointers.put(pointer,buttons.get(i));
