@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 import java.time.LocalTime;
@@ -30,7 +30,7 @@ public class RaceScreen implements Screen {
     public static final float HYPER_COL[]={0.96f,0.85f,0.04f};
 
     Main game;
-    ShaderProgram shipShader, skyShader, billboardShader, shadowShader;
+    ShaderProgram shipShader, skyShader, billboardShader, shadowShader, depthShader;
     solid groundMesh, skyMesh;
     Mesh billboard, shadow;
     texture ground;
@@ -48,6 +48,9 @@ public class RaceScreen implements Screen {
     int updatesPending;
     vertex sun;
     boolean paused;
+
+    FrameBuffer shadowFBO;
+    Texture shadowMap;
 
 
     public RaceScreen(Main game)
@@ -88,6 +91,16 @@ public class RaceScreen implements Screen {
 
         if (!billboardShader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + billboardShader.getLog());
+        }
+
+       vertexShader = Gdx.files.internal("shader/depth_vertex.glsl").readString();
+       fragmentShader = Gdx.files.internal("shader/depth_fragment.glsl").readString();
+
+        ShaderProgram.pedantic = false;
+        depthShader = new ShaderProgram(vertexShader, fragmentShader);
+
+        if (!depthShader.isCompiled()) {
+            Gdx.app.error("Shader", "Error al compilar (depth): " + depthShader.getLog());
         }
 
         vertexShader = Gdx.files.internal("shader/shadow_vertex.glsl").readString();
@@ -215,7 +228,81 @@ public class RaceScreen implements Screen {
 
         paused = false;
 
+        // Shadow map
+        int SHADOW_MAP_SIZE = 1024;
+        shadowFBO = new FrameBuffer(Pixmap.Format.RGBA8888, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, true);
+        shadowMap = shadowFBO.getColorBufferTexture();
+
         game.play_music("sound/song"+((game.cour.info.scene%3)+1)+".mp3");
+    }
+
+    void refresh_shadow_map()
+    {
+        Camera lightCamera = new OrthographicCamera();  // O PerspectiveCamera
+        //lightCamera.position.set(new Vector3(sun.x, sun.y, sun.z));
+        lightCamera.position.set(new Vector3(10f, 0f, 0f));
+        lightCamera.lookAt(new Vector3(0,0,0));  // Mira hacia el centro de la escen
+        lightCamera.near = 1f;
+        lightCamera.far = 30f;
+        lightCamera.update();
+
+        shadowFBO.begin();
+        // Usas un shader que solo grabe profundidad
+        Gdx.gl.glClearColor(0f,0f,0f, 1f);
+        Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT | GL20.GL_COLOR_BUFFER_BIT);
+
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+
+        depthShader.begin();
+
+        //renderSceneWith(depthShader);  // Tu función que dibuja las naves, etc.
+        for(int i = 0; i < game.cour.nodes.length; i++)
+        {
+            Matrix4 model = new Matrix4().idt();
+
+            depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
+            depthShader.setUniformMatrix("u_model", model);
+
+            game.cour.nodes[i].mesh.mesh.render(depthShader, GL20.GL_TRIANGLES);
+        }
+
+        for(int i = 0; i < game.nplayers; i++)
+        {
+            ship s = game.pl[i];
+
+            Quaternion qx = new Quaternion();
+            Quaternion qy = new Quaternion();
+            Quaternion qz = new Quaternion();
+
+            qx.setEulerAnglesRad(0, 0, s.rx);
+            qy.setEulerAnglesRad(s.ry, 0, 0);
+            qz.setEulerAnglesRad(0, s.rz, 0);
+
+            Quaternion combined = qx.mul(qy).mul(qz);
+            Matrix4 rot = new Matrix4().set(combined);
+
+            Matrix4 model = new Matrix4().idt();
+                //.translate(s.renderx,s.y,s.renderz)
+                //.mul(rot)
+                //.scale( scale[0], scale[1], scale[2]);
+                ;
+            /*Matrix4 view = camera.view;
+            Matrix4 proj = camera.projection;
+            Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);*/
+
+            depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
+            depthShader.setUniformMatrix("u_model", model);
+
+            s.mesh.mesh.render(depthShader, GL20.GL_TRIANGLES);
+
+        }
+        depthShader.end();
+
+        shadowFBO.end();
+
+        shadowMap = shadowFBO.getColorBufferTexture();
+
     }
 
     void set_state(int s)
@@ -736,6 +823,8 @@ public class RaceScreen implements Screen {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();*/
 
+        refresh_shadow_map();
+
         Gdx.gl.glClearColor(fogc[0], fogc[1], fogc[2], 1.f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
@@ -776,6 +865,7 @@ public class RaceScreen implements Screen {
         if(state == SINGLE)
         {
             game.batch.begin();
+            game.batch.draw(shadowMap, 0, 0, 512, 512);
             show_position(game.batch,0, HUD_START_X+20, 400);
 
             show_speed(game.batch, (int) game.pl[0].velocity_kmh(), HUD_START_X+20, 10);
