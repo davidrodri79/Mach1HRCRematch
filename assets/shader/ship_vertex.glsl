@@ -13,6 +13,9 @@ varying vec2 v_texCoord;
 varying float v_textureID;
 varying vec3 v_worldPos;
 
+uniform mat4 u_lightVP;
+varying vec4 v_shadowCoord;
+
 void main() {
     vec4 worldPos = u_mvp * vec4(a_position, 1.0);
     v_worldPos = worldPos.xyz;
@@ -27,6 +30,8 @@ void main() {
     v_color = a_color;
     v_texCoord = a_texCoord0;
     v_textureID = a_textureID;
+
+    v_shadowCoord = u_lightVP * u_model * vec4(a_position, 1.0);  // posición del vértice en espacio de sombra
 
     gl_Position = u_mvp * vec4(a_position, 1.0);
 }

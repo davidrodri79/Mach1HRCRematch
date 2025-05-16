@@ -252,6 +252,7 @@ public class RaceScreen implements Screen {
 
         lightCamera.position.set(new Vector3(sun.x, sun.y, sun.z));
         lightCamera.lookAt(new Vector3(0,0,0));  // Mira hacia el centro de la escen
+        lightCamera.up.set(0f,1f,0f);
         lightCamera.near = 1000f;
         lightCamera.far = 9000f;
         lightCamera.update();
@@ -428,7 +429,7 @@ public class RaceScreen implements Screen {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
-        cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y, game.pl[follow].cam_pos.z);
+        cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y+2000, game.pl[follow].cam_pos.z);
         cam.lookAt(game.pl[follow].vrp.x, game.pl[follow].vrp.y, game.pl[follow].vrp.z);
         cam.up.set(0, 1, 0);
         cam.near = 0.1f;
@@ -497,12 +498,12 @@ public class RaceScreen implements Screen {
         //if(accelerated){
         //    glDisable(GL_DEPTH_TEST);
 
-        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+        /*Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         //Gdx.gl.glDisable(GL20.GL_CULL_FACE);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             for(int i=game.nplayers-1; i>=0; i--)
-                show_shadow(cam,game.pl[i]);
+                show_shadow(cam,game.pl[i]);*/
         //};
 
         Gdx.gl.glDisable(GL20.GL_BLEND);

@@ -29,6 +29,7 @@ varying float v_textureID;
 uniform sampler2D u_shadowMap;     // Shadow map generado
 uniform mat4 u_lightVP;            // Matriz ViewProjection de la luz
 uniform mat4 u_model;              // Matriz de modelo
+varying vec4 v_shadowCoord;
 
 void main() {
 
@@ -54,23 +55,13 @@ void main() {
 
     // --- Shadow map ---
 
-    // Posición del fragmento en espacio de la luz
-    vec4 lightSpacePos = u_lightVP * u_model * vec4(v_worldPos, 1.0);
+    vec3 shadowCoord = v_shadowCoord.xyz / v_shadowCoord.w;
+    shadowCoord = shadowCoord * 0.5 + 0.5;  // convertir de clip space a [0,1]
 
-    // Perspectiva divide (pasamos de clip space a NDC)
-    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
-    projCoords = projCoords * 0.5 + 0.5; // NDC (-1,1) → (0,1)
+    float closestDepth = texture2D(u_shadowMap, shadowCoord.xy).r;
+    float currentDepth = shadowCoord.z;
 
-    // Sample del shadow map (profundidad vista por la luz)
-    float closestDepth = texture2D(u_shadowMap, projCoords.xy).r;
-
-    // Profundidad actual
-    float currentDepth = projCoords.z;
-
-    // Comparación con un pequeño sesgo para evitar artefactos
-    float bias = 0.005;
-
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    float shadow = currentDepth > closestDepth + 0.005 ? 0.0 : 1.0;
 
     // --- LIGHTING ---
     vec3 normal = normalize(v_normal);
@@ -84,6 +75,8 @@ void main() {
             float diff = max(dot(normal, lightDir), 0.0);
             lightAccum += u_lightColor[i] * diff * u_lightIntensity[i];
         }
+
+        lightAccum = u_lightColor[0];
     }
 
     vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum;
@@ -93,6 +86,7 @@ void main() {
     float fogFactor = clamp((u_fogEnd - dist) / (u_fogEnd - u_fogStart), 0.0, 1.0);
 
     vec3 colorWithFog = mix(u_fogColor, finalColor, fogFactor);
-    gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
+    //gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
+    gl_FragColor = vec4(finalColor, texColor.a * u_alpha);
 
 }
