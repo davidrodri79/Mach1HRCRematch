@@ -40,6 +40,7 @@ public class RaceScreen implements Screen {
     PerspectiveCamera cameras4p[] = new PerspectiveCamera[4];
     SpriteBatch splitScreenBatch;
     OrthographicCamera splitScreenCamera2d;
+    OrthographicCamera lightCamera;
 
     int state;
     long counter;
@@ -232,39 +233,63 @@ public class RaceScreen implements Screen {
         int SHADOW_MAP_SIZE = 1024;
         shadowFBO = new FrameBuffer(Pixmap.Format.RGBA8888, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, true);
         shadowMap = shadowFBO.getColorBufferTexture();
+        lightCamera = new OrthographicCamera();
 
         game.play_music("sound/song"+((game.cour.info.scene%3)+1)+".mp3");
     }
 
-    void refresh_shadow_map()
+    void refresh_shadow_map(ship sh)
     {
-        Camera lightCamera = new OrthographicCamera();  // O PerspectiveCamera
-        //lightCamera.position.set(new Vector3(sun.x, sun.y, sun.z));
-        lightCamera.position.set(new Vector3(10f, 0f, 0f));
+        // O PerspectiveCamera
+        lightCamera.setToOrtho(false, 4000, 4000);
+        //lightCamera.position.set(new Vector3(game.pl[0].renderx, game.pl[0].y+10, game.pl[0].renderz));
+
+        Vector3 sunPos = new Vector3(sun.x, sun.y, sun.z);
+        Vector3 sceneCenter = new Vector3(sh.renderx, sh.y, sh.renderz);
+        Vector3 lightDir = sunPos.sub(sceneCenter);
+        lightDir.limit(30f);
+        Vector3 camPos = sceneCenter.add(lightDir);
+
+        lightCamera.position.set(new Vector3(sun.x, sun.y, sun.z));
         lightCamera.lookAt(new Vector3(0,0,0));  // Mira hacia el centro de la escen
-        lightCamera.near = 1f;
-        lightCamera.far = 30f;
+        lightCamera.near = 1000f;
+        lightCamera.far = 9000f;
         lightCamera.update();
+
+
 
         shadowFBO.begin();
         // Usas un shader que solo grabe profundidad
-        Gdx.gl.glClearColor(0f,0f,0f, 1f);
+        Gdx.gl.glClearColor(0f,1f,0f, 1f);
         Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT | GL20.GL_COLOR_BUFFER_BIT);
 
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);
 
         depthShader.begin();
+        depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
 
         //renderSceneWith(depthShader);  // Tu función que dibuja las naves, etc.
         for(int i = 0; i < game.cour.nodes.length; i++)
         {
             Matrix4 model = new Matrix4().idt();
 
-            depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
-            depthShader.setUniformMatrix("u_model", model);
 
-            game.cour.nodes[i].mesh.mesh.render(depthShader, GL20.GL_TRIANGLES);
+            course.node n = game.cour.nodes[i];
+
+            depthShader.setUniformMatrix("u_model", model);
+            n.mesh.mesh.render(depthShader, GL20.GL_TRIANGLES);
+
+            //Decorates
+
+            if(n.detype<=2){
+                //game.cour.decorate[n.detype].set_scale(n.dscalexz,n.dscaley,n.dscalexz);
+                //decorate[nodes[i].detype].render(shader, cam, nodes[i].dex,GROUNDY,nodes[i].dez,0,0,0);
+                Matrix4 m = new Matrix4().idt().translate(n.dex,course.GROUNDY,n.dez);
+                depthShader.setUniformMatrix("u_model", m);
+                game.cour.decorate[n.detype].mesh.render(depthShader, GL20.GL_TRIANGLES);
+            };
+
         }
 
         for(int i = 0; i < game.nplayers; i++)
@@ -282,9 +307,9 @@ public class RaceScreen implements Screen {
             Quaternion combined = qx.mul(qy).mul(qz);
             Matrix4 rot = new Matrix4().set(combined);
 
-            Matrix4 model = new Matrix4().idt();
-                //.translate(s.renderx,s.y,s.renderz)
-                //.mul(rot)
+            Matrix4 model = new Matrix4().idt()
+                .translate(s.renderx,s.y,s.renderz)
+                .mul(rot)
                 //.scale( scale[0], scale[1], scale[2]);
                 ;
             /*Matrix4 view = camera.view;
@@ -294,7 +319,7 @@ public class RaceScreen implements Screen {
             depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
             depthShader.setUniformMatrix("u_model", model);
 
-            s.mesh.mesh.render(depthShader, GL20.GL_TRIANGLES);
+            s.mesh.mesh.render(shipShader, GL20.GL_TRIANGLES);
 
         }
         depthShader.end();
@@ -457,6 +482,12 @@ public class RaceScreen implements Screen {
         shipShader.setUniformf("u_fogStart", 10.0f);
         shipShader.setUniformf("u_fogEnd", 1000.0f);
 
+        shipShader.setUniformMatrix("u_lightVP", lightCamera.combined);
+        shipShader.setUniformf("u_shadowMap", 6);
+
+        shadowMap.bind(6);
+
+
         int l=30+(15*game.gdata.drawdist);
         if (game.nhumans>1) l= (int) (0.75*l);
 
@@ -558,11 +589,11 @@ public class RaceScreen implements Screen {
 
         hour = hora + (minuto / 60f);
 
-       /* hour = game.cour.counter / 60f;
+        hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }*/
+        }
 
         switch(game.gdata.daytime){
             case 1 : hour=12.0f; break;
@@ -823,7 +854,7 @@ public class RaceScreen implements Screen {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();*/
 
-        refresh_shadow_map();
+        refresh_shadow_map(game.pl[0]);
 
         Gdx.gl.glClearColor(fogc[0], fogc[1], fogc[2], 1.f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -865,7 +896,6 @@ public class RaceScreen implements Screen {
         if(state == SINGLE)
         {
             game.batch.begin();
-            game.batch.draw(shadowMap, 0, 0, 512, 512);
             show_position(game.batch,0, HUD_START_X+20, 400);
 
             show_speed(game.batch, (int) game.pl[0].velocity_kmh(), HUD_START_X+20, 10);
@@ -879,6 +909,8 @@ public class RaceScreen implements Screen {
             game.fuente.show_text(game.batch, HUD_START_X+500, 345, s, 1);
 
             show_icon_rank();
+
+            game.batch.draw(shadowMap, 0, 0, 256, 256);
 
             game.batch.end();
 
@@ -1066,7 +1098,7 @@ public class RaceScreen implements Screen {
             };
         }
 
-        game.ctr.renderButtonLayout(game.shapeRenderer);
+        //game.ctr.renderButtonLayout(game.shapeRenderer);
 
     }
 

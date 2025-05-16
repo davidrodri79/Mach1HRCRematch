@@ -26,6 +26,10 @@ varying vec3 v_normal;
 varying vec2 v_texCoord;
 varying float v_textureID;
 
+uniform sampler2D u_shadowMap;     // Shadow map generado
+uniform mat4 u_lightVP;            // Matriz ViewProjection de la luz
+uniform mat4 u_model;              // Matriz de modelo
+
 void main() {
 
     vec4 texColor;
@@ -48,15 +52,38 @@ void main() {
         texColor = texture2D(u_textures[5], v_texCoord);
     }
 
+    // --- Shadow map ---
+
+    // Posición del fragmento en espacio de la luz
+    vec4 lightSpacePos = u_lightVP * u_model * vec4(v_worldPos, 1.0);
+
+    // Perspectiva divide (pasamos de clip space a NDC)
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+    projCoords = projCoords * 0.5 + 0.5; // NDC (-1,1) → (0,1)
+
+    // Sample del shadow map (profundidad vista por la luz)
+    float closestDepth = texture2D(u_shadowMap, projCoords.xy).r;
+
+    // Profundidad actual
+    float currentDepth = projCoords.z;
+
+    // Comparación con un pequeño sesgo para evitar artefactos
+    float bias = 0.005;
+
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
     // --- LIGHTING ---
     vec3 normal = normalize(v_normal);
     vec3 lightAccum = u_ambientColor;
 
-    for (int i = 0; i < MAX_LIGHTS; i++) {
-        if (i >= u_numLights) break;
-        vec3 lightDir = normalize(u_lightPos[i] - v_worldPos);
-        float diff = max(dot(normal, lightDir), 0.0);
-        lightAccum += u_lightColor[i] * diff * u_lightIntensity[i];
+    if(shadow < 0.5)
+    {
+        for (int i = 0; i < MAX_LIGHTS; i++) {
+            if (i >= u_numLights) break;
+            vec3 lightDir = normalize(u_lightPos[i] - v_worldPos);
+            float diff = max(dot(normal, lightDir), 0.0);
+            lightAccum += u_lightColor[i] * diff * u_lightIntensity[i];
+        }
     }
 
     vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum;
