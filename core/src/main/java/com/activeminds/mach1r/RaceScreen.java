@@ -185,7 +185,7 @@ public class RaceScreen implements Screen {
         if(game.nhumans <= 1)
             viewPortAspectRatio = (float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
         else if (game.nhumans == 2)
-            viewPortAspectRatio = (float) Gdx.graphics.getWidth() / (Gdx.graphics.getHeight() / 2f);
+            viewPortAspectRatio = (float) (Gdx.graphics.getWidth() / 2) / Gdx.graphics.getHeight();
         else if (game.nhumans > 2)
             viewPortAspectRatio = (float) (Gdx.graphics.getWidth() / 2f) / (Gdx.graphics.getHeight() / 2f);
 
@@ -587,11 +587,11 @@ public class RaceScreen implements Screen {
 
         s.render(shipShader, cam,true);
 
-        /*
-        s->mesh->set_color_coef(1.0,1.0,1.0);
-        s->lowres->set_color_coef(1.0,1.0,1.0);
 
-        glDisable(GL_DEPTH_TEST);
+        s.mesh.set_color_coef(1.0f,1.0f,1.0f);
+        s.lowres.set_color_coef(1.0f,1.0f,1.0f);
+
+        /*glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glDepthMask(0);*/
 

@@ -173,9 +173,9 @@ public class course {
         counter = 0;
         String s;
 
-        if(info.quality==2)
+        //if(info.quality==2)
             s = "scene/" + scenes.course_scenes.get(info.scene).name + ".png";
-        else s = "scene/" + scenes.course_scenes.get(info.scene).name + "lr.png";
+        //else s = "scene/" + scenes.course_scenes.get(info.scene).name + "lr.png";
         road= new texture(s,texture.TEX_PCX,true,false);
 
         for(int i=0; i<3; i++){
@@ -770,7 +770,7 @@ public class course {
         glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight);*/
 
         //Decorates
-        if(info.quality>0)
+        //if(info.quality>0)
             for(s=0; s<range*2; s++){
                 i=(startseg-range+s)%info.nsegments;
                 if(i<0) i+=info.nsegments;

@@ -50,7 +50,7 @@ public class RaceResultScreen implements Screen {
             if(i<game.nhumans) game.plcursor[game.gdata.icons[i]].render2d( game.batch,0,0,32,32,100,375-40*j,130,375+30-40*j,1.0f);
         };
         if((game.game_mode==Main.ENDURANCE) && (game.pl[0].raceover) && (game.position[0]==0))
-            game.fuente.show_text(game.batch, 110,140,Main.loc.get("congratsStageClear"),0);
+            game.fuente.show_text(game.batch, 110,140,Main.loc.get("congratsStageCleared"),0);
 
         game.fuente.show_text(game.batch, 40,30,Main.loc.get("pushAnyButton1p"),1);
 
