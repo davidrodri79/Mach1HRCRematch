@@ -7,6 +7,7 @@ uniform sampler2D u_textures[6]; // Puedes ampliar si quieres más texturas
 #define FOG_ENABLED 1
 #define SHADOWMAP_ENABLED 1
 #define LIGHTING_ENABLED 1
+#define SHADOWPCF_ENABLED 1
 
 #define MAX_LIGHTS 4
 
@@ -113,12 +114,12 @@ void main() {
         if (i >= u_numLights) break;
         vec3 lightDir = normalize(u_lightPos[i] - v_worldPos);
         float diff = max(dot(normal, lightDir), 0.0);
-        lightAccum += u_lightColor[i] * diff * u_lightIntensity[i];
+        lightAccum += u_lightColor[i] * diff * u_lightIntensity[i] * shadow;
     }
 
     //lightAccum = u_lightColor[0];
 
-    vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum * shadow;
+    vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum;
 #else
     vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz;
 #endif
