@@ -393,6 +393,7 @@ public class solid {
         shader.setUniformi("u_textures[4]", 4); // Dummy (no usamos)
         shader.setUniformi("u_textures[5]", 5); // Dummy (no usamos)
         shader.setUniformf("u_colorCoef", col_coef[0], col_coef[1], col_coef[2]);
+        shader.setUniformi("u_shadowMap", 6);
 
         for(int i = 0; i < textures.length; i++)
             textures[i].bind(i);

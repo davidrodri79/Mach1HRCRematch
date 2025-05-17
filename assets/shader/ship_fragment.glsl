@@ -4,6 +4,10 @@ precision mediump float;
 
 uniform sampler2D u_textures[6]; // Puedes ampliar si quieres más texturas
 
+#define FOG_ENABLED 1
+#define SHADOWMAP_ENABLED 1
+#define LIGHTING_ENABLED 1
+
 #define MAX_LIGHTS 4
 
 uniform vec3 u_lightPos[MAX_LIGHTS];
@@ -54,39 +58,80 @@ void main() {
     }
 
     // --- Shadow map ---
-
+#ifdef SHADOWMAP_ENABLED
     vec3 shadowCoord = v_shadowCoord.xyz / v_shadowCoord.w;
     shadowCoord = shadowCoord * 0.5 + 0.5;  // convertir de clip space a [0,1]
 
-    float closestDepth = texture2D(u_shadowMap, shadowCoord.xy).r;
-    float currentDepth = shadowCoord.z;
+    float shadow = 0.0;
 
-    float shadow = currentDepth > closestDepth + 0.005 ? 0.0 : 1.0;
+    // Si está fuera del shadow map
+    if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 ||
+        shadowCoord.y < 0.0 || shadowCoord.y > 1.0)
+        shadow = 1f;
+    else
+    {
+        //float closestDepth = texture2D(u_shadowMap, shadowCoord.xy).r;
+#ifdef SHADOWPCF_ENABLED
+        float texelSize = 1.0 / 1024.0; // Tamaño de texel (ajustar a la resolución real del shadow map)
 
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                vec2 offset = vec2(float(x), float(y)) * texelSize;
+                float closestDepth = texture2D(u_shadowMap, shadowCoord.xy + offset).r;
+                float currentDepth = shadowCoord.z;
+                if (currentDepth - 0.005 <= closestDepth) {
+                    shadow += 1.0;
+                }
+            }
+        }
+
+        shadow /= 9.0; // Promedio de 3x3 muestras
+#else
+        float closestDepth = texture2D(u_shadowMap, shadowCoord.xy).r;
+        float currentDepth = shadowCoord.z;
+        if (currentDepth - 0.005 <= closestDepth) {
+            shadow = 1.0;
+        }
+        else
+        {
+            shadow = 0.0;
+        }
+#endif
+    }
+
+#else
+    float shadow = 1f;
+#endif
+
+#ifdef LIGHTING_ENABLED
     // --- LIGHTING ---
     vec3 normal = normalize(v_normal);
     vec3 lightAccum = u_ambientColor;
 
-    if(shadow < 0.5)
-    {
-        for (int i = 0; i < MAX_LIGHTS; i++) {
-            if (i >= u_numLights) break;
-            vec3 lightDir = normalize(u_lightPos[i] - v_worldPos);
-            float diff = max(dot(normal, lightDir), 0.0);
-            lightAccum += u_lightColor[i] * diff * u_lightIntensity[i];
-        }
 
-        lightAccum = u_lightColor[0];
+    for (int i = 0; i < MAX_LIGHTS; i++) {
+        if (i >= u_numLights) break;
+        vec3 lightDir = normalize(u_lightPos[i] - v_worldPos);
+        float diff = max(dot(normal, lightDir), 0.0);
+        lightAccum += u_lightColor[i] * diff * u_lightIntensity[i];
     }
 
-    vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum;
+    //lightAccum = u_lightColor[0];
+
+    vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum * shadow;
+#else
+    vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz;
+#endif
 
     // --- FOG EFFECT ---
     float dist = length(v_worldPos); // distancia al origen de cámara
     float fogFactor = clamp((u_fogEnd - dist) / (u_fogEnd - u_fogStart), 0.0, 1.0);
-
+#ifdef FOG_ENABLED
     vec3 colorWithFog = mix(u_fogColor, finalColor, fogFactor);
-    //gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
-    gl_FragColor = vec4(finalColor, texColor.a * u_alpha);
+#else
+    vec3 colorWithFog = finalColor;
+#endif
+
+    gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
 
 }

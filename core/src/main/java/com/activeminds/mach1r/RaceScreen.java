@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class RaceScreen implements Screen {
 
     public static final int HUD_START_X = (Main.SCREENX - 640) / 2;
+    public static final int SHADOW_MAP_SIZE = 2048;
     public static final float GROUNDWIDTH = 4900.0f;
     public static final float SKYWIDTH = 6000.0f;
     public static final float GROUNDTILE = 12.0f;
@@ -230,7 +231,6 @@ public class RaceScreen implements Screen {
         paused = false;
 
         // Shadow map
-        int SHADOW_MAP_SIZE = 1024;
         shadowFBO = new FrameBuffer(Pixmap.Format.RGBA8888, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, true);
         shadowMap = shadowFBO.getColorBufferTexture();
         lightCamera = new OrthographicCamera();
@@ -241,31 +241,32 @@ public class RaceScreen implements Screen {
     void refresh_shadow_map(ship sh)
     {
         // O PerspectiveCamera
-        lightCamera.setToOrtho(false, 4000, 4000);
+        lightCamera.setToOrtho(false, 1000, 1000);
         //lightCamera.position.set(new Vector3(game.pl[0].renderx, game.pl[0].y+10, game.pl[0].renderz));
 
-        Vector3 sunPos = new Vector3(sun.x, sun.y, sun.z);
-        Vector3 sceneCenter = new Vector3(sh.renderx, sh.y, sh.renderz);
-        Vector3 lightDir = sunPos.sub(sceneCenter);
-        lightDir.limit(30f);
-        Vector3 camPos = sceneCenter.add(lightDir);
+        //Vector3 sunPos = new Vector3(sun.x, sun.y, sun.z);
+        //Vector3 sceneCenter = new Vector3(0, 0, 0);
+        Vector3 lightDirInv = new Vector3(sun.x, sun.y, sun.z);
+        lightDirInv.limit(80f);
+        Vector3 playerPos = new Vector3(sh.vrp.x, sh.vrp.y, sh.vrp.z);
+        Vector3 camPos = new Vector3(playerPos.x, playerPos.y, playerPos.z);
+        camPos.add(lightDirInv);
+       // Vector3 camPos = new Vector3(sh.vrp.x, sh.vrp.y+60, sh.vrp.z);
 
-        lightCamera.position.set(new Vector3(sun.x, sun.y, sun.z));
-        lightCamera.lookAt(new Vector3(0,0,0));  // Mira hacia el centro de la escen
-        lightCamera.up.set(0f,1f,0f);
-        lightCamera.near = 1000f;
-        lightCamera.far = 9000f;
+        lightCamera.position.set(camPos);
+        lightCamera.lookAt(playerPos);  // Mira hacia el centro de la escen
+        lightCamera.up.set(0f,0f,1f);
+        lightCamera.near = 0.1f;
+        lightCamera.far = 200f;
         lightCamera.update();
-
-
 
         shadowFBO.begin();
         // Usas un shader que solo grabe profundidad
-        Gdx.gl.glClearColor(0f,1f,0f, 1f);
+        Gdx.gl.glClearColor(1f,1f,0f, 1f);
         Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT | GL20.GL_COLOR_BUFFER_BIT);
 
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+        Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
         depthShader.begin();
         depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
@@ -274,7 +275,6 @@ public class RaceScreen implements Screen {
         for(int i = 0; i < game.cour.nodes.length; i++)
         {
             Matrix4 model = new Matrix4().idt();
-
 
             course.node n = game.cour.nodes[i];
 
@@ -291,6 +291,42 @@ public class RaceScreen implements Screen {
                 game.cour.decorate[n.detype].mesh.render(depthShader, GL20.GL_TRIANGLES);
             };
 
+            // Cubes
+
+            if(n.item!=course.NONE){
+
+                solid s;
+
+                switch(n.item){
+                    default:
+                    case course.BOOST : s = game.cour.bcube; break;
+                    case course.ENERGY: s = game.cour.ecube; break;
+                    case course.SHIELD: s = game.cour.ecube; break;
+                    case course.POWER : s = game.cour.ecube; break;
+                    case course.MINE  : s = game.cour.ecube; break;
+                };
+
+                //s.alpha_render(shader, cam, cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50f, counter/70f,0,nodes[i].itemfade);
+
+                Quaternion qx = new Quaternion();
+                Quaternion qy = new Quaternion();
+                Quaternion qz = new Quaternion();
+
+                qx.setEulerAnglesRad(0, 0, counter/50f);
+                qy.setEulerAnglesRad(counter/70f, 0, 0);
+                qz.setEulerAnglesRad(0, 0, 0);
+
+                Quaternion combined = qx.mul(qy).mul(qz);
+                Matrix4 rot = new Matrix4().set(combined);
+
+                Matrix4 m = new Matrix4().idt()
+                    .translate(game.cour.cube_x(i), game.cour.cube_y(i), game.cour.cube_z(i))
+                    .mul(rot);
+
+                depthShader.setUniformMatrix("u_model", m);
+                s.mesh.render(depthShader, GL20.GL_TRIANGLES);
+            };
+
         }
 
         for(int i = 0; i < game.nplayers; i++)
@@ -302,7 +338,7 @@ public class RaceScreen implements Screen {
             Quaternion qz = new Quaternion();
 
             qx.setEulerAnglesRad(0, 0, s.rx);
-            qy.setEulerAnglesRad(s.ry, 0, 0);
+            qy.setEulerAnglesRad((float) (s.ry + Math.PI), 0, 0);
             qz.setEulerAnglesRad(0, s.rz, 0);
 
             Quaternion combined = qx.mul(qy).mul(qz);
@@ -425,11 +461,13 @@ public class RaceScreen implements Screen {
         GLfloat diffusebackg[] = { 0.8f, 0.8f, 0.8f, 1.0f };
         */
 
+        refresh_shadow_map(game.pl[follow]);
+
         Gdx.gl.glViewport(vpx, vpy, vpw, vph);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
-        cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y+2000, game.pl[follow].cam_pos.z);
+        cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y, game.pl[follow].cam_pos.z);
         cam.lookAt(game.pl[follow].vrp.x, game.pl[follow].vrp.y, game.pl[follow].vrp.z);
         cam.up.set(0, 1, 0);
         cam.near = 0.1f;
@@ -484,10 +522,11 @@ public class RaceScreen implements Screen {
         shipShader.setUniformf("u_fogEnd", 1000.0f);
 
         shipShader.setUniformMatrix("u_lightVP", lightCamera.combined);
+        shadowMap.bind(6);
         shipShader.setUniformf("u_shadowMap", 6);
 
-        shadowMap.bind(6);
-
+        Vector3 caca = new Vector3(-5000, 0, 100);
+        caca.mul(lightCamera.combined);
 
         int l=30+(15*game.gdata.drawdist);
         if (game.nhumans>1) l= (int) (0.75*l);
@@ -590,11 +629,11 @@ public class RaceScreen implements Screen {
 
         hour = hora + (minuto / 60f);
 
-        hour = game.cour.counter / 60f;
+        /*hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }
+        }*/
 
         switch(game.gdata.daytime){
             case 1 : hour=12.0f; break;
@@ -855,8 +894,6 @@ public class RaceScreen implements Screen {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();*/
 
-        refresh_shadow_map(game.pl[0]);
-
         Gdx.gl.glClearColor(fogc[0], fogc[1], fogc[2], 1.f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
@@ -911,7 +948,7 @@ public class RaceScreen implements Screen {
 
             show_icon_rank();
 
-            game.batch.draw(shadowMap, 0, 0, 256, 256);
+            game.batch.draw(shadowMap, 0, 0, 256, 256, 0, 0, SHADOW_MAP_SIZE,SHADOW_MAP_SIZE, false, true);
 
             game.batch.end();
 
