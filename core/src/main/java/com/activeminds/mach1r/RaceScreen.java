@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class RaceScreen implements Screen {
 
     public static final int HUD_START_X = (Main.SCREENX - 640) / 2;
-    public static final int SHADOW_MAP_SIZE = 8192;
+    public static final int SHADOW_MAP_SIZE = 2048;
     public static final float GROUNDWIDTH = 4900.0f;
     public static final float SKYWIDTH = 6000.0f;
     public static final float GROUNDTILE = 12.0f;
@@ -71,7 +71,9 @@ public class RaceScreen implements Screen {
         fragmentShader = "#define FOG_ENABLED 1\n" +
             "#define SHADOWMAP_ENABLED 1\n" +
             "#define LIGHTING_ENABLED 1\n" +
-            "#define SHADOWPCF_ENABLED 1\n"+fragmentShader;
+            "#define SHADOWPCF_ENABLED 1\n" +
+            "#define SHADOWMAP24B 1\n" +
+            fragmentShader;
 
         ShaderProgram.pedantic = false;
         shipShader = new ShaderProgram(vertexShader, fragmentShader);
@@ -102,6 +104,9 @@ public class RaceScreen implements Screen {
 
        vertexShader = Gdx.files.internal("shader/depth_vertex.glsl").readString();
        fragmentShader = Gdx.files.internal("shader/depth_fragment.glsl").readString();
+
+        fragmentShader = "#define SHADOWMAP24B 1\n" +
+            fragmentShader;
 
         ShaderProgram.pedantic = false;
         depthShader = new ShaderProgram(vertexShader, fragmentShader);
@@ -262,12 +267,12 @@ public class RaceScreen implements Screen {
         lightCamera.lookAt(playerPos);  // Mira hacia el centro de la escen
         lightCamera.up.set(0f,0f,1f);
         lightCamera.near = 0.1f;
-        lightCamera.far = 700f;
+        lightCamera.far = 500f;
         lightCamera.update();
 
         shadowFBO.begin();
         // Usas un shader que solo grabe profundidad
-        Gdx.gl.glClearColor(1f,1f,0f, 1f);
+        Gdx.gl.glClearColor(1f,1f,1f, 1f);
         Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT | GL20.GL_COLOR_BUFFER_BIT);
 
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -640,11 +645,11 @@ public class RaceScreen implements Screen {
             case 3 : hour=22.0f; break;
         };
 
-        hour = game.cour.counter / 60f;
+        /*hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }
+        }*/
 
         if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
         if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}

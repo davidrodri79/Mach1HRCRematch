@@ -36,6 +36,11 @@ uniform mat4 u_lightVP;            // Matriz ViewProjection de la luz
 uniform mat4 u_model;              // Matriz de modelo
 varying vec4 v_shadowCoord;
 
+
+float decodeDepth(vec3 rgb) {
+    return dot(rgb, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));
+}
+
 void main() {
 
     vec4 texColor;
@@ -78,7 +83,11 @@ void main() {
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 vec2 offset = vec2(float(x), float(y)) * texelSize;
+#ifdef SHADOWMAP24B
+                float closestDepth = decodeDepth(texture2D(u_shadowMap, shadowCoord.xy + offset).rgb);
+#else
                 float closestDepth = texture2D(u_shadowMap, shadowCoord.xy + offset).r;
+#endif
                 float currentDepth = shadowCoord.z;
                 if (currentDepth - 0.005 <= closestDepth) {
                     shadow += 1.0;
