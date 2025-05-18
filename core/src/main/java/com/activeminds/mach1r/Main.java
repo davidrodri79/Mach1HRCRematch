@@ -48,7 +48,7 @@ public class Main extends Game {
         short sel_ship[] = new short[MAXPLAYERS], dif, cour_type, scene, nlaps;
         long score_champ;
         int controls[] = new int[4];
-        boolean music, sound, skygrfog;
+        boolean music, sound, skygrfog, shadowmap;
         int music_volume, drawdist, daytime, icons[] = new int[4], sel_endur, res_endur, sel_champ, language;
 
         game_data()
@@ -65,6 +65,7 @@ public class Main extends Game {
             music = true; sound = true;
             music_volume = 75;
             skygrfog = true;
+            shadowmap = true;
             icons[0] = 0;
             icons[1] = 1;
             icons[2] = 2;

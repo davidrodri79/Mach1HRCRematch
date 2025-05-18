@@ -69,10 +69,10 @@ public class RaceScreen implements Screen {
         String fragmentShader = Gdx.files.internal("shader/ship_fragment.glsl").readString();
 
         fragmentShader = "#define FOG_ENABLED 1\n" +
-            "#define SHADOWMAP_ENABLED 1\n" +
+            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n" : "") +
             "#define LIGHTING_ENABLED 1\n" +
             "#define SHADOWPCF_ENABLED 1\n" +
-            "#define SHADOWMAP24B 1\n" +
+            (game.gdata.shadowmap ? "#define SHADOWMAP24B 1\n" : "") +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -241,9 +241,11 @@ public class RaceScreen implements Screen {
         paused = false;
 
         // Shadow map
-        shadowFBO = new FrameBuffer(Pixmap.Format.RGBA8888, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, true);
-        shadowMap = shadowFBO.getColorBufferTexture();
-        lightCamera = new OrthographicCamera();
+        if(game.gdata.shadowmap) {
+            shadowFBO = new FrameBuffer(Pixmap.Format.RGBA8888, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, true);
+            shadowMap = shadowFBO.getColorBufferTexture();
+            lightCamera = new OrthographicCamera();
+        }
 
         game.play_music("sound/song"+((game.cour.info.scene%3)+1)+".mp3");
     }
@@ -317,9 +319,9 @@ public class RaceScreen implements Screen {
                     default:
                     case course.BOOST : s = game.cour.bcube; break;
                     case course.ENERGY: s = game.cour.ecube; break;
-                    case course.SHIELD: s = game.cour.ecube; break;
-                    case course.POWER : s = game.cour.ecube; break;
-                    case course.MINE  : s = game.cour.ecube; break;
+                    case course.SHIELD: s = game.cour.scube; break;
+                    case course.POWER : s = game.cour.power; break;
+                    case course.MINE  : s = game.cour.mine; break;
                 };
 
                 //s.alpha_render(shader, cam, cube_x(i),cube_y(i)+3.5f,cube_z(i),counter/50f, counter/70f,0,nodes[i].itemfade);
@@ -379,7 +381,8 @@ public class RaceScreen implements Screen {
 
         shadowFBO.end();
 
-        shadowMap = shadowFBO.getColorBufferTexture();
+        if(game.gdata.shadowmap)
+            shadowMap = shadowFBO.getColorBufferTexture();
 
     }
 
@@ -477,7 +480,8 @@ public class RaceScreen implements Screen {
         GLfloat diffusebackg[] = { 0.8f, 0.8f, 0.8f, 1.0f };
         */
 
-        refresh_shadow_map(game.pl[follow]);
+        if(game.gdata.shadowmap)
+            refresh_shadow_map(game.pl[follow]);
 
         Gdx.gl.glViewport(vpx, vpy, vpw, vph);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -537,12 +541,11 @@ public class RaceScreen implements Screen {
         shipShader.setUniformf("u_fogStart", 10.0f);
         shipShader.setUniformf("u_fogEnd", 1000.0f);
 
-        shipShader.setUniformMatrix("u_lightVP", lightCamera.combined);
-        shadowMap.bind(6);
-        shipShader.setUniformf("u_shadowMap", 6);
-
-        Vector3 caca = new Vector3(-5000, 0, 100);
-        caca.mul(lightCamera.combined);
+        if(game.gdata.shadowmap) {
+            shipShader.setUniformMatrix("u_lightVP", lightCamera.combined);
+            shadowMap.bind(6);
+            shipShader.setUniformf("u_shadowMap", 6);
+        }
 
         int l=30+(15*game.gdata.drawdist);
         if (game.nhumans>1) l= (int) (0.75*l);
@@ -550,16 +553,17 @@ public class RaceScreen implements Screen {
         game.cour.render(shipShader,cam,game.pl[follow].segment, (long) game.counter,l);
 
         //Ships
-        //if(accelerated){
-        //    glDisable(GL_DEPTH_TEST);
+        if(!game.gdata.shadowmap) {
+            //    glDisable(GL_DEPTH_TEST);
 
-        /*Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
-        //Gdx.gl.glDisable(GL20.GL_CULL_FACE);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-            for(int i=game.nplayers-1; i>=0; i--)
-                show_shadow(cam,game.pl[i]);*/
-        //};
+            Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+            //Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            for (int i = game.nplayers - 1; i >= 0; i--)
+                show_shadow(cam, game.pl[i]);
+            //};
+        }
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -964,7 +968,8 @@ public class RaceScreen implements Screen {
 
             show_icon_rank();
 
-            game.batch.draw(shadowMap, 0, 0, 256, 256, 0, 0, SHADOW_MAP_SIZE,SHADOW_MAP_SIZE, false, true);
+            if(game.gdata.shadowmap)
+                game.batch.draw(shadowMap, 0, 0, 256, 256, 0, 0, SHADOW_MAP_SIZE,SHADOW_MAP_SIZE, false, true);
 
             game.batch.end();
 
