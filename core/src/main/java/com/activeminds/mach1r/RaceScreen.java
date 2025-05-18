@@ -971,24 +971,24 @@ public class RaceScreen implements Screen {
                 game.batch.begin();
 
                 show_position(game.batch,0, 0, 410);
-                show_speed(game.batch,(int) game.pl[0].velocity_kmh(), 0, 240);
-                show_power(game.batch,0, 420, 350, 0);
+                show_speed(game.batch,(int) game.pl[0].velocity_kmh(), 0, 0);
+                show_power(game.batch,0, Main.SCREENX/2 - 220, 350, 0);
                 String s = "BOOST " + game.pl[0].nboosts;
-                game.fuente.show_text(game.batch, 520, 357, s, 1);
+                game.fuente.show_text(game.batch, Main.SCREENX - 120, 357, s, 1);
                 s = "LAP " + game.pl[0].lap + "/" + game.cour.info.nlaps;
-                game.fuente.show_text(game.batch, 200, 455, s, 1);
+                game.fuente.show_text(game.batch, 180, 435, s, 1);
 
-                show_position(game.batch,1, 0, 10);
-                show_speed(game.batch,(int) game.pl[1].velocity_kmh(), 0, 176);
-                show_power(game.batch,1, 420, 5, 0);
+                show_position(game.batch,1, Main.SCREENX/2, 410);
+                show_speed(game.batch,(int) game.pl[1].velocity_kmh(), Main.SCREENX - 350, 0);
+                show_power(game.batch,1, Main.SCREENX - 220, 350, 0);
                 s = "BOOST " + game.pl[0].nboosts;
-                game.fuente.show_text(game.batch, 520, 12, s, 1);
+                game.fuente.show_text(game.batch, Main.SCREENX/2 - 120, 357, s, 1);
                 s = "LAP " + game.pl[1].lap + "/" + game.cour.info.nlaps;
-                game.fuente.show_text(game.batch, 200, 10, s, 1);
+                game.fuente.show_text(game.batch, Main.SCREENX - 120 + 180, 435, s, 1);
 
                 game.batch.end();
 
-                show_map(550, 240);
+                show_map(Main.SCREENX / 2, 60);
             }
             else if(game.nhumans>=3){
 

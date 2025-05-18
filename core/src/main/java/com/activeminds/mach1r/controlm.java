@@ -259,6 +259,9 @@ public class controlm implements InputProcessor, ControllerListener {
 
         public void renderButtonLayout(ShapeRenderer shapeRenderer)
         {
+            if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
+                return;
+            }
 
             camera.update();
             shapeRenderer.setProjectionMatrix(camera.combined);
