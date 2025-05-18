@@ -251,23 +251,25 @@ public class RaceScreen implements Screen {
     void refresh_shadow_map(ship sh)
     {
         // O PerspectiveCamera
-        lightCamera.setToOrtho(false, 700, 700);
-        //lightCamera.position.set(new Vector3(game.pl[0].renderx, game.pl[0].y+10, game.pl[0].renderz));
+        int drawDist = 450;
+        lightCamera.setToOrtho(false, drawDist, drawDist);
 
-        //Vector3 sunPos = new Vector3(sun.x, sun.y, sun.z);
-        //Vector3 sceneCenter = new Vector3(0, 0, 0);
         Vector3 lightDirInv = new Vector3(sun.x, sun.y, sun.z);
-        lightDirInv.limit(350f);
-        Vector3 playerPos = new Vector3(sh.vrp.x, sh.vrp.y, sh.vrp.z);
-        Vector3 camPos = new Vector3(playerPos.x, playerPos.y, playerPos.z);
+        lightDirInv.limit(drawDist/2f);
+        Vector3 cameraToVrp = new Vector3(sh.vrp.x - sh.cam_pos.x, sh.vrp.y - sh.cam_pos.y, sh.vrp.z - sh.cam_pos.z);
+        cameraToVrp.nor();
+        cameraToVrp.scl(drawDist/2f);
+        Vector3 sceneCenter = new Vector3(sh.cam_pos.x, sh.cam_pos.y, sh.cam_pos.z);
+        sceneCenter.add(cameraToVrp);
+        Vector3 camPos = new Vector3(sceneCenter.x, sceneCenter.y, sceneCenter.z);
         camPos.add(lightDirInv);
-       // Vector3 camPos = new Vector3(sh.vrp.x, sh.vrp.y+60, sh.vrp.z);
+
 
         lightCamera.position.set(camPos);
-        lightCamera.lookAt(playerPos);  // Mira hacia el centro de la escen
+        lightCamera.lookAt(sceneCenter);  // Mira hacia el centro de la escen
         lightCamera.up.set(0f,0f,1f);
         lightCamera.near = 0.1f;
-        lightCamera.far = 500f;
+        lightCamera.far = drawDist;
         lightCamera.update();
 
         shadowFBO.begin();
@@ -282,10 +284,14 @@ public class RaceScreen implements Screen {
         depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
 
         //renderSceneWith(depthShader);  // Tu función que dibuja las naves, etc.
-        for(int i = 0; i < game.cour.nodes.length; i++)
+        int range = 30+(15*game.gdata.drawdist);
+        for(int seg = 0; seg < range; seg++)
         {
             Matrix4 model = new Matrix4().idt();
 
+            int i=(sh.nextsegment-(range/2)+seg);
+            if(i<0) i+=game.cour.info.nsegments;
+            if(i>=game.cour.info.nsegments) i-=game.cour.info.nsegments;
             course.node n = game.cour.nodes[i];
 
             depthShader.setUniformMatrix("u_model", model);
