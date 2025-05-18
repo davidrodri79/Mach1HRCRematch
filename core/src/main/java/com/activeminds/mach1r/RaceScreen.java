@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class RaceScreen implements Screen {
 
     public static final int HUD_START_X = (Main.SCREENX - 640) / 2;
-    public static final int SHADOW_MAP_SIZE = 2048;
+    public static final int SHADOW_MAP_SIZE = 8192;
     public static final float GROUNDWIDTH = 4900.0f;
     public static final float SKYWIDTH = 6000.0f;
     public static final float GROUNDTILE = 12.0f;
@@ -67,6 +67,11 @@ public class RaceScreen implements Screen {
         // Crear shaders
         String vertexShader = Gdx.files.internal("shader/ship_vertex.glsl").readString();
         String fragmentShader = Gdx.files.internal("shader/ship_fragment.glsl").readString();
+
+        fragmentShader = "#define FOG_ENABLED 1\n" +
+            "#define SHADOWMAP_ENABLED 1\n" +
+            "#define LIGHTING_ENABLED 1\n" +
+            "#define SHADOWPCF_ENABLED 1\n"+fragmentShader;
 
         ShaderProgram.pedantic = false;
         shipShader = new ShaderProgram(vertexShader, fragmentShader);
@@ -241,13 +246,13 @@ public class RaceScreen implements Screen {
     void refresh_shadow_map(ship sh)
     {
         // O PerspectiveCamera
-        lightCamera.setToOrtho(false, 1000, 1000);
+        lightCamera.setToOrtho(false, 700, 700);
         //lightCamera.position.set(new Vector3(game.pl[0].renderx, game.pl[0].y+10, game.pl[0].renderz));
 
         //Vector3 sunPos = new Vector3(sun.x, sun.y, sun.z);
         //Vector3 sceneCenter = new Vector3(0, 0, 0);
         Vector3 lightDirInv = new Vector3(sun.x, sun.y, sun.z);
-        lightDirInv.limit(80f);
+        lightDirInv.limit(350f);
         Vector3 playerPos = new Vector3(sh.vrp.x, sh.vrp.y, sh.vrp.z);
         Vector3 camPos = new Vector3(playerPos.x, playerPos.y, playerPos.z);
         camPos.add(lightDirInv);
@@ -257,7 +262,7 @@ public class RaceScreen implements Screen {
         lightCamera.lookAt(playerPos);  // Mira hacia el centro de la escen
         lightCamera.up.set(0f,0f,1f);
         lightCamera.near = 0.1f;
-        lightCamera.far = 200f;
+        lightCamera.far = 700f;
         lightCamera.update();
 
         shadowFBO.begin();
@@ -629,17 +634,17 @@ public class RaceScreen implements Screen {
 
         hour = hora + (minuto / 60f);
 
-        /*hour = game.cour.counter / 60f;
-        while (hour >= 24.f)
-        {
-            hour -=24.f;
-        }*/
-
         switch(game.gdata.daytime){
             case 1 : hour=12.0f; break;
             case 2 : hour=19.30f; break;
             case 3 : hour=22.0f; break;
         };
+
+        hour = game.cour.counter / 60f;
+        while (hour >= 24.f)
+        {
+            hour -=24.f;
+        }
 
         if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
         if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}
@@ -1136,7 +1141,7 @@ public class RaceScreen implements Screen {
             };
         }
 
-        //game.ctr.renderButtonLayout(game.shapeRenderer);
+        game.ctr.renderButtonLayout(game.shapeRenderer);
 
     }
 

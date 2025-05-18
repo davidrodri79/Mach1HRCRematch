@@ -4,10 +4,10 @@ precision mediump float;
 
 uniform sampler2D u_textures[6]; // Puedes ampliar si quieres más texturas
 
-#define FOG_ENABLED 1
-#define SHADOWMAP_ENABLED 1
-#define LIGHTING_ENABLED 1
-#define SHADOWPCF_ENABLED 1
+//#define FOG_ENABLED 0
+//#define SHADOWMAP_ENABLED 0
+//#define LIGHTING_ENABLED 0
+//#define SHADOWPCF_ENABLED 0
 
 #define MAX_LIGHTS 4
 
@@ -68,7 +68,7 @@ void main() {
     // Si está fuera del shadow map
     if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 ||
         shadowCoord.y < 0.0 || shadowCoord.y > 1.0)
-        shadow = 1f;
+        shadow = 1.0;
     else
     {
         //float closestDepth = texture2D(u_shadowMap, shadowCoord.xy).r;
@@ -101,7 +101,7 @@ void main() {
     }
 
 #else
-    float shadow = 1f;
+    float shadow = 1.0;
 #endif
 
 #ifdef LIGHTING_ENABLED
