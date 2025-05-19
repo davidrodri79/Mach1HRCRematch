@@ -383,6 +383,7 @@ public class solid {
         Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
 
         shader.begin();
+        shader.setUniformf("u_cameraPos", camera.position.x, camera.position.y, camera.position.z);
         shader.setUniformMatrix("u_mvp", MVP);
         shader.setUniformMatrix("u_model", model);
         shader.setUniformf("u_alpha", 1f);

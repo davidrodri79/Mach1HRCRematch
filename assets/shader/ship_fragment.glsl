@@ -11,6 +11,7 @@ uniform sampler2D u_textures[6]; // Puedes ampliar si quieres más texturas
 
 #define MAX_LIGHTS 4
 
+uniform vec3 u_cameraPos;
 uniform vec3 u_lightPos[MAX_LIGHTS];
 uniform vec3 u_lightColor[MAX_LIGHTS];
 uniform float u_lightIntensity[MAX_LIGHTS];
@@ -121,9 +122,20 @@ void main() {
 
     for (int i = 0; i < MAX_LIGHTS; i++) {
         if (i >= u_numLights) break;
+
+        // DIFFUSE
         vec3 lightDir = normalize(u_lightPos[i] - v_worldPos);
         float diff = max(dot(normal, lightDir), 0.0);
-        lightAccum += u_lightColor[i] * diff * u_lightIntensity[i] * shadow;
+        //lightAccum += u_lightColor[i] * diff * u_lightIntensity[i] * shadow;
+
+        // SPECULAR
+        vec3 viewDir = normalize(u_cameraPos - v_worldPos);
+        vec3 reflectDir = reflect(-lightDir, normal);
+
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0); // 32 = shininess
+        vec3 specular = spec * u_lightColor[i];
+        lightAccum += specular;
+
     }
 
     //lightAccum = u_lightColor[0];
