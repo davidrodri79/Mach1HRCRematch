@@ -1,5 +1,6 @@
 package com.activeminds.mach1r;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
@@ -14,7 +15,6 @@ import java.util.ArrayList;
 
 public class RaceScreen implements Screen {
 
-    public static final int HUD_START_X = (Main.SCREENX - 640) / 2;
     public static final int SHADOW_MAP_SIZE = 2048;
     public static final float GROUNDWIDTH = 4900.0f;
     public static final float SKYWIDTH = 6000.0f;
@@ -54,6 +54,7 @@ public class RaceScreen implements Screen {
     FrameBuffer shadowFBO;
     Texture shadowMap;
 
+    public static int HUD_START_X;
 
     public RaceScreen(Main game)
     {
@@ -63,6 +64,11 @@ public class RaceScreen implements Screen {
         accumulatedDelta = 0f;
         updatesPending = 0;
         counter = 0;
+
+        if(Gdx.app.getType() == Application.ApplicationType.Desktop)
+            HUD_START_X = 0;
+        else
+            HUD_START_X = (Main.SCREENX - 640) / 2;
 
         // Crear shaders
         String vertexShader = Gdx.files.internal("shader/ship_vertex.glsl").readString();
@@ -205,7 +211,7 @@ public class RaceScreen implements Screen {
 
         splitScreenBatch = new SpriteBatch();
         splitScreenCamera2d = new OrthographicCamera();
-        splitScreenCamera2d.setToOrtho(false,  800, 600);
+        splitScreenCamera2d.setToOrtho(false,  Main.SCREENX, Main.SCREENY);
 
         if(game.nhumans <= 1)
             viewPortAspectRatio = (float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
@@ -605,11 +611,11 @@ public class RaceScreen implements Screen {
 
         // Ship messages
         if(game.pl[follow].messcount>0)
-            game.fuente.show_text( game.batch, 100,320,game.pl[follow].message,0);
+            game.fuente.show_text( game.batch, 260,320,game.pl[follow].message,0);
 
         if(game.pl[follow].state==ship.DESTR){
-            game.fuente.show_text(game.batch, 180,350,game.loc.get("disqualified"),1);
-            game.fuente.show_text(game.batch, 270,100,game.loc.get("gameOver"),1);
+            game.fuente.show_text(game.batch, 340,350,game.loc.get("disqualified"),1);
+            game.fuente.show_text(game.batch, 430,100,game.loc.get("gameOver"),1);
         };
 
         //Start countdown
@@ -619,7 +625,7 @@ public class RaceScreen implements Screen {
                 long i=game.cour.counter-(360+(60*j));
                 float size=2000f/(0.25f*i);
 
-                game.start[j].render2d(game.batch, 0,0,256,256,(int)(320-(size/2)),(int)(240-(size/2)),(int)(320+(size/2)),(int)(240+(size/2)),1f-(i*0.015f));
+                game.start[j].render2d(game.batch, 0,0,256,256,(int)((Main.SCREENX/2)-(size/2)),(int)((Main.SCREENY/2)-(size/2)),(int)((Main.SCREENX/2)+(size/2)),(int)((Main.SCREENY/2)+(size/2)),1f-(i*0.015f));
             };
 
         game.batch.end();
@@ -958,22 +964,22 @@ public class RaceScreen implements Screen {
 
             show_speed(game.batch, (int) game.pl[0].velocity_kmh(), HUD_START_X+20, 10);
 
-            show_power(game.batch,0, HUD_START_X+400, 340, 0);
+            show_power(game.batch,0, Main.SCREENX-HUD_START_X-240, 340, 0);
 
             //Lap count
             String s = "LAP " + game.pl[0].lap + "/" + game.cour.info.nlaps;
             game.fuente.show_text(game.batch, HUD_START_X+200, 400, s, 1);
             s = "BOOST " + game.pl[0].nboosts;
-            game.fuente.show_text(game.batch, HUD_START_X+500, 345, s, 1);
+            game.fuente.show_text(game.batch, Main.SCREENX-HUD_START_X-140, 345, s, 1);
 
             show_icon_rank();
 
-            if(game.gdata.shadowmap)
-                game.batch.draw(shadowMap, 0, 0, 256, 256, 0, 0, SHADOW_MAP_SIZE,SHADOW_MAP_SIZE, false, true);
+            //if(game.gdata.shadowmap)
+            //    game.batch.draw(shadowMap, 0, 0, 256, 256, 0, 0, SHADOW_MAP_SIZE,SHADOW_MAP_SIZE, false, true);
 
             game.batch.end();
 
-            show_map(HUD_START_X+550, 70);
+            show_map(Main.SCREENX-HUD_START_X-90, 70);
         }
         else if(state == VERSUS)
         {
@@ -1008,63 +1014,58 @@ public class RaceScreen implements Screen {
                splitScreenBatch.setProjectionMatrix(splitScreenCamera2d.combined);
                splitScreenBatch.begin();
 
-                show_position(splitScreenBatch, 0,0,530);
-                show_speed(splitScreenBatch, (int) game.pl[0].velocity_kmh(),0,295);
-                show_power(splitScreenBatch, 0,200,470,1);
+                show_position(splitScreenBatch, 0,0,Main.SCREENY - 70);
+                show_speed(splitScreenBatch, (int) game.pl[0].velocity_kmh(),0,Main.SCREENY/2 - 5);
+                show_power(splitScreenBatch, 0,Main.SCREENX/2 - 200,Main.SCREENY - 130,1);
 
-                show_position(splitScreenBatch, 1,630,530);
-                show_speed(splitScreenBatch, (int) game.pl[1].velocity_kmh(),470,295);
-                show_power(splitScreenBatch, 1,360,470,1);
+                show_position(splitScreenBatch, 1,Main.SCREENX - 170,Main.SCREENY - 70);
+                show_speed(splitScreenBatch, (int) game.pl[1].velocity_kmh(),Main.SCREENX/2 + 70,Main.SCREENY/2 - 5);
+                show_power(splitScreenBatch, 1,Main.SCREENX/2 - 40,Main.SCREENY - 130,1);
 
                 show_position(splitScreenBatch, 2,0,10);
-                show_speed(splitScreenBatch, (int) game.pl[2].velocity_kmh(),0,240);
-                show_power(splitScreenBatch, 2,200,-40,1);
+                show_speed(splitScreenBatch, (int) game.pl[2].velocity_kmh(),0,Main.SCREENY/2 - 60);
+                show_power(splitScreenBatch, 2,Main.SCREENX/2 - 200,-40,1);
 
                 if(game.nhumans==4) {
-                    show_position(splitScreenBatch, 3, 630, 10);
-                    show_speed(splitScreenBatch, (int) game.pl[3].velocity_kmh(), 470, 240);
-                    show_power(splitScreenBatch, 3, 360, -40, 1);
+                    show_position(splitScreenBatch, 3, Main.SCREENX - 170, 10);
+                    show_speed(splitScreenBatch, (int) game.pl[3].velocity_kmh(), Main.SCREENX/2 + 70, Main.SCREENY/2 - 60);
+                    show_power(splitScreenBatch, 3, Main.SCREENX/2 - 40, -40, 1);
                 }
-                splitScreenBatch.end();
-
-                game.camera2d.update();
-                game.batch.setProjectionMatrix(game.camera2d.combined);
-                game.batch.begin();
 
                 String s = "BOOST "+game.pl[0].nboosts;
-                game.fuente.show_text(game.batch,207,418,s,1);
-                s = game.pl[0].lap+"/"+game.cour.info.nlaps;
-                game.fuente.show_text(game.batch,145,455,s,1);
+                game.fuente.show_text(splitScreenBatch,Main.SCREENX/2 - 113,Main.SCREENY - 82,s,1);
+                s = "LAP "+game.pl[0].lap+"/"+game.cour.info.nlaps;
+                game.fuente.show_text(splitScreenBatch,165,Main.SCREENY - 25,s,1);
 
                 s="BOOST "+game.pl[1].nboosts;
-                game.fuente.show_text(game.batch, 335,418,s,1);
-                s = game.pl[1].lap+"/"+game.cour.info.nlaps;
-                game.fuente.show_text(game.batch, 450,455,s,1);
+                game.fuente.show_text(splitScreenBatch, Main.SCREENX/2 + 15,Main.SCREENY - 82,s,1);
+                s = "LAP "+game.pl[1].lap+"/"+game.cour.info.nlaps;
+                game.fuente.show_text(splitScreenBatch, Main.SCREENX - 270,Main.SCREENY - 25,s,1);
 
                 s = "BOOST "+game.pl[2].nboosts;
-                game.fuente.show_text(game.batch, 207,10,s,1);
-                s = game.pl[2].lap+"/"+game.cour.info.nlaps;
-                game.fuente.show_text(game.batch, 145,10,s,1);
+                game.fuente.show_text(splitScreenBatch, Main.SCREENX/2 - 113,10,s,1);
+                s = "LAP "+game.pl[2].lap+"/"+game.cour.info.nlaps;
+                game.fuente.show_text(splitScreenBatch, 165,10,s,1);
 
                 if(game.nhumans==4){
                     s = "BOOST "+game.pl[3].nboosts;
-                    game.fuente.show_text(game.batch,335,10,s,1);
-                    s =  game.pl[3].lap+"/"+game.cour.info.nlaps;
-                    game.fuente.show_text(game.batch,450,10,s,1);
+                    game.fuente.show_text(splitScreenBatch,Main.SCREENX/2 + 15,10,s,1);
+                    s =  "LAP "+game.pl[3].lap+"/"+game.cour.info.nlaps;
+                    game.fuente.show_text(splitScreenBatch,Main.SCREENX - 270,10,s,1);
                 }
-                game.batch.end();
+                splitScreenBatch.end();
 
                 if(game.nhumans==3)
                 {
                     game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                     game.shapeRenderer.setColor(0f,0f,0f, 1f);
-                    game.shapeRenderer.rect(Gdx.graphics.getWidth()/2, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+                    game.shapeRenderer.rect(Main.SCREENX/2, 0, Main.SCREENX/2, Main.SCREENY/2);
                     game.shapeRenderer.end();
-                    show_map(480,120);
+                    show_map(3*Main.SCREENX/4,Main.SCREENY/4);
                 }
                 else
                 {
-                    show_map(320,240);
+                    show_map(Main.SCREENX/2,Main.SCREENY/2);
                 }
             };
         }
