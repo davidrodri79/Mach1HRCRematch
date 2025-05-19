@@ -9,10 +9,25 @@ public class SingleRaceSelectScreen implements Screen {
 
     Main game;
     int cur_wait = 20, cursor = 0;
+    int minbots, maxbots;
 
     SingleRaceSelectScreen(Main game)
     {
         this.game = game;
+        if(game.nhumans == 1)
+        {
+            minbots = 1;
+            maxbots = 5;
+        }
+        else
+        {
+            minbots = 0;
+            maxbots = 6 - game.nhumans;
+        }
+
+        if(game.gdata.nbots < minbots) game.gdata.nbots = (short) minbots;
+        if(game.gdata.nbots > maxbots) game.gdata.nbots = (short) maxbots;
+
     }
 
     @Override
@@ -40,6 +55,8 @@ public class SingleRaceSelectScreen implements Screen {
         game.fuente.show_text(game.batch,150,230,game.loc.get(course.scenes.course_scenes.get(game.gdata.scene).descr),0);
         game.fuente.show_text(game.batch,100,190,game.loc.get("numberOfLaps"),1);
         game.fuente.show_text(game.batch,150,160,""+game.gdata.nlaps,1);
+        game.fuente.show_text(game.batch,100,120,game.loc.get("numberOfBots"),1);
+        game.fuente.show_text(game.batch,150,90,""+game.gdata.nbots,1);
         game.preview[game.gdata.scene].render2d(game.batch, 0,0,128,128,390,160,390+192,160+144,1);
         game.fuente.show_text(game.batch, 40,30,game.loc.get("pushAnyButton1p"),1);
         game.show_menu_cursor(85,362-(70*cursor));
@@ -59,6 +76,7 @@ public class SingleRaceSelectScreen implements Screen {
                     case 1 : if (game.gdata.cour_type<9) game.gdata.cour_type++; break;
                     case 2 : if (game.gdata.scene<5) game.gdata.scene++; break;
                     case 3 : if (game.gdata.nlaps<10) game.gdata.nlaps++; break;
+                    case 4 : if (game.gdata.nbots<maxbots) game.gdata.nbots++; break;
                 };
                 cur_wait=20;
             };
@@ -68,15 +86,16 @@ public class SingleRaceSelectScreen implements Screen {
                     case 1 : if (game.gdata.cour_type>0) game.gdata.cour_type--; break;
                     case 2 : if (game.gdata.scene>0) game.gdata.scene--; break;
                     case 3 : if (game.gdata.nlaps>2) game.gdata.nlaps--; break;
+                    case 4 : if (game.gdata.nbots>minbots) game.gdata.nbots--; break;
                 };
                 cur_wait=20;
             };
             if((game.ctr.arr(controlm.TEC1)) || (game.ctr.arr(game.gdata.controls[0]))){ if(cursor>0) cursor--; cur_wait=20;};
-            if((game.ctr.aba(controlm.TEC1)) || (game.ctr.aba(game.gdata.controls[0]))){ if(cursor<3) cursor++; cur_wait=20;};
+            if((game.ctr.aba(controlm.TEC1)) || (game.ctr.aba(game.gdata.controls[0]))){ if(cursor<4) cursor++; cur_wait=20;};
             if((game.ctr.algun_boton(controlm.TEC1)) || (game.ctr.algun_boton(game.gdata.controls[0]))) {
                 game.wconfirm.playonce();
                 /*lock=TRUE;*/
-                game.random_ships(game.nhumans);
+                game.random_ships(game.nhumans, game.gdata.nbots);
                 /*set_state(LOADING);*/
                 game.setScreen(new LoadingScreen(game));
                 dispose();

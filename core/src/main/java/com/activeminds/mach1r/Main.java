@@ -45,7 +45,7 @@ public class Main extends Game {
         int resol;
         int dummy[] = new int[4];
         int available[] = new int[NSHIPS];
-        short sel_ship[] = new short[MAXPLAYERS], dif, cour_type, scene, nlaps;
+        short sel_ship[] = new short[MAXPLAYERS], dif, cour_type, scene, nlaps, nbots;
         long score_champ;
         int controls[] = new int[4];
         boolean music, sound, skygrfog, shadowmap;
@@ -62,6 +62,7 @@ public class Main extends Game {
                 available[i] = 1;//i < ship.ICARUS ? 1 : 0;
             drawdist = 2;
             nlaps = 3;
+            nbots = 3;
             music = true; sound = true;
             music_volume = 75;
             skygrfog = true;
@@ -252,13 +253,14 @@ public class Main extends Game {
 
     }
 
-    void random_ships(int npl)
+    void random_ships(int npl, int nbot)
     {
         boolean used[] = new boolean[NSHIPS];
         int i,j;
 
         nhumans=npl;
-        if(npl<2) nplayers=6; else nplayers=npl;
+        //if(npl<2) nplayers=6; else nplayers=npl;
+        nplayers = npl + nbot;
 
         //Random ships for opponents
         for(i=0; i<NSHIPS; i++)
@@ -341,6 +343,7 @@ public class Main extends Game {
         buffer.putShort(gdata.cour_type);
         buffer.putShort(gdata.scene);
         buffer.putShort(gdata.nlaps);
+        buffer.putShort(gdata.nbots);
         buffer.putLong(gdata.score_champ);
         for(int i = 0; i < 4; i++)
             buffer.putInt(gdata.controls[i]);
@@ -383,6 +386,7 @@ public class Main extends Game {
             gdata.cour_type = buffer.getShort();
             gdata.scene = buffer.getShort();
             gdata.nlaps = buffer.getShort();
+            gdata.nbots = buffer.getShort();
             gdata.score_champ = buffer.getLong();
             for (int i = 0; i < 4; i++)
                 gdata.controls[i] = buffer.getInt();

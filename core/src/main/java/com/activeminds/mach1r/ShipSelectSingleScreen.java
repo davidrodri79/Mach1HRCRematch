@@ -171,7 +171,7 @@ public class ShipSelectSingleScreen implements Screen {
                     dispose();
                     break;
                 case Main.CHAMPIONSHIP :
-                    game.random_ships(1);
+                    game.random_ships(1, 5);
                     game.setScreen(new ChampionshipStageScreen(game));
                     dispose();
                     break;

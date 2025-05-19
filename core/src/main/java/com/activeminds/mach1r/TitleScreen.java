@@ -43,7 +43,7 @@ public class TitleScreen implements Screen {
                 dispose();
             }
         if(counter>180) {
-            game.random_ships(0);
+            game.random_ships(0, 6);
             //game.startup_course(2,course.rand()%4,course.rand()%10,course.rand()%6);
             game.game_mode = Main.DEMO;
             game.setScreen(new LoadingScreen(game));

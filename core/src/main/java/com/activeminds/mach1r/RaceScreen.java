@@ -232,11 +232,19 @@ public class RaceScreen implements Screen {
         {
             game.pl[0].soundCam = cameras2p[0];
             game.pl[1].soundCam = cameras2p[1];
+            for(int i = game.nhumans; i < game.nplayers; i++)
+            {
+                game.pl[i].soundCam = cameras2p[0];
+            }
         }
         else if (game.nhumans > 2)
         {
             for(int i = 0; i < game.nhumans; i++)
                 game.pl[i].soundCam = cameras4p[i];
+            for(int i = game.nhumans; i < game.nplayers; i++)
+            {
+                game.pl[i].soundCam = cameras4p[0];
+            }
         }
 
 
@@ -1001,7 +1009,7 @@ public class RaceScreen implements Screen {
                 s = "BOOST " + game.pl[0].nboosts;
                 game.fuente.show_text(game.batch, Main.SCREENX/2 - 120, 357, s, 1);
                 s = "LAP " + game.pl[1].lap + "/" + game.cour.info.nlaps;
-                game.fuente.show_text(game.batch, Main.SCREENX - 120 + 180, 435, s, 1);
+                game.fuente.show_text(game.batch, Main.SCREENX - 120 - 180, 435, s, 1);
 
                 game.batch.end();
 
