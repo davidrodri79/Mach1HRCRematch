@@ -22,6 +22,9 @@ public class ShipSelectSingleScreen implements Screen {
         String vertexShader = Gdx.files.internal("shader/ship_vertex.glsl").readString();
         String fragmentShader = Gdx.files.internal("shader/ship_fragment.glsl").readString();
 
+        fragmentShader = "#define LIGHTING_ENABLED 1\n" +
+            fragmentShader;
+
         ShaderProgram.pedantic = false;
         shader = new ShaderProgram(vertexShader, fragmentShader);
 

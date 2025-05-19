@@ -3,7 +3,7 @@
     {
       "name" : "zero-64",
       "file" : "zero64",
-      "gouraud" : false,
+      "gouraud" : true,
       "light" : [0.98,0.94,0.68],
       nlights : 2,
       "lsize" : 0.6,
@@ -48,7 +48,7 @@
     {
       "name" : "gemini",
       "file" : "gemini",
-      "gouraud" : false,
+      "gouraud" : true,
       "light" : [0.65,0.84,0.65],
       nlights : 2,
       "lsize" : 0.9,
@@ -108,7 +108,7 @@
     {
       "name" : "turbo bull",
       "file" : "turbobull",
-      "gouraud" : false,
+      "gouraud" : true,
       "light" : [0.98,0.957,0.671],
       nlights : 1,
       "lsize" : 1.4,
@@ -198,7 +198,7 @@
     {
       "name" : "vertigo",
       "file" : "vertigo",
-      "gouraud" : false,
+      "gouraud" : true,
       "light" : [1.0,0.78,0.78],
       nlights : 1,
       "lsize" : 1.0,

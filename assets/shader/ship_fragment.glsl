@@ -119,21 +119,21 @@ void main() {
     vec3 normal = normalize(v_normal);
     vec3 lightAccum = u_ambientColor;
 
-
     for (int i = 0; i < MAX_LIGHTS; i++) {
         if (i >= u_numLights) break;
 
         // DIFFUSE
         vec3 lightDir = normalize(u_lightPos[i] - v_worldPos);
         float diff = max(dot(normal, lightDir), 0.0);
-        //lightAccum += u_lightColor[i] * diff * u_lightIntensity[i] * shadow;
+        //vec3 diffuse = u_lightColor[i] * diff * u_lightIntensity[i] * shadow;
+        lightAccum += u_lightColor[i] * diff * u_lightIntensity[i] * shadow;;
 
         // SPECULAR
         vec3 viewDir = normalize(u_cameraPos - v_worldPos);
         vec3 reflectDir = reflect(-lightDir, normal);
 
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0); // 32 = shininess
-        vec3 specular = spec * u_lightColor[i];
+        vec3 specular = spec * vec3(1,1,1); //u_lightColor[i];
         lightAccum += specular;
 
     }
