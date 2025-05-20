@@ -78,6 +78,7 @@ public class RaceScreen implements Screen {
             "#define LIGHTING_ENABLED 1\n" +
             "#define SPECULAR_ENABLED 1\n" +
             (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n#define SHADOWMAP24B 1\n" : "") +
+            "#define REFLECTION_ENABLED º\n" +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -624,6 +625,14 @@ public class RaceScreen implements Screen {
             shipShader.setUniformf("u_shadowMap", 6);
         }
 
+        shipShader.setUniformi("u_face0", 7);
+        shipShader.setUniformi("u_face1", 7);
+        shipShader.setUniformi("u_face2", 7);
+        shipShader.setUniformi("u_face3", 7);
+        shipShader.setUniformi("u_face4", 7);
+        shipShader.setUniformi("u_face5", 7);
+        game.wallpCubemap.bind(7);
+
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -631,6 +640,8 @@ public class RaceScreen implements Screen {
             show_ship(cam,game.pl[i]);
 
         shipShader.end();
+
+        Gdx.gl.glDepthMask(false);
 
         for(int i=game.nplayers-1; i>=0; i--)
             show_ship_sprites(cam,game.pl[i]);

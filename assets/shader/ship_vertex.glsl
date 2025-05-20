@@ -21,7 +21,7 @@ uniform mat4 u_lightVP;
 varying vec4 v_shadowCoord;
 
 void main() {
-    vec4 worldPos = u_mvp * vec4(a_position, 1.0);
+    vec4 worldPos = u_model * vec4(a_position, 1.0);
     v_worldPos = worldPos.xyz;
 
     mat3 rotation = mat3(

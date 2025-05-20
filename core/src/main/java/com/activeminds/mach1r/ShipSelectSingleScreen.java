@@ -59,8 +59,11 @@ public class ShipSelectSingleScreen implements Screen {
         game.batch.end();
 
 
-        game.camera.position.set(-3f, 6f, 15f);
+        //game.camera.position.set(-3f, 6f, 15f);
+        game.camera.position.set(-3f, 15f, 0f);
         game.camera.lookAt(-3, 0, 0);
+        //game.camera.position.set(-3f, 15f, 1000f);
+        //game.camera.lookAt(-3, 0, 1000);
         game.camera.near = 0.1f;
         game.camera.far = 10000f;
         game.camera.update();
@@ -105,7 +108,7 @@ public class ShipSelectSingleScreen implements Screen {
         game.fuente.show_text(game.batch,30,60,game.loc.get("handling"),0); game.statbar.render2d(game.batch, 0,0,25*(game.pl[0].data.handling+1),16,175,60,175+50*(game.pl[0].data.handling+1),60+16,1-0);
         float sp=game.pl[0].data.enginef-(int)(game.pl[0].data.weight/500)+1;
         game.fuente.show_text(game.batch,30,30,game.loc.get("maxSpeed"),0); game.statbar.render2d(game.batch, 0,0,25*(sp+1),16,175,30,(int)(175+50*(sp+1)),30+16,1-0);
-        game.batch.draw(game.wallpCubemap,0,0);
+        //game.batch.draw(game.wallpCubemap,0,0);
         game.batch.end();
 
         game.ctr.renderButtonLayout(game.shapeRenderer);
