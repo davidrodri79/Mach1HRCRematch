@@ -26,11 +26,14 @@ public class controlm implements InputProcessor, ControllerListener {
     public static final int TEC1=1;
     public static final int TEC2=2;
     public static final int JOY1=3;
-    public static final int MOUS=4;
-    public static final int TOUC=5;
+    public static final int JOY2=4;
+    public static final int JOY3=5;
+    public static final int JOY4=6;
+    public static final int MOUS=7;
+    public static final int TOUC=8;
 
 
-    public static final int CMET=6;
+    public static final int CMET=9;
     public static final int CMAXB=4;
 
     public static final int CARR = 0;
@@ -58,6 +61,13 @@ public class controlm implements InputProcessor, ControllerListener {
     boolean cpau[] = new boolean[CMET];
     boolean cboton[][] = new boolean[CMET][CMAXB];
     int joy_xaxis[] = new int[CMET], joy_yaxis[] = new int[CMET];
+    ArrayList<Controller> controllers = new ArrayList<>();
+
+    public String getControllerName(int ctrlNum) {
+        if(controllers.size() > ctrlNum)
+            return controllers.get(ctrlNum).getName();
+        else return null;
+    }
 
 
     // TActile ==================================
@@ -123,6 +133,11 @@ public class controlm implements InputProcessor, ControllerListener {
 
         Gdx.input.setInputProcessor(this);
         Controllers.addListener(this);
+
+        for(Controller c : Controllers.getControllers())
+        {
+            controllers.add(c);
+        }
     }
 
     public void loadButtonLayoutFromJson(String fileName)
@@ -591,65 +606,84 @@ public class controlm implements InputProcessor, ControllerListener {
     @Override
     public void connected(Controller controller) {
 
+        controllers.add(controller);
     }
 
     @Override
     public void disconnected(Controller controller) {
-
+        controllers.remove(controller);
     }
 
     @Override
     public boolean buttonDown(Controller controller, int i)
     {
-        if(i < CMAXB)
-            cboton[JOY1][i] = true;
+        for(int j = 0; j < controllers.size(); j++)
+        {
+            if(j >= 4) break;
+            if(controllers.get(j).getUniqueId().equals(controller.getUniqueId())) {
+                if (i < CMAXB)
+                    cboton[JOY1 + j][i] = true;
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
     public boolean buttonUp(Controller controller, int i)
     {
-        if(i < CMAXB)
-            cboton[JOY1][i] = false;
+        for(int j = 0; j < controllers.size(); j++)
+        {
+            if(j >= 4) break;
+            if(controllers.get(j).getUniqueId().equals(controller.getUniqueId())) {
+                if (i < CMAXB)
+                    cboton[JOY1 + j][i] = false;
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
-    public boolean axisMoved(Controller controller, int i, float v) {
-        if(i == 0)
+    public boolean axisMoved(Controller controller, int i, float v)
+    {
+        for(int j = 0; j < controllers.size(); j++)
         {
-            if(v < -0.5f)
+            if (j >= 4) break;
+            if (controllers.get(j).getUniqueId().equals(controller.getUniqueId()))
             {
-                cizq[JOY1] = true; cder[JOY1] = false;
-            }
-            else if (v > 0.5f)
-            {
-                cder[JOY1] = true; cizq[JOY1] = false;
-            }
-            else
-            {
-                cder[JOY1] = false; cizq[JOY1] = false;
-            }
+                if (i == 0) {
+                    if (v < -0.5f) {
+                        cizq[JOY1 + j] = true;
+                        cder[JOY1 + j] = false;
+                    } else if (v > 0.5f) {
+                        cder[JOY1 + j] = true;
+                        cizq[JOY1 + j] = false;
+                    } else {
+                        cder[JOY1 + j] = false;
+                        cizq[JOY1 + j] = false;
+                    }
 
-            joy_xaxis[JOY1] = (int)(v*1000f);
-        }
+                    joy_xaxis[JOY1 + j] = (int) (v * 1000f);
+                }
 
-        if(i == 1)
-        {
-            if(v < -0.5f)
-            {
-                carr[JOY1] = true; caba[JOY1] = false;
-            }
-            else if (v > 0.5f)
-            {
-                caba[JOY1] = true; carr[JOY1] = false;
-            }
-            else
-            {
-                carr[JOY1] = false; caba[JOY1] = false;
-            }
+                if (i == 1) {
+                    if (v < -0.5f) {
+                        carr[JOY1 + j] = true;
+                        caba[JOY1 + j] = false;
+                    } else if (v > 0.5f) {
+                        caba[JOY1 + j] = true;
+                        carr[JOY1 + j] = false;
+                    } else {
+                        carr[JOY1 + j] = false;
+                        caba[JOY1 + j] = false;
+                    }
 
-            joy_yaxis[JOY1] = (int)(v*1000f);
+                    joy_yaxis[JOY1 + j] = (int) (v * 1000f);
+                }
+
+                return true;
+            }
         }
         return false;
     }

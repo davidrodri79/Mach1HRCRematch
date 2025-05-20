@@ -9,7 +9,7 @@ public class ControlOptionsScreen implements Screen {
     float cur_wait = 0;
     int cursor = 0;
 
-    String[] ctr_str={"controlStr0", "controlStr1", "controlStr2", "controlStr3", "controlStr4", "controlStr5"};
+    String[] ctr_str={"controlStr0", "controlStr1", "controlStr2", "controlStr3", "controlStr3", "controlStr3", "controlStr3", "controlStr4", "controlStr5"};
 
 
     public ControlOptionsScreen(Main game)
@@ -39,7 +39,17 @@ public class ControlOptionsScreen implements Screen {
         for(int i=0; i<4; i++){
             String s = Main.loc.get("controlPl")+" "+(i+1);
             game.fuente.show_text(game.batch,100,350-40*i,s,0);
-            game.fuente.show_text(game.batch,300,350-40*i,Main.loc.get(ctr_str[game.gdata.controls[i]]),0);
+            if (game.gdata.controls[i] >= controlm.JOY1 && game.gdata.controls[i] <= controlm.JOY4)
+            {
+                int ctrl_num = game.gdata.controls[i] - controlm.JOY1;
+                s = game.ctr.getControllerName(ctrl_num);
+                if (s == null)
+                    s = Main.loc.get(ctr_str[game.gdata.controls[i]])+" "+(ctrl_num+1)+" (no con.)";
+                else
+                    s = "contr. "+(ctrl_num+1)+":"+s;
+            }
+            else s = Main.loc.get(ctr_str[game.gdata.controls[i]]);
+            game.fuente.show_text(game.batch,300,350-40*i,s,0);
         };
         for(int i=0; i<4; i++){
             String s = Main.loc.get("player")+" "+(i+1)+" "+Main.loc.get("versusIcon");
