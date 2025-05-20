@@ -31,7 +31,7 @@ public class RaceScreen implements Screen {
     public static final float HYPER_COL[]={0.96f,0.85f,0.04f};
 
     Main game;
-    ShaderProgram shipShader, skyShader, billboardShader, shadowShader, depthShader;
+    ShaderProgram shipShader, sceneShader, skyShader, billboardShader, shadowShader, depthShader;
     solid groundMesh, skyMesh;
     Mesh billboard, shadow;
     texture ground;
@@ -45,7 +45,7 @@ public class RaceScreen implements Screen {
 
     int state;
     long counter;
-    float skyc[] = new float[4], fogc[] = new float[4], viewPortAspectRatio;
+    float skyc[] = new float[4], fogc[] = new float[4], viewPortAspectRatio, hour;
     float accumulatedDelta;
     int updatesPending;
     vertex sun;
@@ -75,10 +75,9 @@ public class RaceScreen implements Screen {
         String fragmentShader = Gdx.files.internal("shader/ship_fragment.glsl").readString();
 
         fragmentShader = "#define FOG_ENABLED 1\n" +
-            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n" : "") +
             "#define LIGHTING_ENABLED 1\n" +
-            "#define SHADOWPCF_ENABLED 1\n" +
-            (game.gdata.shadowmap ? "#define SHADOWMAP24B 1\n" : "") +
+            "#define SPECULAR_ENABLED 1\n" +
+            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n#define SHADOWMAP24B 1\n" : "") +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -86,6 +85,21 @@ public class RaceScreen implements Screen {
 
         if (!shipShader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + shipShader.getLog());
+        }
+
+        vertexShader = Gdx.files.internal("shader/ship_vertex.glsl").readString();
+        fragmentShader = Gdx.files.internal("shader/ship_fragment.glsl").readString();
+
+        fragmentShader = "#define FOG_ENABLED 1\n" +
+            "#define LIGHTING_ENABLED 1\n" +
+            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n#define SHADOWMAP24B 1\n" : "") +
+            fragmentShader;
+
+        ShaderProgram.pedantic = false;
+        sceneShader = new ShaderProgram(vertexShader, fragmentShader);
+
+        if (!sceneShader.isCompiled()) {
+            Gdx.app.error("Shader", "Error al compilar: " + sceneShader.getLog());
         }
 
         vertexShader = Gdx.files.internal("shader/sky_vertex.glsl").readString();
@@ -388,7 +402,7 @@ public class RaceScreen implements Screen {
             depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
             depthShader.setUniformMatrix("u_model", model);
 
-            s.mesh.mesh.render(shipShader, GL20.GL_TRIANGLES);
+            s.mesh.mesh.render(depthShader, GL20.GL_TRIANGLES);
 
         }
         depthShader.end();
@@ -527,14 +541,41 @@ public class RaceScreen implements Screen {
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);*/
 
-        //Ground
+        Gdx.gl.glDepthMask(false);
+
+        //Sky
         if(game.gdata.skygrfog){
 
             //glEnable(GL_FOG);
-            Gdx.gl.glDepthMask(false);
             show_sky(cam);
-            Gdx.gl.glDepthMask(true);
         };
+
+        // Sun
+        if(hour < 7.f || hour >= 19.f)
+            show_3d_sprite(cam,game.moon,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,500, 500,1f);
+        else
+            show_3d_sprite(cam,game.flame,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,1000,1000,1f);
+
+
+        sceneShader.begin();
+        sceneShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
+
+        sceneShader.setUniformi("u_numLights", 1);
+        sceneShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
+        sceneShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
+        sceneShader.setUniformf("u_lightIntensity[0]", 1.0f);
+
+        sceneShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
+        sceneShader.setUniformf("u_fogStart", 10.0f);
+        sceneShader.setUniformf("u_fogEnd", 1000.0f);
+
+        if(game.gdata.shadowmap) {
+            sceneShader.setUniformMatrix("u_lightVP", lightCamera.combined);
+            shadowMap.bind(6);
+            sceneShader.setUniformf("u_shadowMap", 6);
+        }
+
+        Gdx.gl.glDepthMask(true);
         show_ground(cam);
 
         /*glClear(GL_DEPTH_BUFFER_BIT);
@@ -544,6 +585,28 @@ public class RaceScreen implements Screen {
         glEnable(GL_CULL_FACE);
         glLightfv(GL_LIGHT0,GL_DIFFUSE,diffusebackg);*/
 
+        int l=30+(15*game.gdata.drawdist);
+        if (game.nhumans>1) l= (int) (0.75*l);
+
+        game.cour.render(sceneShader,cam,game.pl[follow].segment, (long) game.counter,l);
+
+        sceneShader.end();
+
+        //Ships
+
+        if(!game.gdata.shadowmap) {
+            //    glDisable(GL_DEPTH_TEST);
+
+            Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+            //Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            for (int i = game.nplayers - 1; i >= 0; i--)
+                show_shadow(cam, game.pl[i]);
+            //};
+        }
+
+        shipShader.begin();
         shipShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
 
         shipShader.setUniformi("u_numLights", 1);
@@ -561,35 +624,22 @@ public class RaceScreen implements Screen {
             shipShader.setUniformf("u_shadowMap", 6);
         }
 
-        int l=30+(15*game.gdata.drawdist);
-        if (game.nhumans>1) l= (int) (0.75*l);
-
-        game.cour.render(shipShader,cam,game.pl[follow].segment, (long) game.counter,l);
-
-        //Ships
-        if(!game.gdata.shadowmap) {
-            //    glDisable(GL_DEPTH_TEST);
-
-            Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
-            //Gdx.gl.glDisable(GL20.GL_CULL_FACE);
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-            for (int i = game.nplayers - 1; i >= 0; i--)
-                show_shadow(cam, game.pl[i]);
-            //};
-        }
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         for(int i=game.nplayers-1; i>=0; i--)
             show_ship(cam,game.pl[i]);
 
+        shipShader.end();
+
+        for(int i=game.nplayers-1; i>=0; i--)
+            show_ship_sprites(cam,game.pl[i]);
+
         // The fuel wastes
         /*glDisable(GL_FOG);
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glDepthMask(0);*/
-        Gdx.gl.glDepthMask(false);
         for(int i=game.nplayers-1; i>=0; i--)
             show_ship_flame(cam,game.pl[i]);
 
@@ -602,6 +652,7 @@ public class RaceScreen implements Screen {
                 show_3d_sprite(cam,game.arrow.texture,0,1,1,0,game.pl[i].renderx,game.pl[i].y+(size/3.0f),game.pl[i].renderz,1.0f,1.0f,1.0f,size/2,size/2,1.0f);
             };
         };
+
 
         //glDepthMask(1);
         Gdx.gl.glDepthMask(true);
@@ -647,7 +698,7 @@ public class RaceScreen implements Screen {
             dawnsky[]={1.0f,128f/255.0f,0.0f},
             nightsky[]={0.0f/255.0f,0.0f,100.0f/255.0f},
 		s1[]={0f,0f,0f}, s2[]={0f,0f,0f};
-        float hour, g = 0f, ig, a;
+        float g = 0f, ig, a;
         //struct tm *newtime;
         //time_t long_time;
         int i,j;
@@ -664,9 +715,10 @@ public class RaceScreen implements Screen {
         hour = hora + (minuto / 60f);
 
         switch(game.gdata.daytime){
-            case 1 : hour=12.0f; break;
-            case 2 : hour=19.30f; break;
-            case 3 : hour=22.0f; break;
+            case 1 : hour=7.30f; break;
+            case 2 : hour=12.0f; break;
+            case 3 : hour=19.30f; break;
+            case 4 : hour=22.0f; break;
         };
 
         /*hour = game.cour.counter / 60f;
@@ -713,7 +765,7 @@ public class RaceScreen implements Screen {
 
             for(z=0; z<TILE; z++){
 
-                groundMesh.render(shipShader, cam, gx, 0f, gz, 0f, 0f, 0f);
+                groundMesh.render(sceneShader, cam, gx, 0f, gz, 0f, 0f, 0f);
                 gz+=GROUNDWIDTH/TILE;
             };
 
@@ -783,12 +835,14 @@ public class RaceScreen implements Screen {
         s.mesh.set_color_coef(1.0f,1.0f,1.0f);
         s.lowres.set_color_coef(1.0f,1.0f,1.0f);
 
-        /*glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-        glDepthMask(0);*/
+    }
 
+    void show_ship_sprites(PerspectiveCamera cam, ship s)
+    {
+        int i,j, dur;
+        float a, c, size, dy, sz, sy, dif;
+        texture t;
 
-        Gdx.gl.glDepthMask(false);
         if(s.shield>0){
 
 
@@ -832,9 +886,6 @@ public class RaceScreen implements Screen {
                 show_3d_sprite(cam,t,0+(0.25f*(i%4)),0.25f+(0.25f*(i/4)),0.25f+(0.25f*(i%4)),0+(0.25f*(i/4)),s.exppos[j][0],s.exppos[j][1],s.exppos[j][2],1.0f,1.0f,1.0f,size,size,1.0f-(s.expframe[j]*0.05f));
             };
         };
-        Gdx.gl.glDepthMask(true);
-        //glDepthMask(1);
-
     }
 
     void show_ship_flame(PerspectiveCamera cam, ship s)
@@ -846,7 +897,6 @@ public class RaceScreen implements Screen {
 
         for(i=0; i<s.data.nlights; i++)
             show_3d_sprite(cam,game.flame,0,0,1,1,s.light_x(i),s.light_y(i),s.light_z(i),s.lightcol[0],s.lightcol[1],s.lightcol[2],sx,sy,a);
-
     }
 
     void show_shadow(PerspectiveCamera cam, ship s)

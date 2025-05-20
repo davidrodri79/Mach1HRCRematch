@@ -125,16 +125,20 @@ void main() {
         // DIFFUSE
         vec3 lightDir = normalize(u_lightPos[i] - v_worldPos);
         float diff = max(dot(normal, lightDir), 0.0);
-        //vec3 diffuse = u_lightColor[i] * diff * u_lightIntensity[i] * shadow;
-        lightAccum += u_lightColor[i] * diff * u_lightIntensity[i] * shadow;;
+        vec3 diffuse = u_lightColor[i] * diff * u_lightIntensity[i];
+        if(i == 0) diffuse *= shadow;
+        lightAccum += diffuse; //u_lightColor[i] * diff * u_lightIntensity[i] * shadow;;
 
+#ifdef SPECULAR_ENABLED
         // SPECULAR
         vec3 viewDir = normalize(u_cameraPos - v_worldPos);
         vec3 reflectDir = reflect(-lightDir, normal);
 
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0); // 32 = shininess
-        vec3 specular = spec * vec3(1,1,1); //u_lightColor[i];
+        vec3 specular = spec * u_lightColor[i];
+        if(i == 0) specular *= shadow;
         lightAccum += specular;
+#endif
 
     }
 

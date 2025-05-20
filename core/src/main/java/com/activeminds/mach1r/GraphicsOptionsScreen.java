@@ -13,7 +13,7 @@ public class GraphicsOptionsScreen implements Screen {
 
     String resol_str[]={"320x200","400x300","512x384","640x480","800x600","1024x768"},
            dist_str[]={"distStr0","distStr1","distStr2"},
-            time_str[]={"timeStr0","timeStr1","timeStr2","timeStr3"};
+            time_str[]={"timeStr0","timeStr1","timeStr2","timeStr3","timeStr4"};
 
     public GraphicsOptionsScreen(Main game)
     {
@@ -76,7 +76,7 @@ public class GraphicsOptionsScreen implements Screen {
                     case 0 : if(game.gdata.resol<5) {game.gdata.resol++; cur_wait=20;}; break;
                     case 1 : if(game.gdata.drawdist<2) {game.gdata.drawdist++; cur_wait=20;}; break;
                     case 2 : if(game.gdata.skygrfog==false) game.gdata.skygrfog=false; else game.gdata.skygrfog=false; cur_wait=20; break;
-                    case 3 : if(game.gdata.daytime<3) {game.gdata.daytime++; cur_wait=20;}; break;
+                    case 3 : if(game.gdata.daytime<4) {game.gdata.daytime++; cur_wait=20;}; break;
                     case 4 : game.gdata.language = (game.gdata.language + 1) % 2; Main.loc.loadLanguage(game.gdata.language); cur_wait=20; break;
                 };
             };

@@ -382,7 +382,6 @@ public class solid {
         Matrix4 proj = camera.projection;
         Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
 
-        shader.begin();
         shader.setUniformf("u_cameraPos", camera.position.x, camera.position.y, camera.position.z);
         shader.setUniformMatrix("u_mvp", MVP);
         shader.setUniformMatrix("u_model", model);
@@ -399,7 +398,7 @@ public class solid {
         for(int i = 0; i < textures.length; i++)
             textures[i].bind(i);
         mesh.render(shader, GL20.GL_TRIANGLES);
-        shader.end();
+
 
     }
 

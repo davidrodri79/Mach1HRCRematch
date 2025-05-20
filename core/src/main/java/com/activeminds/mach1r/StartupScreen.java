@@ -125,6 +125,7 @@ public class StartupScreen implements Screen {
                     game.shield = new texture("sprite/shield.png", texture.TEX_PCX, false, true);
                     game.explos = new texture("sprite/explos.png", texture.TEX_PCX, false, true);
                     game.smoke = new texture("sprite/smoke.png", texture.TEX_PCX, false, true);
+                    game.moon = new texture("sprite/moon.png", texture.TEX_PCX, false, true);
                     /*changed=TRUE;*/
                     break;
 
