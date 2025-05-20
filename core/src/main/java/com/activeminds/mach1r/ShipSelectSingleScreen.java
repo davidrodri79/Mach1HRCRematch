@@ -59,8 +59,7 @@ public class ShipSelectSingleScreen implements Screen {
         game.batch.end();
 
 
-        //game.camera.position.set(-3f, 6f, 15f);
-        game.camera.position.set(-3f, 15f, 0f);
+        game.camera.position.set(-3f, 4f, 10f);
         game.camera.lookAt(-3, 0, 0);
         //game.camera.position.set(-3f, 15f, 1000f);
         //game.camera.lookAt(-3, 0, 1000);

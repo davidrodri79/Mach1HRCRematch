@@ -123,7 +123,7 @@ public class Main extends Game {
 
         fuente = new font("sprite/FONT.png",16,16,14);
 
-        camera = new PerspectiveCamera(67, 640, 480);
+        camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.position.set(0f, 0f, 200f);
         camera.lookAt(0, 0, 0);
         camera.up.set(0, 1, 0);

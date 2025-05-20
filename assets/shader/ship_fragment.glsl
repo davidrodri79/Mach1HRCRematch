@@ -204,13 +204,13 @@ void main() {
 #endif
 
     // --- FOG EFFECT ---
-//#ifdef FOG_ENABLED
-    float dist = length(v_worldPos); // distancia al origen de cámara
+#ifdef FOG_ENABLED
+    float dist = distance(u_cameraPos, v_worldPos); // distancia al origen de cámara
     float fogFactor = clamp((u_fogEnd - dist) / (u_fogEnd - u_fogStart), 0.0, 1.0);
-//    vec3 colorWithFog = mix(u_fogColor, finalColor, fogFactor);
-//#else
+    vec3 colorWithFog = mix(u_fogColor, finalColor, fogFactor);
+#else
     vec3 colorWithFog = finalColor;
-//#endif
+#endif
 
     gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
 
