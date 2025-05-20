@@ -37,9 +37,48 @@ uniform mat4 u_lightVP;            // Matriz ViewProjection de la luz
 uniform mat4 u_model;              // Matriz de modelo
 varying vec4 v_shadowCoord;
 
+uniform sampler2D u_face0;
+uniform sampler2D u_face1;
+uniform sampler2D u_face2;
+uniform sampler2D u_face3;
+uniform sampler2D u_face4;
+uniform sampler2D u_face5;
+
 
 float decodeDepth(vec3 rgb) {
     return dot(rgb, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));
+}
+
+vec2 getUVForDirection(vec3 dir, int face) {
+    vec2 uv;
+    if (face == 0) uv = vec2(-dir.z, dir.y) / abs(dir.x); // +X
+    if (face == 1) uv = vec2(dir.z, dir.y) / abs(dir.x);  // -X
+    if (face == 2) uv = vec2(dir.x, -dir.z) / abs(dir.y); // +Y
+    if (face == 3) uv = vec2(dir.x, dir.z) / abs(dir.y);  // -Y
+    if (face == 4) uv = vec2(dir.x, dir.y) / abs(dir.z);  // +Z
+    if (face == 5) uv = vec2(-dir.x, dir.y) / abs(dir.z); // -Z
+    return uv * 0.5 + 0.5;
+}
+
+vec4 sampleCubemap(vec3 dir) {
+    vec3 absDir = abs(dir);
+    int face;
+    if (absDir.x >= absDir.y && absDir.x >= absDir.z) {
+        face = dir.x > 0.0 ? 0 : 1;
+    } else if (absDir.y >= absDir.x && absDir.y >= absDir.z) {
+        face = dir.y > 0.0 ? 2 : 3;
+    } else {
+        face = dir.z > 0.0 ? 4 : 5;
+    }
+
+    vec2 uv = getUVForDirection(dir, face);
+
+    if (face == 0) return texture2D(u_face0, uv);
+    if (face == 1) return texture2D(u_face1, uv);
+    if (face == 2) return texture2D(u_face2, uv);
+    if (face == 3) return texture2D(u_face3, uv);
+    if (face == 4) return texture2D(u_face4, uv);
+    return texture2D(u_face5, uv);
 }
 
 void main() {
@@ -114,6 +153,8 @@ void main() {
     float shadow = 1.0;
 #endif
 
+    vec3 viewDir = normalize(u_cameraPos - v_worldPos);
+
 #ifdef LIGHTING_ENABLED
     // --- LIGHTING ---
     vec3 normal = normalize(v_normal);
@@ -131,10 +172,9 @@ void main() {
 
 #ifdef SPECULAR_ENABLED
         // SPECULAR
-        vec3 viewDir = normalize(u_cameraPos - v_worldPos);
-        vec3 reflectDir = reflect(-lightDir, normal);
+        vec3 reflectSpecDir = reflect(-lightDir, normal);
 
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0); // 32 = shininess
+        float spec = pow(max(dot(viewDir, reflectSpecDir), 0.0), 32.0); // 32 = shininess
         vec3 specular = spec * u_lightColor[i];
         if(i == 0) specular *= shadow;
         lightAccum += specular;
@@ -144,15 +184,29 @@ void main() {
 
     //lightAccum = u_lightColor[0];
 
-    vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum;
+    vec3 colorWithLight = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum;
 #else
-    vec3 finalColor = texColor.rgb * u_colorCoef * v_color.xyz;
+    vec3 colorWithLight = texColor.rgb * u_colorCoef * v_color.xyz;
+#endif
+
+    // --- REFLECTION WITH CUBEMAP ---
+#ifdef REFLECTION_ENABLED
+    vec3 reflectDir = reflect(-viewDir, normalize(v_normal));
+    vec4 reflectionColor = sampleCubemap(reflectDir);
+    float fresnel = pow(1.0 - max(dot(viewDir, normalize(v_normal)), 0.0), 3.5);
+
+    // Ajuste del reflectionAmount con fresnel
+    float reflectionAmount = mix(0.1, 0.6, fresnel); // 0.1 en vista perpendicular, 0.8 en rasante
+
+    vec3 finalColor = mix(colorWithLight, reflectionColor.rgb, reflectionAmount);
+#else
+    vec3 finalColor = colorWithLight;
 #endif
 
     // --- FOG EFFECT ---
+#ifdef FOG_ENABLED
     float dist = length(v_worldPos); // distancia al origen de cámara
     float fogFactor = clamp((u_fogEnd - dist) / (u_fogEnd - u_fogStart), 0.0, 1.0);
-#ifdef FOG_ENABLED
     vec3 colorWithFog = mix(u_fogColor, finalColor, fogFactor);
 #else
     vec3 colorWithFog = finalColor;

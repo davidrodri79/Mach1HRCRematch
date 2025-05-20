@@ -24,6 +24,7 @@ public class ShipSelectSingleScreen implements Screen {
 
         fragmentShader = "#define LIGHTING_ENABLED 1\n" +
             "#define SPECULAR_ENABLED 1\n" +
+            "#define REFLECTION_ENABLED º\n" +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -32,6 +33,8 @@ public class ShipSelectSingleScreen implements Screen {
         if (!shader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + shader.getLog());
         }
+
+        game.generate_scrolling_wallp_cubemap();
 
         game.play_voice("selectship.wav");
     }
@@ -77,7 +80,13 @@ public class ShipSelectSingleScreen implements Screen {
         shader.setUniformf("u_fogColor", 1f, 1f, 1f); // gris claro
         shader.setUniformf("u_fogStart", 10.0f);
         shader.setUniformf("u_fogEnd", 1000.0f);
-
+        shader.setUniformi("u_face0", 7);
+        shader.setUniformi("u_face1", 7);
+        shader.setUniformi("u_face2", 7);
+        shader.setUniformi("u_face3", 7);
+        shader.setUniformi("u_face4", 7);
+        shader.setUniformi("u_face5", 7);
+        game.wallpCubemap.bind(7);
 
 	    game.pl[0].mesh.render(shader, game.camera, (float) sel_offset, (float) 0,0,0f,game.counter/100.0f,0);
         shader.end();
@@ -96,6 +105,7 @@ public class ShipSelectSingleScreen implements Screen {
         game.fuente.show_text(game.batch,30,60,game.loc.get("handling"),0); game.statbar.render2d(game.batch, 0,0,25*(game.pl[0].data.handling+1),16,175,60,175+50*(game.pl[0].data.handling+1),60+16,1-0);
         float sp=game.pl[0].data.enginef-(int)(game.pl[0].data.weight/500)+1;
         game.fuente.show_text(game.batch,30,30,game.loc.get("maxSpeed"),0); game.statbar.render2d(game.batch, 0,0,25*(sp+1),16,175,30,(int)(175+50*(sp+1)),30+16,1-0);
+        game.batch.draw(game.wallpCubemap,0,0);
         game.batch.end();
 
         game.ctr.renderButtonLayout(game.shapeRenderer);

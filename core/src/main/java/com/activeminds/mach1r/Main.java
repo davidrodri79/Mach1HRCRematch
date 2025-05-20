@@ -7,6 +7,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.io.ByteArrayOutputStream;
@@ -78,7 +79,7 @@ public class Main extends Game {
 
     public SpriteBatch batch;
     public ShapeRenderer shapeRenderer;
-    Texture image;
+    Texture image, wallpCubemap;
 
     font fuente;
 
@@ -155,6 +156,32 @@ public class Main extends Game {
             for(j=-1; j<5; j++)
                 wallp.render2d(batch, 0,0,128,128,128*i,(int)(-(counter%128)+((i%2)*64)+128*j),128*(i+1),(int)(-(counter%128)+((i%2)*64)+128*(j+1)),1.0f);
 
+        //RENDERED_TRIANGLES+=2;
+    }
+
+    void generate_scrolling_wallp_cubemap()
+    {
+        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 256, 256, false);
+        fbo.begin();
+
+        OrthographicCamera cam = new OrthographicCamera();
+        cam.setToOrtho(false,  256, 256);
+
+
+        cam.update();
+        batch.setProjectionMatrix(cam.combined);
+        batch.begin();
+
+        int i,j;
+        for(i=0; i<8; i++)
+            for(j=-1; j<5; j++)
+                wallp.render2d(batch, 0,0,128,128,128*i,(int)(-(counter%128)+((i%2)*64)+128*j),128*(i+1),(int)(-(counter%128)+((i%2)*64)+128*(j+1)),1.0f);
+
+        batch.end();
+
+        fbo.end();
+
+        wallpCubemap = fbo.getColorBufferTexture();
         //RENDERED_TRIANGLES+=2;
     }
 
