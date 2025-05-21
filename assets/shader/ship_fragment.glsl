@@ -116,7 +116,6 @@ void main() {
         shadow = 1.0;
     else
     {
-        //float closestDepth = texture2D(u_shadowMap, shadowCoord.xy).r;
 #ifdef SHADOWPCF_ENABLED
         float texelSize = 1.0 / 1024.0; // Tamaño de texel (ajustar a la resolución real del shadow map)
 
@@ -193,10 +192,16 @@ void main() {
 #ifdef REFLECTION_ENABLED
     vec3 reflectDir = reflect(-viewDir, normalize(v_normal));
     vec4 reflectionColor = sampleCubemap(vec3(reflectDir.x, reflectDir.y, reflectDir.z));
-    float fresnel = pow(1.0 - max(dot(viewDir, normalize(v_normal)), 0.0), 3.5);
+    //float fresnel = pow(1.0 - max(dot(viewDir, normalize(v_normal)), 0.0), 3.5);
+
+    float fresnelMin = 0.03;
+    float fresnelPower = 3.0;
+    float fresnel = fresnelMin + (1.0 - fresnelMin) * pow(1.0 - max(dot(viewDir, normalize(v_normal)), 0.0), fresnelPower);
+
 
     // Ajuste del reflectionAmount con fresnel
-    float reflectionAmount = mix(0.1, 0.6, fresnel); // 0.1 en vista perpendicular, 0.8 en rasante
+    float reflectionAmount = mix(0.1, 0.6, fresnel); // 0.1 en vista perpendicular, 0.6 en rasante
+    reflectionAmount = reflectionAmount * shadow;
 
     vec3 finalColor = mix(colorWithLight, reflectionColor.rgb, reflectionAmount);
 #else

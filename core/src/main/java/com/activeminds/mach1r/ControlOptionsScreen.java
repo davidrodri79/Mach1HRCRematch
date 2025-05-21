@@ -42,11 +42,11 @@ public class ControlOptionsScreen implements Screen {
             if (game.gdata.controls[i] >= controlm.JOY1 && game.gdata.controls[i] <= controlm.JOY4)
             {
                 int ctrl_num = game.gdata.controls[i] - controlm.JOY1;
-                s = game.ctr.getControllerName(ctrl_num).toLowerCase();
+                s = game.ctr.getControllerName(ctrl_num);
                 if (s == null)
                     s = Main.loc.get(ctr_str[game.gdata.controls[i]])+" "+(ctrl_num+1)+":(no con.)";
                 else
-                    s = Main.loc.get(ctr_str[game.gdata.controls[i]])+" "+(ctrl_num+1)+":"+s;
+                    s = Main.loc.get(ctr_str[game.gdata.controls[i]])+" "+(ctrl_num+1)+":"+s.toLowerCase();
             }
             else s = Main.loc.get(ctr_str[game.gdata.controls[i]]);
             game.fuente.show_text(game.batch,300,350-40*i,s,0);

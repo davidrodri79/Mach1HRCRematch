@@ -78,7 +78,7 @@ public class RaceScreen implements Screen {
             "#define LIGHTING_ENABLED 1\n" +
             "#define SPECULAR_ENABLED 1\n" +
             (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n#define SHADOWMAP24B 1\n" : "") +
-            "#define REFLECTION_ENABLED º\n" +
+            (game.gdata.reflections ? "#define REFLECTION_ENABLED 1\n" : "") +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -375,6 +375,22 @@ public class RaceScreen implements Screen {
 
             cubemapFaces[i] = cubemapFbos[i].getColorBufferTexture();
         }
+
+        // Ground
+        OrthographicCamera camera2d = new OrthographicCamera();
+        camera2d.setToOrtho(false,  cubemapSize, cubemapSize);
+        camera2d.update();
+
+        Vector3 lightDir = new Vector3(sun.x, sun.y, sun.z).nor();
+        Vector3 groundNormal = new Vector3(0,1,0);
+        float dot = lightDir.dot(groundNormal);
+        cubemapFbos[3].begin();
+        game.batch.setProjectionMatrix(camera2d.combined);
+        game.batch.begin();
+        game.batch.setColor(0.2f + 0.8f*dot, 0.2f + 0.8f*dot, 0.2f + 0.8f*dot, 1);
+        game.batch.draw(game.cour.road.gdxTexture,0, 0, cubemapSize, cubemapSize, 16, 80, 32, 48, false, false);
+        game.batch.end();
+        cubemapFbos[3].end();
     }
 
     void refresh_shadow_map(ship sh)
@@ -780,6 +796,7 @@ public class RaceScreen implements Screen {
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+        game.batch.setProjectionMatrix(game.camera2d.combined);
         game.batch.begin();
 
         // Ship messages
@@ -1149,12 +1166,14 @@ public class RaceScreen implements Screen {
             //if(game.gdata.shadowmap)
             //    game.batch.draw(shadowMap, 0, 0, 256, 256, 0, 0, SHADOW_MAP_SIZE,SHADOW_MAP_SIZE, false, true);
 
+            /*
             game.batch.draw(cubemapFaces[0], 0, 0, 128, 128, 0, 0, cubemapSize, cubemapSize, false, true);
             game.batch.draw(cubemapFaces[1], 128, 0, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[2], 256, 0, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[3], 0, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[4], 128, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[5], 256, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
+             */
 
             game.batch.end();
 

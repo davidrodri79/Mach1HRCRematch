@@ -24,7 +24,7 @@ public class ShipSelectSingleScreen implements Screen {
 
         fragmentShader = "#define LIGHTING_ENABLED 1\n" +
             "#define SPECULAR_ENABLED 1\n" +
-            "#define REFLECTION_ENABLED º\n" +
+            (game.gdata.reflections ? "#define REFLECTION_ENABLED 1\n" : "") +
             fragmentShader;
 
         ShaderProgram.pedantic = false;

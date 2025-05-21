@@ -27,6 +27,7 @@ public class ChampionshipPrizeScreen implements Screen {
 
         fragmentShader = "#define LIGHTING_ENABLED 1\n" +
             "#define SPECULAR_ENABLED 1\n" +
+            (game.gdata.reflections ? "#define REFLECTION_ENABLED 1\n" : "") +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -35,6 +36,8 @@ public class ChampionshipPrizeScreen implements Screen {
         if (!shader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + shader.getLog());
         }
+
+        game.generate_scrolling_wallp_cubemap();
     }
 
     @Override
@@ -78,7 +81,7 @@ public class ChampionshipPrizeScreen implements Screen {
         game.batch.end();
 
         // 3D Layer
-        game.camera.position.set(0f, 2f, 110f);
+        game.camera.position.set(0f, 2f, 50f);
         game.camera.lookAt(0, 0, 0);
         game.camera.near = 0.1f;
         game.camera.far = 10000f;
@@ -99,11 +102,18 @@ public class ChampionshipPrizeScreen implements Screen {
         shader.setUniformf("u_fogColor", 1f, 1f, 1f); // gris claro
         shader.setUniformf("u_fogStart", 10.0f);
         shader.setUniformf("u_fogEnd", 1000.0f);
-
+        shader.setUniformi("u_face0", 7);
+        shader.setUniformi("u_face1", 7);
+        shader.setUniformi("u_face2", 7);
+        shader.setUniformi("u_face3", 7);
+        shader.setUniformi("u_face4", 7);
+        shader.setUniformi("u_face5", 7);
+        game.wallpCubemap.bind(7);
 
         //game.pl[0].mesh.render(shader, game.camera,sel_offset,0,0,0,game.counter/100.0f,0);
 
-        if(game.ranking_position(0)<3) {
+        //if(game.ranking_position(0)<3) {
+        {
             game.cup.set_color_coef(cup_color[game.ranking_position(0)][0], cup_color[game.ranking_position(0)][1], cup_color[game.ranking_position(0)][2]);
             if (game.counter < 120)
                 game.cup.render(shader, game.camera, 0, 0, 120 - (float) (game.counter), 0, game.counter / 100.0f, 0);
