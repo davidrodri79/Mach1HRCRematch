@@ -279,6 +279,53 @@ public class RaceScreen implements Screen {
         game.play_music("sound/song"+((game.cour.info.scene%3)+1)+".mp3");
     }
 
+    int cubemapSize = 256;
+    FrameBuffer[] fbos = new FrameBuffer[6];
+    Texture[] faces = new Texture[6];
+
+
+    void generate_cube_map()
+    {
+        Camera[] cubeCameras = new Camera[6];
+        Vector3 origin = new Vector3(0, 0, 0); // donde estás generando el reflejo
+
+        Vector3[] dirs = {
+            new Vector3(1, 0, 0), new Vector3(-1, 0, 0),
+            new Vector3(0, 1, 0), new Vector3(0, -1, 0),
+            new Vector3(0, 0, 1), new Vector3(0, 0, -1)
+        };
+
+        Vector3[] ups = {
+            new Vector3(0, -1, 0), new Vector3(0, -1, 0),
+            new Vector3(0, 0, 1), new Vector3(0, 0, -1),
+            new Vector3(0, -1, 0), new Vector3(0, -1, 0)
+        };
+
+        for (int i = 0; i < 6; i++) {
+            PerspectiveCamera cam = new PerspectiveCamera(90, cubemapSize, cubemapSize);
+            cam.position.set(origin);
+            cam.direction.set(dirs[i]);
+            cam.up.set(ups[i]);
+            cam.near = 1f;
+            cam.far = 1000f;
+            cam.update();
+            cubeCameras[i] = cam;
+        }
+
+        for (int i = 0; i < 6; i++) {
+            fbos[i].begin();
+
+            Gdx.gl.glViewport(0, 0, cubemapSize, cubemapSize);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+            //renderSceneWithCamera(cubeCameras[i]); // usa tu render() pasando esa cámara
+
+            fbos[i].end();
+
+            faces[i] = fbos[i].getColorBufferTexture();
+        }
+    }
+
     void refresh_shadow_map(ship sh)
     {
         // O PerspectiveCamera
