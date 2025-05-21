@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class RaceScreen implements Screen {
 
-    public static final int SHADOW_MAP_SIZE = 2048;
+    public static final int SHADOW_MAP_SIZE = 4096;
     public static final float GROUNDWIDTH = 4900.0f;
     public static final float SKYWIDTH = 6000.0f;
     public static final float GROUNDTILE = 12.0f;
@@ -396,7 +396,7 @@ public class RaceScreen implements Screen {
     void refresh_shadow_map(ship sh)
     {
         // O PerspectiveCamera
-        int drawDist = 450;
+        int drawDist = 600;
         lightCamera.setToOrtho(false, drawDist, drawDist);
 
         Vector3 lightDirInv = new Vector3(sun.x, sun.y, sun.z);
