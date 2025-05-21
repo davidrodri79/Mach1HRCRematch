@@ -9,7 +9,7 @@ uniform sampler2D u_textures[6]; // Puedes ampliar si quieres más texturas
 //#define LIGHTING_ENABLED 0
 //#define SHADOWPCF_ENABLED 0
 
-#define MAX_LIGHTS 4
+#define MAX_LIGHTS 20
 
 uniform vec3 u_cameraPos;
 uniform vec3 u_lightPos[MAX_LIGHTS];
@@ -163,11 +163,23 @@ void main() {
         if (i >= u_numLights) break;
 
         // DIFFUSE
-        vec3 lightDir = normalize(u_lightPos[i] - v_worldPos);
+        vec3 lightDir = u_lightPos[i] - v_worldPos;
+        float dist = length(lightDir);
+        lightDir = normalize(lightDir);
+
         float diff = max(dot(normal, lightDir), 0.0);
         vec3 diffuse = u_lightColor[i] * diff * u_lightIntensity[i];
         if(i == 0) diffuse *= shadow;
-        lightAccum += diffuse; //u_lightColor[i] * diff * u_lightIntensity[i] * shadow;;
+
+        // Atenuación por distancia
+        float attConstant = 1.0;   // e.g. 1.0
+        float attLinear = 0.07;     // e.g. 0.1
+        float attQuadratic = 0.017;  // e.g. 0.01
+        float attenuation = 1.0 / (attConstant + attLinear * dist + attQuadratic * dist * dist);
+
+        if(i == 0) attenuation = 1.0;
+
+        lightAccum += diffuse * attenuation; //u_lightColor[i] * diff * u_lightIntensity[i] * shadow;;
 
 #ifdef SPECULAR_ENABLED
         // SPECULAR

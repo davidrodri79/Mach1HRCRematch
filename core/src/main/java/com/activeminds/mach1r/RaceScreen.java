@@ -690,6 +690,10 @@ public class RaceScreen implements Screen {
             sceneShader.setUniformf("u_shadowMap", 6);
         }
 
+        int numLights = 1;
+        // Flame lights
+        add_ship_flame_lights(sceneShader, cam);
+
         Gdx.gl.glDepthMask(true);
         show_ground(cam);
 
@@ -728,6 +732,8 @@ public class RaceScreen implements Screen {
         shipShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
         shipShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
         shipShader.setUniformf("u_lightIntensity[0]", 1.0f);
+
+        add_ship_flame_lights(shipShader, cam);
 
         shipShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
         shipShader.setUniformf("u_fogStart", 10.0f);
@@ -770,8 +776,8 @@ public class RaceScreen implements Screen {
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glDepthMask(0);*/
-        for(int i=game.nplayers-1; i>=0; i--)
-            show_ship_flame(cam,game.pl[i]);
+        //for(int i=game.nplayers-1; i>=0; i--)
+         //   show_ship_flame(cam,game.pl[i]);
 
         // Opponent cursor in versus
         //glDisable(GL_CULL_FACE);
@@ -820,6 +826,47 @@ public class RaceScreen implements Screen {
 
         game.batch.end();
 
+    }
+
+    void add_ship_flame_lights(ShaderProgram shader, PerspectiveCamera cam)
+    {
+        int numLights = 1;
+        // Flame lights
+        for(int i = 0; i < game.nplayers; i++)
+        {
+            ship sh = game.pl[i];
+
+            Vector3 camToShip = new Vector3(cam.position.x - sh.renderx, cam.position.y - sh.y, cam.position.z - sh.renderz);
+            if(/*camToShip.len() < 500f && */sh.engine > 0.01) {
+
+                // Versión una luz por nave
+                /*Vector3 lightPos = new Vector3(0, 0, 0);
+                for (int j = 0; j < sh.data.nlights; j++) {
+                    lightPos.x += sh.light_x(j);
+                    lightPos.y += sh.light_y(j);
+                    lightPos.z += sh.light_z(j);
+                }
+                lightPos.x /= sh.data.nlights;
+                lightPos.y /= sh.data.nlights;
+                lightPos.z /= sh.data.nlights;
+
+                shader.setUniformf("u_lightPos[" + numLights + "]", lightPos.x, lightPos.y, lightPos.z);
+                shader.setUniformf("u_lightColor[" + numLights + "]", sh.lightcol[0], sh.lightcol[1], sh.lightcol[2]);
+                shader.setUniformf("u_lightIntensity[" + numLights + "]", sh.engine);
+                numLights++;
+                shader.setUniformi("u_numLights", numLights);*/
+
+                // Versión múltiples luces por nave
+                for(int j = 0; j < sh.data.nlights; j++) {
+                    shader.setUniformf("u_lightPos[" + numLights + "]", sh.light_x(j), sh.light_y(j), sh.light_z(j));
+                    shader.setUniformf("u_lightColor[" + numLights + "]", sh.lightcol[0], sh.lightcol[1], sh.lightcol[2]);
+                    shader.setUniformf("u_lightIntensity[" + numLights + "]", sh.engine);
+                    numLights++;
+                }
+                shader.setUniformi("u_numLights", numLights);
+            }
+
+        }
     }
 
     void hour_environment()
