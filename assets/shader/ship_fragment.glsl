@@ -192,7 +192,7 @@ void main() {
     // --- REFLECTION WITH CUBEMAP ---
 #ifdef REFLECTION_ENABLED
     vec3 reflectDir = reflect(-viewDir, normalize(v_normal));
-    vec4 reflectionColor = sampleCubemap(reflectDir);
+    vec4 reflectionColor = sampleCubemap(vec3(reflectDir.x, reflectDir.y, reflectDir.z));
     float fresnel = pow(1.0 - max(dot(viewDir, normalize(v_normal)), 0.0), 3.5);
 
     // Ajuste del reflectionAmount con fresnel

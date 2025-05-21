@@ -276,17 +276,19 @@ public class RaceScreen implements Screen {
             lightCamera = new OrthographicCamera();
         }
 
+        generate_cube_map();
+
         game.play_music("sound/song"+((game.cour.info.scene%3)+1)+".mp3");
     }
 
     int cubemapSize = 256;
-    FrameBuffer[] fbos = new FrameBuffer[6];
-    Texture[] faces = new Texture[6];
+    FrameBuffer[] cubemapFbos = new FrameBuffer[6];
+    Texture[] cubemapFaces = new Texture[6];
 
 
     void generate_cube_map()
     {
-        Camera[] cubeCameras = new Camera[6];
+        PerspectiveCamera[] cubeCameras = new PerspectiveCamera[6];
         Vector3 origin = new Vector3(0, 0, 0); // donde estás generando el reflejo
 
         Vector3[] dirs = {
@@ -296,9 +298,9 @@ public class RaceScreen implements Screen {
         };
 
         Vector3[] ups = {
-            new Vector3(0, -1, 0), new Vector3(0, -1, 0),
+            new Vector3(0, 1, 0), new Vector3(0, 1, 0),
             new Vector3(0, 0, 1), new Vector3(0, 0, -1),
-            new Vector3(0, -1, 0), new Vector3(0, -1, 0)
+            new Vector3(0, 1, 0), new Vector3(0, 1, 0)
         };
 
         for (int i = 0; i < 6; i++) {
@@ -307,22 +309,71 @@ public class RaceScreen implements Screen {
             cam.direction.set(dirs[i]);
             cam.up.set(ups[i]);
             cam.near = 1f;
-            cam.far = 1000f;
+            cam.far = 6000f;
             cam.update();
             cubeCameras[i] = cam;
         }
 
         for (int i = 0; i < 6; i++) {
-            fbos[i].begin();
+            cubemapFbos[i] = new FrameBuffer(Pixmap.Format.RGBA8888, cubemapSize, cubemapSize, true);
+            cubemapFaces[i] = cubemapFbos[i].getColorBufferTexture();
+            cubemapFaces[i].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            cubemapFaces[i].setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+        }
+
+        hour_environment();
+
+        for (int i = 0; i < 6; i++) {
+            cubemapFbos[i].begin();
 
             Gdx.gl.glViewport(0, 0, cubemapSize, cubemapSize);
+            Gdx.gl.glClearColor(fogc[0], fogc[1], fogc[2], 1f);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             //renderSceneWithCamera(cubeCameras[i]); // usa tu render() pasando esa cámara
+            Gdx.gl.glDepthMask(false);
 
-            fbos[i].end();
+            //Sky
+            if(game.gdata.skygrfog){
 
-            faces[i] = fbos[i].getColorBufferTexture();
+                //glEnable(GL_FOG);
+                show_sky(cubeCameras[i]);
+            };
+
+            // Sun
+            if(hour < 7.f || hour >= 19.f)
+                show_3d_sprite(cubeCameras[i],game.moon,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,500, 500,1f);
+            else
+                show_3d_sprite(cubeCameras[i],game.flame,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,1000,1000,1f);
+
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+
+            sceneShader.begin();
+            sceneShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
+
+            sceneShader.setUniformi("u_numLights", 1);
+            sceneShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
+            sceneShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
+            sceneShader.setUniformf("u_lightIntensity[0]", 1.0f);
+
+            sceneShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
+            sceneShader.setUniformf("u_fogStart", 10.0f);
+            sceneShader.setUniformf("u_fogEnd", 1000.0f);
+
+            if(game.gdata.shadowmap) {
+                sceneShader.setUniformMatrix("u_lightVP", lightCamera.combined);
+                shadowMap.bind(6);
+                sceneShader.setUniformf("u_shadowMap", 6);
+            }
+
+            Gdx.gl.glDepthMask(true);
+            show_ground(cubeCameras[i]);
+
+            sceneShader.end();
+
+            cubemapFbos[i].end();
+
+            cubemapFaces[i] = cubemapFbos[i].getColorBufferTexture();
         }
     }
 
@@ -673,12 +724,17 @@ public class RaceScreen implements Screen {
         }
 
         shipShader.setUniformi("u_face0", 7);
-        shipShader.setUniformi("u_face1", 7);
-        shipShader.setUniformi("u_face2", 7);
-        shipShader.setUniformi("u_face3", 7);
-        shipShader.setUniformi("u_face4", 7);
-        shipShader.setUniformi("u_face5", 7);
-        game.wallpCubemap.bind(7);
+        shipShader.setUniformi("u_face1", 8);
+        shipShader.setUniformi("u_face2", 9);
+        shipShader.setUniformi("u_face3", 10);
+        shipShader.setUniformi("u_face4", 11);
+        shipShader.setUniformi("u_face5", 12);
+        cubemapFaces[0].bind(7);
+        cubemapFaces[1].bind(8);
+        cubemapFaces[2].bind(9);
+        cubemapFaces[3].bind(10);
+        cubemapFaces[4].bind(11);
+        cubemapFaces[5].bind(12);
 
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -779,11 +835,11 @@ public class RaceScreen implements Screen {
             case 4 : hour=22.0f; break;
         };
 
-        hour = game.cour.counter / 60f;
+        /*hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }
+        }*/
 
         if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
         if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}
@@ -1092,6 +1148,13 @@ public class RaceScreen implements Screen {
 
             //if(game.gdata.shadowmap)
             //    game.batch.draw(shadowMap, 0, 0, 256, 256, 0, 0, SHADOW_MAP_SIZE,SHADOW_MAP_SIZE, false, true);
+
+            game.batch.draw(cubemapFaces[0], 0, 0, 128, 128, 0, 0, cubemapSize, cubemapSize, false, true);
+            game.batch.draw(cubemapFaces[1], 128, 0, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
+            game.batch.draw(cubemapFaces[2], 256, 0, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
+            game.batch.draw(cubemapFaces[3], 0, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
+            game.batch.draw(cubemapFaces[4], 128, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
+            game.batch.draw(cubemapFaces[5], 256, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
 
             game.batch.end();
 
