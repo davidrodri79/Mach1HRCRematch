@@ -32,7 +32,7 @@ varying vec3 v_normal;
 varying vec2 v_texCoord;
 varying float v_textureID;
 
-#define MAX_SHADOW_MAPS 3
+#define MAX_SHADOW_MAPS 4
 
 uniform sampler2D u_shadowMap[MAX_SHADOW_MAPS];     // Shadow map generado
 uniform mat4 u_lightVP[MAX_SHADOW_MAPS];            // Matriz ViewProjection de la luz
@@ -140,6 +140,7 @@ float getShadow()
             }
         }
     }
+    return 1.0;
     #else
     return 1.0;
     #endif
@@ -246,6 +247,15 @@ void main() {
 #else
     vec3 colorWithFog = finalColor;
 #endif
+
+    /*// Debug cascade shadow maps
+    float viewDepth = length(v_worldPos - u_cameraPos);
+    if(viewDepth < u_cascadeEnds[0])
+        colorWithFog.r = colorWithFog.r;
+    else if (viewDepth < u_cascadeEnds[1])
+        colorWithFog.g = 0.0;
+    else
+        colorWithFog.b = 0.0;*/
 
     gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
 

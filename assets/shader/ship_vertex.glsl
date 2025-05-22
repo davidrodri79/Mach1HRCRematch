@@ -17,7 +17,7 @@ varying vec2 v_texCoord;
 varying float v_textureID;
 varying vec3 v_worldPos;
 
-#define MAX_SHADOW_MAPS 3
+#define MAX_SHADOW_MAPS 4
 
 uniform mat4 u_lightVP[MAX_SHADOW_MAPS];
 varying vec4 v_shadowCoord[MAX_SHADOW_MAPS];
