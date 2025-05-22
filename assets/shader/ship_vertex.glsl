@@ -17,8 +17,10 @@ varying vec2 v_texCoord;
 varying float v_textureID;
 varying vec3 v_worldPos;
 
-uniform mat4 u_lightVP;
-varying vec4 v_shadowCoord;
+#define MAX_SHADOW_MAPS 3
+
+uniform mat4 u_lightVP[MAX_SHADOW_MAPS];
+varying vec4 v_shadowCoord[MAX_SHADOW_MAPS];
 
 void main() {
     vec4 worldPos = u_model * vec4(a_position, 1.0);
@@ -35,7 +37,8 @@ void main() {
     v_texCoord = a_texCoord0;
     v_textureID = a_textureID;
 
-    v_shadowCoord = u_lightVP * u_model * vec4(a_position, 1.0);  // posición del vértice en espacio de sombra
+    for(int i = 0; i < MAX_SHADOW_MAPS; i++)
+        v_shadowCoord[i] = u_lightVP[i] * u_model * vec4(a_position, 1.0);  // posición del vértice en espacio de sombra
 
     gl_Position = u_mvp * vec4(a_position, 1.0);
 }

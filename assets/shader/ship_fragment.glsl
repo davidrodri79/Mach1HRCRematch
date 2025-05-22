@@ -32,10 +32,14 @@ varying vec3 v_normal;
 varying vec2 v_texCoord;
 varying float v_textureID;
 
-uniform sampler2D u_shadowMap;     // Shadow map generado
-uniform mat4 u_lightVP;            // Matriz ViewProjection de la luz
+#define MAX_SHADOW_MAPS 3
+
+uniform sampler2D u_shadowMap[MAX_SHADOW_MAPS];     // Shadow map generado
+uniform mat4 u_lightVP[MAX_SHADOW_MAPS];            // Matriz ViewProjection de la luz
+uniform float u_cascadeEnds[MAX_SHADOW_MAPS]; // distancias fin de cada cascada
 uniform mat4 u_model;              // Matriz de modelo
-varying vec4 v_shadowCoord;
+varying vec4 v_shadowCoord[MAX_SHADOW_MAPS];
+
 
 uniform sampler2D u_face0;
 uniform sampler2D u_face1;
@@ -81,6 +85,66 @@ vec4 sampleCubemap(vec3 dir) {
     return texture2D(u_face5, uv);
 }
 
+float getShadow()
+{
+    // --- Shadow map ---
+    #ifdef SHADOWMAP_ENABLED
+
+    float viewDepth = length(v_worldPos - u_cameraPos);
+
+    for(int i = 0; i < MAX_SHADOW_MAPS; i++)
+    {
+        if (viewDepth < u_cascadeEnds[i])
+        {
+            vec3 shadowCoord = v_shadowCoord[i].xyz / v_shadowCoord[i].w;
+            shadowCoord = shadowCoord * 0.5 + 0.5;// convertir de clip space a [0,1]
+
+            // Si está fuera del shadow map
+            if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 ||
+            shadowCoord.y < 0.0 || shadowCoord.y > 1.0)
+                return 1.0;
+            else
+            {
+                #ifdef SHADOWPCF_ENABLED
+                float shadow = 0.0;
+                float texelSize = 1.0 / 1024.0; // Tamaño de texel (ajustar a la resolución real del shadow map)
+
+                for (int x = -1; x <= 1; x++) {
+                    for (int y = -1; y <= 1; y++) {
+                        vec2 offset = vec2(float(x), float(y)) * texelSize;
+                        #ifdef SHADOWMAP24B
+                        float closestDepth = decodeDepth(texture2D(u_shadowMap[i], shadowCoord.xy + offset).rgb);
+                        #else
+                        float closestDepth = texture2D(u_shadowMap[i], shadowCoord.xy + offset).r;
+                        #endif
+                        float currentDepth = shadowCoord.z;
+                        if (currentDepth - 0.005 <= closestDepth) {
+                            shadow += 1.0;
+                        }
+                    }
+                }
+
+                shadow /= 9.0; // Promedio de 3x3 muestras
+                return shadow;
+                #else
+                float closestDepth = texture2D(u_shadowMap[i], shadowCoord.xy).r;
+                float currentDepth = shadowCoord.z;
+                if (currentDepth - 0.005 <= closestDepth) {
+                   return 1.0;
+                }
+                else
+                {
+                    return 0.0;
+                }
+                #endif
+            }
+        }
+    }
+    #else
+    return 1.0;
+    #endif
+}
+
 void main() {
 
     vec4 texColor;
@@ -104,53 +168,7 @@ void main() {
     }
 
     // --- Shadow map ---
-#ifdef SHADOWMAP_ENABLED
-    vec3 shadowCoord = v_shadowCoord.xyz / v_shadowCoord.w;
-    shadowCoord = shadowCoord * 0.5 + 0.5;  // convertir de clip space a [0,1]
-
-    float shadow = 0.0;
-
-    // Si está fuera del shadow map
-    if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 ||
-        shadowCoord.y < 0.0 || shadowCoord.y > 1.0)
-        shadow = 1.0;
-    else
-    {
-#ifdef SHADOWPCF_ENABLED
-        float texelSize = 1.0 / 1024.0; // Tamaño de texel (ajustar a la resolución real del shadow map)
-
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                vec2 offset = vec2(float(x), float(y)) * texelSize;
-#ifdef SHADOWMAP24B
-                float closestDepth = decodeDepth(texture2D(u_shadowMap, shadowCoord.xy + offset).rgb);
-#else
-                float closestDepth = texture2D(u_shadowMap, shadowCoord.xy + offset).r;
-#endif
-                float currentDepth = shadowCoord.z;
-                if (currentDepth - 0.005 <= closestDepth) {
-                    shadow += 1.0;
-                }
-            }
-        }
-
-        shadow /= 9.0; // Promedio de 3x3 muestras
-#else
-        float closestDepth = texture2D(u_shadowMap, shadowCoord.xy).r;
-        float currentDepth = shadowCoord.z;
-        if (currentDepth - 0.005 <= closestDepth) {
-            shadow = 1.0;
-        }
-        else
-        {
-            shadow = 0.0;
-        }
-#endif
-    }
-
-#else
-    float shadow = 1.0;
-#endif
+    float shadow = getShadow();
 
     vec3 viewDir = normalize(u_cameraPos - v_worldPos);
 

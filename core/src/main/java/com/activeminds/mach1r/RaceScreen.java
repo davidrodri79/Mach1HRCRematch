@@ -15,7 +15,8 @@ import java.util.ArrayList;
 
 public class RaceScreen implements Screen {
 
-    public static final int SHADOW_MAP_SIZE = 4096;
+    public static final int NUM_SHADOW_MAPS = 3;
+    public static final int SHADOW_MAP_SIZE = 1024;
     public static final float GROUNDWIDTH = 4900.0f;
     public static final float SKYWIDTH = 6000.0f;
     public static final float GROUNDTILE = 12.0f;
@@ -41,7 +42,7 @@ public class RaceScreen implements Screen {
     PerspectiveCamera cameras4p[] = new PerspectiveCamera[4];
     SpriteBatch splitScreenBatch;
     OrthographicCamera splitScreenCamera2d;
-    OrthographicCamera lightCamera;
+
 
     int state;
     long counter;
@@ -51,8 +52,9 @@ public class RaceScreen implements Screen {
     vertex sun;
     boolean paused;
 
-    FrameBuffer shadowFBO;
-    Texture shadowMap;
+    FrameBuffer shadowFBO[];
+    Texture shadowMap[];
+    OrthographicCamera lightCamera[];
 
     public static int HUD_START_X;
 
@@ -77,7 +79,7 @@ public class RaceScreen implements Screen {
         fragmentShader = "#define FOG_ENABLED 1\n" +
             "#define LIGHTING_ENABLED 1\n" +
             "#define SPECULAR_ENABLED 1\n" +
-            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n#define SHADOWMAP24B 1\n" : "") +
+            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n//#define SHADOWMAP24B 1\n" : "") +
             (game.gdata.reflections ? "#define REFLECTION_ENABLED 1\n" : "") +
             fragmentShader;
 
@@ -93,7 +95,7 @@ public class RaceScreen implements Screen {
 
         fragmentShader = "#define FOG_ENABLED 1\n" +
             "#define LIGHTING_ENABLED 1\n" +
-            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n#define SHADOWMAP24B 1\n" : "") +
+            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n//#define SHADOWMAP24B 1\n" : "") +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -126,7 +128,7 @@ public class RaceScreen implements Screen {
        vertexShader = Gdx.files.internal("shader/depth_vertex.glsl").readString();
        fragmentShader = Gdx.files.internal("shader/depth_fragment.glsl").readString();
 
-        fragmentShader = "#define SHADOWMAP24B 1\n" +
+        fragmentShader = "//#define SHADOWMAP24B 1\n" +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -271,9 +273,16 @@ public class RaceScreen implements Screen {
 
         // Shadow map
         if(game.gdata.shadowmap) {
-            shadowFBO = new FrameBuffer(Pixmap.Format.RGBA8888, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, true);
-            shadowMap = shadowFBO.getColorBufferTexture();
-            lightCamera = new OrthographicCamera();
+            shadowFBO = new FrameBuffer[NUM_SHADOW_MAPS];
+            shadowMap = new Texture[NUM_SHADOW_MAPS];
+            lightCamera = new OrthographicCamera[NUM_SHADOW_MAPS];
+
+            for(int i = 0; i < NUM_SHADOW_MAPS; i++) {
+                shadowFBO[i] = new FrameBuffer(Pixmap.Format.RGBA8888, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, true);
+                shadowMap[i] = shadowFBO[i].getColorBufferTexture();
+                lightCamera[i] = new OrthographicCamera();
+            }
+
         }
 
         generate_cube_map();
@@ -361,9 +370,7 @@ public class RaceScreen implements Screen {
             sceneShader.setUniformf("u_fogEnd", 1000.0f);
 
             if(game.gdata.shadowmap) {
-                sceneShader.setUniformMatrix("u_lightVP", lightCamera.combined);
-                shadowMap.bind(6);
-                sceneShader.setUniformf("u_shadowMap", 6);
+                set_shadowmap_values(sceneShader);
             }
 
             Gdx.gl.glDepthMask(true);
@@ -393,31 +400,30 @@ public class RaceScreen implements Screen {
         cubemapFbos[3].end();
     }
 
-    void refresh_shadow_map(ship sh)
+    void refresh_shadow_map(int id, ship sh, int drawDist)
     {
         // O PerspectiveCamera
-        int drawDist = 600;
-        lightCamera.setToOrtho(false, drawDist, drawDist);
+        lightCamera[id].setToOrtho(false, drawDist, drawDist);
 
         Vector3 lightDirInv = new Vector3(sun.x, sun.y, sun.z);
         lightDirInv.limit(drawDist/2f);
         Vector3 cameraToVrp = new Vector3(sh.vrp.x - sh.cam_pos.x, sh.vrp.y - sh.cam_pos.y, sh.vrp.z - sh.cam_pos.z);
         cameraToVrp.nor();
-        cameraToVrp.scl(drawDist/2f);
+        cameraToVrp.scl((drawDist/2f) - 10f);
         Vector3 sceneCenter = new Vector3(sh.cam_pos.x, sh.cam_pos.y, sh.cam_pos.z);
         sceneCenter.add(cameraToVrp);
         Vector3 camPos = new Vector3(sceneCenter.x, sceneCenter.y, sceneCenter.z);
         camPos.add(lightDirInv);
 
 
-        lightCamera.position.set(camPos);
-        lightCamera.lookAt(sceneCenter);  // Mira hacia el centro de la escen
-        lightCamera.up.set(0f,0f,1f);
-        lightCamera.near = 0.1f;
-        lightCamera.far = drawDist;
-        lightCamera.update();
+        lightCamera[id].position.set(camPos);
+        lightCamera[id].lookAt(sceneCenter);  // Mira hacia el centro de la escen
+        lightCamera[id].up.set(0f,0f,1f);
+        lightCamera[id].near = 0.1f;
+        lightCamera[id].far = drawDist;
+        lightCamera[id].update();
 
-        shadowFBO.begin();
+        shadowFBO[id].begin();
         // Usas un shader que solo grabe profundidad
         Gdx.gl.glClearColor(1f,1f,1f, 1f);
         Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT | GL20.GL_COLOR_BUFFER_BIT);
@@ -426,7 +432,7 @@ public class RaceScreen implements Screen {
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
         depthShader.begin();
-        depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
+        depthShader.setUniformMatrix("u_lightVP", lightCamera[id].combined);
 
         //renderSceneWith(depthShader);  // Tu función que dibuja las naves, etc.
         int range = 30+(15*game.gdata.drawdist);
@@ -514,7 +520,7 @@ public class RaceScreen implements Screen {
             Matrix4 proj = camera.projection;
             Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);*/
 
-            depthShader.setUniformMatrix("u_lightVP", lightCamera.combined);
+            depthShader.setUniformMatrix("u_lightVP", lightCamera[id].combined);
             depthShader.setUniformMatrix("u_model", model);
 
             s.mesh.mesh.render(depthShader, GL20.GL_TRIANGLES);
@@ -522,10 +528,9 @@ public class RaceScreen implements Screen {
         }
         depthShader.end();
 
-        shadowFBO.end();
+        shadowFBO[id].end();
 
-        if(game.gdata.shadowmap)
-            shadowMap = shadowFBO.getColorBufferTexture();
+        shadowMap[id] = shadowFBO[id].getColorBufferTexture();
 
     }
 
@@ -623,8 +628,11 @@ public class RaceScreen implements Screen {
         GLfloat diffusebackg[] = { 0.8f, 0.8f, 0.8f, 1.0f };
         */
 
-        if(game.gdata.shadowmap)
-            refresh_shadow_map(game.pl[follow]);
+        if(game.gdata.shadowmap) {
+            refresh_shadow_map(0, game.pl[follow], 70);
+            refresh_shadow_map(1, game.pl[follow], 220);
+            refresh_shadow_map(2, game.pl[follow], 1200);
+        }
 
         Gdx.gl.glViewport(vpx, vpy, vpw, vph);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -685,9 +693,7 @@ public class RaceScreen implements Screen {
         sceneShader.setUniformf("u_fogEnd", 1000.0f);
 
         if(game.gdata.shadowmap) {
-            sceneShader.setUniformMatrix("u_lightVP", lightCamera.combined);
-            shadowMap.bind(6);
-            sceneShader.setUniformf("u_shadowMap", 6);
+            set_shadowmap_values(sceneShader);
         }
 
         int numLights = 1;
@@ -742,23 +748,21 @@ public class RaceScreen implements Screen {
         shipShader.setUniformf("u_fogEnd", 1000.0f);
 
         if(game.gdata.shadowmap) {
-            shipShader.setUniformMatrix("u_lightVP", lightCamera.combined);
-            shadowMap.bind(6);
-            shipShader.setUniformf("u_shadowMap", 6);
+            set_shadowmap_values(shipShader);
         }
 
-        shipShader.setUniformi("u_face0", 7);
-        shipShader.setUniformi("u_face1", 8);
-        shipShader.setUniformi("u_face2", 9);
-        shipShader.setUniformi("u_face3", 10);
-        shipShader.setUniformi("u_face4", 11);
-        shipShader.setUniformi("u_face5", 12);
-        cubemapFaces[0].bind(7);
-        cubemapFaces[1].bind(8);
-        cubemapFaces[2].bind(9);
-        cubemapFaces[3].bind(10);
-        cubemapFaces[4].bind(11);
-        cubemapFaces[5].bind(12);
+        shipShader.setUniformi("u_face0", 9);
+        shipShader.setUniformi("u_face1", 10);
+        shipShader.setUniformi("u_face2", 11);
+        shipShader.setUniformi("u_face3", 12);
+        shipShader.setUniformi("u_face4", 13);
+        shipShader.setUniformi("u_face5", 14);
+        cubemapFaces[0].bind(9);
+        cubemapFaces[1].bind(10);
+        cubemapFaces[2].bind(11);
+        cubemapFaces[3].bind(12);
+        cubemapFaces[4].bind(13);
+        cubemapFaces[5].bind(14);
 
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -828,6 +832,22 @@ public class RaceScreen implements Screen {
 
         game.batch.end();
 
+    }
+
+    void set_shadowmap_values(ShaderProgram shader)
+    {
+        shader.setUniformMatrix("u_lightVP[0]", lightCamera[0].combined);
+        shader.setUniformMatrix("u_lightVP[1]", lightCamera[1].combined);
+        shader.setUniformMatrix("u_lightVP[2]", lightCamera[2].combined);
+        shadowMap[0].bind(6);
+        shadowMap[1].bind(7);
+        shadowMap[2].bind(8);
+        shader.setUniformi("u_shadowMap[0]", 6);
+        shader.setUniformi("u_shadowMap[1]", 7);
+        shader.setUniformi("u_shadowMap[2]", 8);
+        shader.setUniformf("u_cascadeEnds[0]", 40);
+        shader.setUniformf("u_cascadeEnds[1]", 190);
+        shader.setUniformf("u_cascadeEnds[2]", 1000);
     }
 
     void add_ship_flame_lights(ShaderProgram shader, PerspectiveCamera cam)
@@ -1212,8 +1232,11 @@ public class RaceScreen implements Screen {
 
             show_icon_rank();
 
-            //if(game.gdata.shadowmap)
-            //    game.batch.draw(shadowMap, 0, 0, 256, 256, 0, 0, SHADOW_MAP_SIZE,SHADOW_MAP_SIZE, false, true);
+            if(game.gdata.shadowmap) {
+                game.batch.draw(shadowMap[0], 0, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
+                game.batch.draw(shadowMap[1], 128, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
+                game.batch.draw(shadowMap[2], 256, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
+            }
 
             /*
             game.batch.draw(cubemapFaces[0], 0, 0, 128, 128, 0, 0, cubemapSize, cubemapSize, false, true);
