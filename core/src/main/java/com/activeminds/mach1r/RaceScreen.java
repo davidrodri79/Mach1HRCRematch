@@ -692,7 +692,8 @@ public class RaceScreen implements Screen {
 
         int numLights = 1;
         // Flame lights
-        add_ship_flame_lights(sceneShader, cam);
+        if(game.gdata.exhaustLights)
+            add_ship_flame_lights(sceneShader, cam);
 
         Gdx.gl.glDepthMask(true);
         show_ground(cam);
@@ -733,7 +734,8 @@ public class RaceScreen implements Screen {
         shipShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
         shipShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
-        add_ship_flame_lights(shipShader, cam);
+        if(game.gdata.exhaustLights)
+            add_ship_flame_lights(shipShader, cam);
 
         shipShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
         shipShader.setUniformf("u_fogStart", 10.0f);
@@ -837,7 +839,7 @@ public class RaceScreen implements Screen {
             ship sh = game.pl[i];
 
             Vector3 camToShip = new Vector3(cam.position.x - sh.renderx, cam.position.y - sh.y, cam.position.z - sh.renderz);
-            if(/*camToShip.len() < 500f && */sh.engine > 0.01) {
+            if(camToShip.len() < 700f && sh.engine > 0.001f) {
 
                 // Versión una luz por nave
                 /*Vector3 lightPos = new Vector3(0, 0, 0);

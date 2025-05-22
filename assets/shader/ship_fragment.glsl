@@ -173,8 +173,8 @@ void main() {
 
         // Atenuación por distancia
         float attConstant = 1.0;   // e.g. 1.0
-        float attLinear = 0.07;     // e.g. 0.1
-        float attQuadratic = 0.017;  // e.g. 0.01
+        float attLinear = 0.01;     // e.g. 0.1
+        float attQuadratic = 0.001;  // e.g. 0.01
         float attenuation = 1.0 / (attConstant + attLinear * dist + attQuadratic * dist * dist);
 
         if(i == 0) attenuation = 1.0;
@@ -188,7 +188,7 @@ void main() {
         float spec = pow(max(dot(viewDir, reflectSpecDir), 0.0), 32.0); // 32 = shininess
         vec3 specular = spec * u_lightColor[i];
         if(i == 0) specular *= shadow;
-        lightAccum += specular;
+        lightAccum += specular * attenuation;
 #endif
 
     }

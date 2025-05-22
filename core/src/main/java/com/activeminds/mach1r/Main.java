@@ -50,7 +50,7 @@ public class Main extends Game {
         short sel_ship[] = new short[MAXPLAYERS], dif, cour_type, scene, nlaps, nbots;
         long score_champ;
         int controls[] = new int[4];
-        boolean music, sound, skygrfog, shadowmap, reflections;
+        boolean music, sound, skygrfog, shadowmap, reflections, exhaustLights;
         int music_volume, drawdist, daytime, icons[] = new int[4], sel_endur, res_endur, sel_champ, language;
 
         game_data()
@@ -73,6 +73,7 @@ public class Main extends Game {
             skygrfog = true;
             shadowmap = true;
             reflections = true;
+            exhaustLights = true;
             icons[0] = 0;
             icons[1] = 1;
             icons[2] = 2;
@@ -384,6 +385,7 @@ public class Main extends Game {
         buffer.put((byte) (gdata.skygrfog ? 1 : 0));
         buffer.put((byte) (gdata.shadowmap ? 1 : 0));
         buffer.put((byte) (gdata.reflections ? 1 : 0));
+        buffer.put((byte) (gdata.exhaustLights ? 1 : 0));
         buffer.putInt(gdata.music_volume);
         buffer.putInt(gdata.drawdist);
         buffer.putInt(gdata.daytime);
@@ -429,6 +431,7 @@ public class Main extends Game {
             gdata.skygrfog = buffer.get() == 1;
             gdata.shadowmap = buffer.get() == 1;
             gdata.reflections = buffer.get() == 1;
+            gdata.exhaustLights = buffer.get() == 1;
             gdata.music_volume = buffer.getInt();
             gdata.drawdist = buffer.getInt();
             gdata.daytime = buffer.getInt();
