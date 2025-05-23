@@ -36,8 +36,9 @@ varying float v_textureID;
 
 uniform sampler2D u_shadowMap[MAX_SHADOW_MAPS];     // Shadow map generado
 uniform mat4 u_lightVP[MAX_SHADOW_MAPS];            // Matriz ViewProjection de la luz
-uniform float u_cascadeEnds[MAX_SHADOW_MAPS]; // distancias fin de cada cascada
-uniform mat4 u_model;              // Matriz de modelo
+uniform float u_cascadeEnds[MAX_SHADOW_MAPS];       // distancias fin de cada cascada
+uniform float u_shadowMapSize[MAX_SHADOW_MAPS];
+uniform mat4 u_model;                                // Matriz de modelo
 varying vec4 v_shadowCoord[MAX_SHADOW_MAPS];
 
 
@@ -107,7 +108,7 @@ float getShadow()
             {
                 #ifdef SHADOWPCF_ENABLED
                 float shadow = 0.0;
-                float texelSize = 1.0 / 1024.0; // Tamaño de texel (ajustar a la resolución real del shadow map)
+                float texelSize = 1.0 / u_shadowMapSize[i]; // Tamaño de texel (ajustar a la resolución real del shadow map)
 
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
@@ -248,14 +249,16 @@ void main() {
     vec3 colorWithFog = finalColor;
 #endif
 
-    /*// Debug cascade shadow maps
-    float viewDepth = length(v_worldPos - u_cameraPos);
+    // Debug cascade shadow maps
+    /*float viewDepth = length(v_worldPos - u_cameraPos);
     if(viewDepth < u_cascadeEnds[0])
         colorWithFog.r = colorWithFog.r;
     else if (viewDepth < u_cascadeEnds[1])
         colorWithFog.g = 0.0;
+    else if (viewDepth < u_cascadeEnds[2])
+        colorWithFog.b = 0.0;
     else
-        colorWithFog.b = 0.0;*/
+        colorWithFog.r = 0.0;*/
 
     gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
 

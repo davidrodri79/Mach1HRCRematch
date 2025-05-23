@@ -15,8 +15,8 @@ import java.util.ArrayList;
 
 public class RaceScreen implements Screen {
 
-    public static final int NUM_SHADOW_MAPS = 4;
-    public static final int SHADOW_MAP_SIZE = 4096;
+    public static final int NUM_SHADOW_MAPS = 3;
+    //public static final int SHADOW_MAP_SIZE = 4096;
     public static final float GROUNDWIDTH = 4900.0f;
     public static final float SKYWIDTH = 6000.0f;
     public static final float GROUNDTILE = 12.0f;
@@ -55,6 +55,7 @@ public class RaceScreen implements Screen {
     FrameBuffer shadowFBO[];
     Texture shadowMap[];
     OrthographicCamera lightCamera[];
+    int shadowMapSize[];
 
     public static int HUD_START_X;
 
@@ -79,7 +80,7 @@ public class RaceScreen implements Screen {
         fragmentShader = "#define FOG_ENABLED 1\n" +
             "#define LIGHTING_ENABLED 1\n" +
             "#define SPECULAR_ENABLED 1\n" +
-            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n//#define SHADOWMAP24B 1\n" : "") +
+            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n#define SHADOWMAP24B 1\n" : "") +
             (game.gdata.reflections ? "#define REFLECTION_ENABLED 1\n" : "") +
             fragmentShader;
 
@@ -95,7 +96,7 @@ public class RaceScreen implements Screen {
 
         fragmentShader = "#define FOG_ENABLED 1\n" +
             "#define LIGHTING_ENABLED 1\n" +
-            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n//#define SHADOWMAP24B 1\n" : "") +
+            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n#define SHADOWMAP24B 1\n" : "") +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -128,7 +129,7 @@ public class RaceScreen implements Screen {
        vertexShader = Gdx.files.internal("shader/depth_vertex.glsl").readString();
        fragmentShader = Gdx.files.internal("shader/depth_fragment.glsl").readString();
 
-        fragmentShader = "//#define SHADOWMAP24B 1\n" +
+        fragmentShader = "#define SHADOWMAP24B 1\n" +
             fragmentShader;
 
         ShaderProgram.pedantic = false;
@@ -276,9 +277,13 @@ public class RaceScreen implements Screen {
             shadowFBO = new FrameBuffer[NUM_SHADOW_MAPS];
             shadowMap = new Texture[NUM_SHADOW_MAPS];
             lightCamera = new OrthographicCamera[NUM_SHADOW_MAPS];
+            shadowMapSize = new int[NUM_SHADOW_MAPS];
+            shadowMapSize[0] = 2048;
+            shadowMapSize[1] = 1024;
+            shadowMapSize[2] = 512;
 
             for(int i = 0; i < NUM_SHADOW_MAPS; i++) {
-                shadowFBO[i] = new FrameBuffer(Pixmap.Format.RGBA8888, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, true);
+                shadowFBO[i] = new FrameBuffer(Pixmap.Format.RGBA8888, shadowMapSize[i], shadowMapSize[i], true);
                 shadowMap[i] = shadowFBO[i].getColorBufferTexture();
                 lightCamera[i] = new OrthographicCamera();
             }
@@ -318,7 +323,7 @@ public class RaceScreen implements Screen {
             cam.direction.set(dirs[i]);
             cam.up.set(ups[i]);
             cam.near = 1f;
-            cam.far = 6000f;
+            cam.far = 1200f;
             cam.update();
             cubeCameras[i] = cam;
         }
@@ -409,7 +414,7 @@ public class RaceScreen implements Screen {
         lightDirInv.limit(drawDist/2f);
         Vector3 cameraToVrp = new Vector3(sh.vrp.x - sh.cam_pos.x, sh.vrp.y - sh.cam_pos.y, sh.vrp.z - sh.cam_pos.z);
         cameraToVrp.nor();
-        cameraToVrp.scl((drawDist/2f) - 10f);
+        cameraToVrp.scl((drawDist/2f) - 20f);
         Vector3 sceneCenter = new Vector3(sh.cam_pos.x, sh.cam_pos.y, sh.cam_pos.z);
         sceneCenter.add(cameraToVrp);
         Vector3 camPos = new Vector3(sceneCenter.x, sceneCenter.y, sceneCenter.z);
@@ -631,8 +636,8 @@ public class RaceScreen implements Screen {
         if(game.gdata.shadowmap) {
             refresh_shadow_map(0, game.pl[follow], 200);
             refresh_shadow_map(1, game.pl[follow], 500);
-            refresh_shadow_map(2, game.pl[follow], 1000);
-            refresh_shadow_map(3, game.pl[follow], 1500);
+            refresh_shadow_map(2, game.pl[follow], 1500);
+            //refresh_shadow_map(3, game.pl[follow], 1500);
         }
 
         Gdx.gl.glViewport(vpx, vpy, vpw, vph);
@@ -674,7 +679,9 @@ public class RaceScreen implements Screen {
             show_sky(cam);
         };
 
+
         // Sun
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         if(hour < 7.f || hour >= 19.f)
             show_3d_sprite(cam,game.moon,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,500, 500,1f);
         else
@@ -712,6 +719,7 @@ public class RaceScreen implements Screen {
         glEnable(GL_CULL_FACE);
         glLightfv(GL_LIGHT0,GL_DIFFUSE,diffusebackg);*/
 
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         int l=30+(15*game.gdata.drawdist);
         if (game.nhumans>1) l= (int) (0.75*l);
 
@@ -840,19 +848,22 @@ public class RaceScreen implements Screen {
         shader.setUniformMatrix("u_lightVP[0]", lightCamera[0].combined);
         shader.setUniformMatrix("u_lightVP[1]", lightCamera[1].combined);
         shader.setUniformMatrix("u_lightVP[2]", lightCamera[2].combined);
-        shader.setUniformMatrix("u_lightVP[3]", lightCamera[3].combined);
+        shader.setUniformf("u_shadowMapSize[0]", shadowMapSize[0]);
+        shader.setUniformf("u_shadowMapSize[1]", shadowMapSize[1]);
+        shader.setUniformf("u_shadowMapSize[2]", shadowMapSize[2]);
+        //shader.setUniformMatrix("u_lightVP[3]", lightCamera[3].combined);
         shadowMap[0].bind(6);
         shadowMap[1].bind(7);
         shadowMap[2].bind(8);
-        shadowMap[3].bind(9);
+        //shadowMap[3].bind(9);
         shader.setUniformi("u_shadowMap[0]", 6);
         shader.setUniformi("u_shadowMap[1]", 7);
         shader.setUniformi("u_shadowMap[2]", 8);
-        shader.setUniformi("u_shadowMap[2]", 9);
+        //shader.setUniformi("u_shadowMap[3]", 9);
         shader.setUniformf("u_cascadeEnds[0]", 50);
         shader.setUniformf("u_cascadeEnds[1]", 300);
-        shader.setUniformf("u_cascadeEnds[2]", 800);
-        shader.setUniformf("u_cascadeEnds[3]", 1300);
+        shader.setUniformf("u_cascadeEnds[2]", 1300);
+        //shader.setUniformf("u_cascadeEnds[3]", 1300);
     }
 
     void add_ship_flame_lights(ShaderProgram shader, PerspectiveCamera cam)
@@ -1238,10 +1249,10 @@ public class RaceScreen implements Screen {
             show_icon_rank();
 
             if(game.gdata.shadowmap) {
-                game.batch.draw(shadowMap[0], 0, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
-                game.batch.draw(shadowMap[1], 128, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
-                game.batch.draw(shadowMap[2], 256, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
-                game.batch.draw(shadowMap[3], 256+128, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
+                game.batch.draw(shadowMap[0], 0, 0, 128, 128, 0, 0, shadowMapSize[0], shadowMapSize[0], false, true);
+                game.batch.draw(shadowMap[1], 128, 0, 128, 128, 0, 0, shadowMapSize[1], shadowMapSize[1], false, true);
+                game.batch.draw(shadowMap[2], 256, 0, 128, 128, 0, 0, shadowMapSize[2], shadowMapSize[2], false, true);
+                //game.batch.draw(shadowMap[3], 256+128, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
             }
 
             /*
