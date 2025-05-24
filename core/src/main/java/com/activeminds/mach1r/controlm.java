@@ -461,8 +461,8 @@ public class controlm implements InputProcessor, ControllerListener {
             if(v.len() < s.radius)
             {
                 pointers.put(pointer, s);
-                s.stickx = screenX;
-                s.sticky = Gdx.graphics.getHeight() - screenY;
+                s.stickx = (int) touchPos.x;
+                s.sticky = (int) touchPos.y;
                 s.pressed = true;
                 updateStick(s);
             }
@@ -543,7 +543,7 @@ public class controlm implements InputProcessor, ControllerListener {
         if(pointers.get(pointer).getClass() == Stick.class)
         {
             Stick s = (Stick)pointers.get(pointer);
-            Vector2 v = new Vector2(screenX - s.x, Gdx.graphics.getHeight() - screenY - s.y);
+            Vector2 v = new Vector2(touchPos.x - s.x, touchPos.y - s.y);
             if(v.len() > s.radius)
             {
                 v = v.limit(s.radius);

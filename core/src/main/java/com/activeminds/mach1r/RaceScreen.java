@@ -1245,15 +1245,17 @@ public class RaceScreen implements Screen {
             game.fuente.show_text(game.batch, HUD_START_X+200, 400, s, 1);
             s = "BOOST " + game.pl[0].nboosts;
             game.fuente.show_text(game.batch, Main.SCREENX-HUD_START_X-140, 345, s, 1);
+            s = "FPS:"+(1f/delta);
+            game.fuente.show_text(game.batch, 0, 440, s, 1);
 
             show_icon_rank();
 
-            if(game.gdata.shadowmap) {
+            /*if(game.gdata.shadowmap) {
                 game.batch.draw(shadowMap[0], 0, 0, 128, 128, 0, 0, shadowMapSize[0], shadowMapSize[0], false, true);
                 game.batch.draw(shadowMap[1], 128, 0, 128, 128, 0, 0, shadowMapSize[1], shadowMapSize[1], false, true);
                 game.batch.draw(shadowMap[2], 256, 0, 128, 128, 0, 0, shadowMapSize[2], shadowMapSize[2], false, true);
                 //game.batch.draw(shadowMap[3], 256+128, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
-            }
+            }*/
 
             /*
             game.batch.draw(cubemapFaces[0], 0, 0, 128, 128, 0, 0, cubemapSize, cubemapSize, false, true);

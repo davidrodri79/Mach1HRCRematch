@@ -71,9 +71,17 @@ public class Main extends Game {
             music = true; sound = true;
             music_volume = 75;
             skygrfog = true;
-            shadowmap = true;
-            reflections = true;
-            exhaustLights = true;
+            if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
+                shadowmap = true;
+                reflections = true;
+                exhaustLights = true;
+            }
+            else
+            {
+                shadowmap = false;
+                reflections = false;
+                exhaustLights = true;
+            }
             icons[0] = 0;
             icons[1] = 1;
             icons[2] = 2;
