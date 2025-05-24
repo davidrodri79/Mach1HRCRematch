@@ -26,9 +26,9 @@ public class ship {
 
     public static final float MACH_1 = 1234.8f;
 
-        public static final float DRAWFAR =	340*340;
-        public static final float DRAWMEDIUM = 220*220;
-        public static final float DRAWNEAR = 140*140;
+        public static final float DRAWFAR =	700*700;
+        public static final float DRAWMEDIUM = 440*440;
+        public static final float DRAWNEAR = 300*300;
     public static final float DISTCOLLIDE = 5.0f*5.0f;
     public static final float DISTPICKUP =	8.0f*8.0f;
     public static final float IMPACTVEL	= 0.1f;

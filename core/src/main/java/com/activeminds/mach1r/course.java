@@ -174,7 +174,7 @@ public class course {
         String s;
 
         //if(info.quality==2)
-            s = "scene/" + scenes.course_scenes.get(info.scene).name + ".png";
+            s = "scene/" + scenes.course_scenes.get(info.scene).name + "hd.png";
         //else s = "scene/" + scenes.course_scenes.get(info.scene).name + "lr.png";
         road= new texture(s,texture.TEX_PCX,true,false);
 

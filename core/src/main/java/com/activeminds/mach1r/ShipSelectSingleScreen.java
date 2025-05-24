@@ -64,7 +64,7 @@ public class ShipSelectSingleScreen implements Screen {
         //game.camera.position.set(-3f, 15f, 1000f);
         //game.camera.lookAt(-3, 0, 1000);
         game.camera.near = 0.1f;
-        game.camera.far = 10000f;
+        game.camera.far = 1200f;
         game.camera.update();
 
         Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
