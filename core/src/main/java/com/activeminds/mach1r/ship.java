@@ -2,7 +2,10 @@ package com.activeminds.mach1r;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
@@ -871,5 +874,69 @@ public class ship {
         };
 
         lowres.buildGdxMesh();
+    }
+
+    static Mesh exhaustMesh;
+
+    public static void generateExhaustMesh()
+    {
+        float circleRadius = 1.0f;
+        int circleSegments = 20;
+        float length = 5f;
+        int lengthSegments = 4;
+
+        float[] vertices = new float[8 * circleSegments * (lengthSegments + 1)];
+        short[] indices = new short[3 * 2 * circleSegments * (lengthSegments + 1)];
+
+        int currentVertex = 0;
+
+        float radius = circleRadius;
+        for(int j = 0; j <= lengthSegments; j++) {
+            for (int i = 0; i < circleSegments; i++) {
+                float angle = (float) (2f * Math.PI / circleSegments * i);
+                float z = (float) (radius * Math.cos(angle));
+                float y = (float) (radius * Math.sin(angle));
+                float x = (length / lengthSegments) * j;
+                Vector3 color = Main.mixColors(new Vector3(1f,1f,1f), new Vector3(1f, 0f, 0f), (float) j / (float)lengthSegments);
+
+                vertices[currentVertex * 8 + 0] = x;
+                vertices[currentVertex * 8 + 1] = y;
+                vertices[currentVertex * 8 + 2] = z;
+                vertices[currentVertex * 8 + 3] = color.x;
+                vertices[currentVertex * 8 + 4] = color.y;
+                vertices[currentVertex * 8 + 5] = color.z;
+                vertices[currentVertex * 8 + 6] = 1f - ((float) j / (float)lengthSegments);
+                vertices[currentVertex * 8 + 7] = 0.1f + 0.9f* ((float) j / (float)lengthSegments);
+
+                currentVertex++;
+            }
+
+            radius = radius * 0.5f;
+        }
+
+        int currentTriangle = 0;
+        for(int j = 0; j < lengthSegments; j++)
+            for(int i = 0; i < circleSegments; i++)
+            {
+                indices[currentTriangle*3 + 0] = (short) (circleSegments * j + (i%circleSegments));
+                indices[currentTriangle*3 + 2] = (short) (circleSegments * j + ((i+1)%circleSegments));
+                indices[currentTriangle*3 + 1] = (short) (circleSegments * (j+1) + (i%circleSegments));
+                currentTriangle++;
+                indices[currentTriangle*3 + 0] = (short) (circleSegments  * j + ((i+1)%circleSegments));
+                indices[currentTriangle*3 + 2] = (short) (circleSegments  * (j+1) + ((i+1)%circleSegments));
+                indices[currentTriangle*3 + 1] = (short) (circleSegments  * (j+1) + (i%circleSegments));
+                currentTriangle++;
+
+            }
+
+        exhaustMesh = new Mesh(true, vertices.length / 7, indices.length,
+            new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+            new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 4, "a_color"),
+            new VertexAttribute(VertexAttributes.Usage.Generic, 1, "a_gasColor")
+        );
+
+        exhaustMesh.setVertices(vertices);
+        exhaustMesh.setIndices(indices);
+
     }
 }

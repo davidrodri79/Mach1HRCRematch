@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -492,5 +493,16 @@ public class Main extends Game {
     @Override
     public void dispose() {
         batch.dispose();
+    }
+
+    static Vector3 mixColors(Vector3 c1, Vector3 c2, float f)
+    {
+        if(f < 0) f = 0f;
+        if(f > 1) f = 1f;
+
+        return new Vector3(c1.x * (1f - f) + c2.x * f,
+            c1.y * (1f - f) + c2.y * f,
+            c1.z * (1f - f) + c2.z * f
+            );
     }
 }

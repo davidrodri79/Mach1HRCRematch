@@ -32,7 +32,7 @@ public class RaceScreen implements Screen {
     public static final float HYPER_COL[]={0.96f,0.85f,0.04f};
 
     Main game;
-    ShaderProgram shipShader, sceneShader, skyShader, billboardShader, shadowShader, depthShader;
+    ShaderProgram shipShader, sceneShader, exhaustShader, skyShader, billboardShader, shadowShader, depthShader;
     solid groundMesh, skyMesh;
     Mesh billboard, shadow;
     texture ground;
@@ -104,6 +104,16 @@ public class RaceScreen implements Screen {
 
         if (!sceneShader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + sceneShader.getLog());
+        }
+
+        vertexShader = Gdx.files.internal("shader/exhaust_vertex.glsl").readString();
+        fragmentShader = Gdx.files.internal("shader/exhaust_fragment.glsl").readString();
+
+        ShaderProgram.pedantic = false;
+        exhaustShader = new ShaderProgram(vertexShader, fragmentShader);
+
+        if (!exhaustShader.isCompiled()) {
+            Gdx.app.error("Shader", "Error al compilar: " + exhaustShader.getLog());
         }
 
         vertexShader = Gdx.files.internal("shader/sky_vertex.glsl").readString();
@@ -287,6 +297,9 @@ public class RaceScreen implements Screen {
                 shadowMap[i] = shadowFBO[i].getColorBufferTexture();
                 lightCamera[i] = new OrthographicCamera();
             }
+
+            // Exhaust mesh
+            ship.generateExhaustMesh();
 
         }
 
@@ -791,8 +804,11 @@ public class RaceScreen implements Screen {
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glDepthMask(0);*/
-        //for(int i=game.nplayers-1; i>=0; i--)
-         //   show_ship_flame(cam,game.pl[i]);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        for(int i=game.nplayers-1; i>=0; i--)
+            show_ship_flame(cam,game.pl[i]);
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
         // Opponent cursor in versus
         //glDisable(GL_CULL_FACE);
@@ -1104,15 +1120,50 @@ public class RaceScreen implements Screen {
         };
     }
 
-    void show_ship_flame(PerspectiveCamera cam, ship s)
-    {
+    void show_ship_flame(PerspectiveCamera cam, ship s) {
 
-        float a=s.engine,f;
-        float sx=5.0f*s.data.lsize*a, sy=5.0f*s.data.lsize*a;
+        float a = s.engine, f;
+        float sx = 5.0f * s.data.lsize * a, sy = 5.0f * s.data.lsize * a;
         int i;
 
+        /* // Versión sprite
         for(i=0; i<s.data.nlights; i++)
             show_3d_sprite(cam,game.flame,0,0,1,1,s.light_x(i),s.light_y(i),s.light_z(i),s.lightcol[0],s.lightcol[1],s.lightcol[2],sx,sy,a);
+
+         */
+
+        exhaustShader.begin();
+
+        for (i = 0; i < s.data.nlights; i++) {
+
+            float scalex = (float) (a + Math.sin(game.cour.counter*2) * 0.1f * a);
+            float scaley = (float) (a + Math.sin(game.cour.counter*2 + 4) * 0.1f * a);
+            float scalez = (float) (a + Math.cos(game.cour.counter*2) * 0.1f * a);
+
+            Quaternion qx = new Quaternion();
+            Quaternion qy = new Quaternion();
+            Quaternion qz = new Quaternion();
+
+            qx.setEulerAnglesRad(0, 0, s.rx);
+            qy.setEulerAnglesRad(s.ry, 0, 0);
+            qz.setEulerAnglesRad(0, s.rz, 0);
+
+            Quaternion combined = qx.mul(qy).mul(qz);
+            Matrix4 rot = new Matrix4().set(combined);
+
+            Matrix4 model = new Matrix4().idt().translate(s.light_x(i), s.light_y(i), s.light_z(i))
+                .mul(rot)
+                .scale( scalex, scaley, scalez);
+            Matrix4 view = cam.view;
+            Matrix4 proj = cam.projection;
+            Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
+
+            exhaustShader.setUniformMatrix("u_mvp", MVP);
+            exhaustShader.setUniformf("u_meshColor", s.lightcol[0], s.lightcol[1], s.lightcol[2], a);
+            ship.exhaustMesh.render(exhaustShader, GL20.GL_TRIANGLES);
+        }
+
+        exhaustShader.end();
     }
 
     void show_shadow(PerspectiveCamera cam, ship s)
