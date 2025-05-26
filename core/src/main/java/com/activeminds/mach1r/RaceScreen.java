@@ -103,7 +103,7 @@ public class RaceScreen implements Screen {
         sceneShader = new ShaderProgram(vertexShader, fragmentShader);
 
         if (!sceneShader.isCompiled()) {
-            Gdx.app.error("Shader", "Error al compilar: " + sceneShader.getLog());
+            Gdx.app.error("Shader", "Error al compilar scene shader: " + sceneShader.getLog());
         }
 
         vertexShader = Gdx.files.internal("shader/exhaust_vertex.glsl").readString();
@@ -113,7 +113,7 @@ public class RaceScreen implements Screen {
         exhaustShader = new ShaderProgram(vertexShader, fragmentShader);
 
         if (!exhaustShader.isCompiled()) {
-            Gdx.app.error("Shader", "Error al compilar: " + exhaustShader.getLog());
+            Gdx.app.error("Shader", "Error al compilar exhaust shader: " + exhaustShader.getLog());
         }
 
         vertexShader = Gdx.files.internal("shader/shield_vertex.glsl").readString();
@@ -123,7 +123,7 @@ public class RaceScreen implements Screen {
         shieldShader = new ShaderProgram(vertexShader, fragmentShader);
 
         if (!shieldShader.isCompiled()) {
-            Gdx.app.error("Shader", "Error al compilar: " + exhaustShader.getLog());
+            Gdx.app.error("Shader", "Error al compilar shield shader: " + shieldShader.getLog());
         }
 
         vertexShader = Gdx.files.internal("shader/sky_vertex.glsl").readString();
@@ -133,7 +133,7 @@ public class RaceScreen implements Screen {
         skyShader = new ShaderProgram(vertexShader, fragmentShader);
 
         if (!skyShader.isCompiled()) {
-            Gdx.app.error("Shader", "Error al compilar: " + skyShader.getLog());
+            Gdx.app.error("Shader", "Error al compilar sky shader: " + skyShader.getLog());
         }
 
         vertexShader = Gdx.files.internal("shader/billboard_vertex.glsl").readString();
@@ -143,7 +143,7 @@ public class RaceScreen implements Screen {
         billboardShader = new ShaderProgram(vertexShader, fragmentShader);
 
         if (!billboardShader.isCompiled()) {
-            Gdx.app.error("Shader", "Error al compilar: " + billboardShader.getLog());
+            Gdx.app.error("Shader", "Error al compilar billboard shader: " + billboardShader.getLog());
         }
 
        vertexShader = Gdx.files.internal("shader/depth_vertex.glsl").readString();
@@ -166,7 +166,7 @@ public class RaceScreen implements Screen {
         shadowShader = new ShaderProgram(vertexShader, fragmentShader);
 
         if (!shadowShader.isCompiled()) {
-            Gdx.app.error("Shader", "Error al compilar: " + shadowShader.getLog());
+            Gdx.app.error("Shader", "Error al compilar shadow shader: " + shadowShader.getLog());
         }
 
         // Ground mesh
@@ -818,10 +818,15 @@ public class RaceScreen implements Screen {
         glDepthMask(0);*/
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+        for(int i=game.nplayers-1; i>=0; i--) {
+
+            show_ship_shield(cam, game.pl[i]);
+        }
+        Gdx.gl.glEnable(GL20.GL_CULL_FACE);
         for(int i=game.nplayers-1; i>=0; i--) {
 
             show_ship_flame(cam, game.pl[i]);
-            show_ship_shield(cam, game.pl[i]);
         }
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
@@ -1234,8 +1239,10 @@ public class RaceScreen implements Screen {
         Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
 
         shieldShader.setUniformMatrix("u_mvp", MVP);
-        shieldShader.setUniformf("u_meshColor", 0.3125f,0.5507f,0.9922f,.5f);
-        shield.render(exhaustShader, GL20.GL_TRIANGLES);
+        shieldShader.setUniformMatrix("u_model", model);
+        shieldShader.setUniformf("u_cameraPos", cam.position.x, cam.position.y, cam.position.z);
+        shieldShader.setUniformf("u_meshColor", 0.3125f,0.5507f,0.9922f,1f);
+        shield.render(shieldShader, GL20.GL_TRIANGLES);
 
         shieldShader.end();
     }

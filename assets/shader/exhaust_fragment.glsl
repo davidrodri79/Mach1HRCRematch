@@ -9,6 +9,6 @@ varying float v_gasColor;
 
 void main() {
 
-    gl_FragColor = vec4(mix(vec3(1,1,1),u_meshColor,v_gasColor), v_color.a * u_meshColor.a);
+    gl_FragColor = vec4(mix(vec3(1,1,1),u_meshColor.rgb,v_gasColor), v_color.a * u_meshColor.a);
 
 }

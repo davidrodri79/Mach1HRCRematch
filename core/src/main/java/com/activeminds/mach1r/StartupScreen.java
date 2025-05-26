@@ -165,7 +165,7 @@ public class StartupScreen implements Screen {
                     delay(300);
                     con.add_mess(game.loc.get("loadGameSprites"));
                     /*light=new sprite(2,2,"sprite\\light");*/
-                    game.posnumber = new sprite(64, 64, "sprite/position.png");
+                    game.posnumber = new sprite(64, 64, "sprite/positionhd.png");
                     game.speed = new sprite(64, 64, "sprite/speed.png");
                     game.kmh = new sprite(128, 32, "sprite/kmh.png");
                     game.power[0] = new sprite(256, 128, "sprite/power.png");
