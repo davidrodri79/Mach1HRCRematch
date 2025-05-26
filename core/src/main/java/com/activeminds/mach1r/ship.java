@@ -880,7 +880,7 @@ public class ship {
 
     public static void generateExhaustMesh()
     {
-        float circleRadius = 1.0f;
+        float circleRadius = 0.5f;
         int circleSegments = 20;
         float length = 5f;
         int lengthSegments = 4;
@@ -889,6 +889,7 @@ public class ship {
         short[] indices = new short[3 * 2 * circleSegments * (lengthSegments + 1)];
 
         int currentVertex = 0;
+        float radiusDiff = (float) (circleRadius * Math.pow(0.5f, lengthSegments));
 
         float radius = circleRadius;
         for(int j = 0; j <= lengthSegments; j++) {
@@ -896,7 +897,7 @@ public class ship {
                 float angle = (float) (2f * Math.PI / circleSegments * i);
                 float z = (float) (radius * Math.cos(angle));
                 float y = (float) (radius * Math.sin(angle));
-                float x = (length / lengthSegments) * j;
+                float x = 1f - (length / lengthSegments) * j;
                 Vector3 color = Main.mixColors(new Vector3(1f,1f,1f), new Vector3(1f, 0f, 0f), (float) j / (float)lengthSegments);
 
                 vertices[currentVertex * 8 + 0] = x;
@@ -906,12 +907,13 @@ public class ship {
                 vertices[currentVertex * 8 + 4] = color.y;
                 vertices[currentVertex * 8 + 5] = color.z;
                 vertices[currentVertex * 8 + 6] = 1f - ((float) j / (float)lengthSegments);
-                vertices[currentVertex * 8 + 7] = 0.1f + 0.9f* ((float) j / (float)lengthSegments);
+                vertices[currentVertex * 8 + 7] = 0.2f + 0.8f* ((float) j / (float)lengthSegments);
 
                 currentVertex++;
             }
 
-            radius = radius * 0.5f;
+            radius = radius - radiusDiff;
+            radiusDiff = radiusDiff * 2;
         }
 
         int currentTriangle = 0;
@@ -919,12 +921,12 @@ public class ship {
             for(int i = 0; i < circleSegments; i++)
             {
                 indices[currentTriangle*3 + 0] = (short) (circleSegments * j + (i%circleSegments));
-                indices[currentTriangle*3 + 2] = (short) (circleSegments * j + ((i+1)%circleSegments));
-                indices[currentTriangle*3 + 1] = (short) (circleSegments * (j+1) + (i%circleSegments));
+                indices[currentTriangle*3 + 1] = (short) (circleSegments * j + ((i+1)%circleSegments));
+                indices[currentTriangle*3 + 2] = (short) (circleSegments * (j+1) + (i%circleSegments));
                 currentTriangle++;
                 indices[currentTriangle*3 + 0] = (short) (circleSegments  * j + ((i+1)%circleSegments));
-                indices[currentTriangle*3 + 2] = (short) (circleSegments  * (j+1) + ((i+1)%circleSegments));
-                indices[currentTriangle*3 + 1] = (short) (circleSegments  * (j+1) + (i%circleSegments));
+                indices[currentTriangle*3 + 1] = (short) (circleSegments  * (j+1) + ((i+1)%circleSegments));
+                indices[currentTriangle*3 + 2] = (short) (circleSegments  * (j+1) + (i%circleSegments));
                 currentTriangle++;
 
             }

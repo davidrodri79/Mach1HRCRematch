@@ -1137,15 +1137,15 @@ public class RaceScreen implements Screen {
         for (i = 0; i < s.data.nlights; i++) {
 
             float scalex = (float) (a + Math.sin(game.cour.counter*2) * 0.1f * a);
-            float scaley = (float) (a + Math.sin(game.cour.counter*2 + 4) * 0.1f * a);
-            float scalez = (float) (a + Math.cos(game.cour.counter*2) * 0.1f * a);
+            float scaley = (float) (s.data.lsize * a + Math.sin(game.cour.counter*2 + 4) * 0.1f * a);
+            float scalez = (float) (s.data.lsize * a + Math.cos(game.cour.counter*2) * 0.1f * a);
 
             Quaternion qx = new Quaternion();
             Quaternion qy = new Quaternion();
             Quaternion qz = new Quaternion();
 
             qx.setEulerAnglesRad(0, 0, s.rx);
-            qy.setEulerAnglesRad(s.ry, 0, 0);
+            qy.setEulerAnglesRad((float) (s.ry + Math.PI), 0, 0);
             qz.setEulerAnglesRad(0, s.rz, 0);
 
             Quaternion combined = qx.mul(qy).mul(qz);
