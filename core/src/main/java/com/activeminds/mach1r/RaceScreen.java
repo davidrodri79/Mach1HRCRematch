@@ -32,7 +32,7 @@ public class RaceScreen implements Screen {
     public static final float HYPER_COL[]={0.96f,0.85f,0.04f};
 
     Main game;
-    ShaderProgram shipShader, sceneShader, exhaustShader, skyShader, billboardShader, shadowShader, depthShader;
+    ShaderProgram shipShader, sceneShader, exhaustShader, shieldShader, skyShader, billboardShader, shadowShader, depthShader;
     solid groundMesh, skyMesh;
     Mesh billboard, shadow, shield;
     texture ground;
@@ -113,6 +113,16 @@ public class RaceScreen implements Screen {
         exhaustShader = new ShaderProgram(vertexShader, fragmentShader);
 
         if (!exhaustShader.isCompiled()) {
+            Gdx.app.error("Shader", "Error al compilar: " + exhaustShader.getLog());
+        }
+
+        vertexShader = Gdx.files.internal("shader/shield_vertex.glsl").readString();
+        fragmentShader = Gdx.files.internal("shader/shield_fragment.glsl").readString();
+
+        ShaderProgram.pedantic = false;
+        shieldShader = new ShaderProgram(vertexShader, fragmentShader);
+
+        if (!shieldShader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar: " + exhaustShader.getLog());
         }
 
@@ -1199,17 +1209,11 @@ public class RaceScreen implements Screen {
 
         int i;
 
-        /* // Versión sprite
-        for(i=0; i<s.data.nlights; i++)
-            show_3d_sprite(cam,game.flame,0,0,1,1,s.light_x(i),s.light_y(i),s.light_z(i),s.lightcol[0],s.lightcol[1],s.lightcol[2],sx,sy,a);
+        shieldShader.begin();
 
-         */
-
-        exhaustShader.begin();
-
-        float scalex = (float) (15f);
-        float scaley = (float) (15f);
-        float scalez = (float) (15f);
+        float scalex = (float) (s.data.sizez);
+        float scaley = (float) (s.data.sizey);
+        float scalez = (float) (s.data.sizex);
 
         Quaternion qx = new Quaternion();
         Quaternion qy = new Quaternion();
@@ -1229,11 +1233,11 @@ public class RaceScreen implements Screen {
         Matrix4 proj = cam.projection;
         Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
 
-        exhaustShader.setUniformMatrix("u_mvp", MVP);
-        exhaustShader.setUniformf("u_meshColor", 1f,1f,1f,1f);
+        shieldShader.setUniformMatrix("u_mvp", MVP);
+        shieldShader.setUniformf("u_meshColor", 0.3125f,0.5507f,0.9922f,.5f);
         shield.render(exhaustShader, GL20.GL_TRIANGLES);
 
-        exhaustShader.end();
+        shieldShader.end();
     }
 
     void show_shadow(PerspectiveCamera cam, ship s)
@@ -1809,29 +1813,41 @@ public class RaceScreen implements Screen {
 
     public Mesh createSphereMesh(float radius, int numSegments)
     {
-        float[] vertices = new float[(numSegments) * (numSegments) * 3];
+        float[] vertices = new float[(numSegments) * (numSegments) * 6];
         short[] indices = new short[numSegments * numSegments * 2 * 3];
 
-        float angleStep = (float) (Math.PI / numSegments);
+        float angleStep = (float) (2*Math.PI / numSegments);
+        float verticalAngleStep = (float) (Math.PI / numSegments);
 
         for(int j = 0; j < numSegments; j++)
             for(int i = 0; i < numSegments; i++)
             {
-                vertices[(numSegments*6) + 6*i + 0] = (float) (radius * Math.cos(angleStep * i));
-                vertices[(numSegments*6) + 6*i + 1] = radius - (radius / numSegments) * j;
-                vertices[(numSegments*6) + 6*i + 2] = (float) (radius * Math.sin(angleStep * i));
+                float x = (float) (radius * Math.cos(angleStep * i) * Math.abs(Math.sin(verticalAngleStep * j)));
+                float y = (float) (radius * Math.cos(verticalAngleStep * j));
+                float z = (float) (radius * Math.sin(angleStep * i) * Math.abs(Math.sin(verticalAngleStep * j)));
+
+                vertices[(numSegments*6*j) + 6*i + 0] = x;
+                vertices[(numSegments*6*j) + 6*i + 1] = y;
+                vertices[(numSegments*6*j) + 6*i + 2] = z;
+
+                Vector3 normal = new Vector3(x,y,z);
+                normal = normal.nor();
+
+                vertices[(numSegments*6*j) + 6*i + 3] = normal.x;
+                vertices[(numSegments*6*j) + 6*i + 4] = normal.y;
+                vertices[(numSegments*6*j) + 6*i + 5] = normal.z;
             }
 
         for(int j = 0; j < numSegments - 1; j++)
             for(int i = 0; i < numSegments; i++)
             {
-                indices[j*6 + 0] = (short) ((j*numSegments) + i);
-                indices[j*6 + 1] = (short) ((j*numSegments) + i + 1);
-                indices[j*6 + 2] = (short) ((j*(numSegments+1)) + i);
+                indices[(j*numSegments+i)*6 + 0] = (short) ((j*numSegments) + i);
+                indices[(j*numSegments+i)*6 + 1] = (short) ((j*numSegments) + (i + 1)%numSegments);
+                indices[(j*numSegments+i)*6 + 2] = (short) (((j+1)*numSegments) + i);
 
-                indices[j*6 + 3] = (short) ((j*numSegments) + i + 1);
-                indices[j*6 + 4] = (short) ((j*(numSegments+1)) + i + 1);
-                indices[j*6 + 5] = (short) ((j*(numSegments+1)) + i);
+                indices[(j*numSegments+i)*6 + 3] = (short) ((j*numSegments) + (i + 1)%numSegments);
+                indices[(j*numSegments+i)*6 + 4] = (short) (((j+1)*numSegments) + (i + 1)%numSegments);
+                indices[(j*numSegments+i)*6 + 5] = (short) (((j+1)*numSegments) + i);
             }
 
 
