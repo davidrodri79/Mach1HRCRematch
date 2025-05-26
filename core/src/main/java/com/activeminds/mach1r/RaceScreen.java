@@ -34,7 +34,7 @@ public class RaceScreen implements Screen {
     Main game;
     ShaderProgram shipShader, sceneShader, exhaustShader, skyShader, billboardShader, shadowShader, depthShader;
     solid groundMesh, skyMesh;
-    Mesh billboard, shadow;
+    Mesh billboard, shadow, shield;
     texture ground;
 
     PerspectiveCamera cameraSingle;
@@ -297,11 +297,13 @@ public class RaceScreen implements Screen {
                 shadowMap[i] = shadowFBO[i].getColorBufferTexture();
                 lightCamera[i] = new OrthographicCamera();
             }
-
-            // Exhaust mesh
-            ship.generateExhaustMesh();
-
         }
+
+        // Exhaust mesh
+        ship.generateExhaustMesh();
+
+        // SHield
+        shield = createSphereMesh(1,20);
 
         generate_cube_map();
 
@@ -806,8 +808,11 @@ public class RaceScreen implements Screen {
         glDepthMask(0);*/
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        for(int i=game.nplayers-1; i>=0; i--)
-            show_ship_flame(cam,game.pl[i]);
+        for(int i=game.nplayers-1; i>=0; i--) {
+
+            show_ship_flame(cam, game.pl[i]);
+            show_ship_shield(cam, game.pl[i]);
+        }
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
         // Opponent cursor in versus
@@ -1186,6 +1191,47 @@ public class RaceScreen implements Screen {
             exhaustShader.setUniformf("u_meshColor", s.lightcol[0], s.lightcol[1], s.lightcol[2], a);
             ship.exhaustMesh.render(exhaustShader, GL20.GL_TRIANGLES);
         }
+
+        exhaustShader.end();
+    }
+
+    void show_ship_shield(PerspectiveCamera cam, ship s) {
+
+        int i;
+
+        /* // Versión sprite
+        for(i=0; i<s.data.nlights; i++)
+            show_3d_sprite(cam,game.flame,0,0,1,1,s.light_x(i),s.light_y(i),s.light_z(i),s.lightcol[0],s.lightcol[1],s.lightcol[2],sx,sy,a);
+
+         */
+
+        exhaustShader.begin();
+
+        float scalex = (float) (15f);
+        float scaley = (float) (15f);
+        float scalez = (float) (15f);
+
+        Quaternion qx = new Quaternion();
+        Quaternion qy = new Quaternion();
+        Quaternion qz = new Quaternion();
+
+        qx.setEulerAnglesRad(0, 0, s.rx);
+        qy.setEulerAnglesRad((float) (s.ry + Math.PI), 0, 0);
+        qz.setEulerAnglesRad(0, s.rz, 0);
+
+        Quaternion combined = qx.mul(qy).mul(qz);
+        Matrix4 rot = new Matrix4().set(combined);
+
+        Matrix4 model = new Matrix4().idt().translate(s.renderx, s.y, s.renderz)
+            .mul(rot)
+            .scale( scalex, scaley, scalez);
+        Matrix4 view = cam.view;
+        Matrix4 proj = cam.projection;
+        Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
+
+        exhaustShader.setUniformMatrix("u_mvp", MVP);
+        exhaustShader.setUniformf("u_meshColor", 1f,1f,1f,1f);
+        shield.render(exhaustShader, GL20.GL_TRIANGLES);
 
         exhaustShader.end();
     }
@@ -1759,6 +1805,45 @@ public class RaceScreen implements Screen {
         billboard.render(billboardShader, GL20.GL_TRIANGLES);
         billboardShader.end();
 
+    }
+
+    public Mesh createSphereMesh(float radius, int numSegments)
+    {
+        float[] vertices = new float[(numSegments) * (numSegments) * 3];
+        short[] indices = new short[numSegments * numSegments * 2 * 3];
+
+        float angleStep = (float) (Math.PI / numSegments);
+
+        for(int j = 0; j < numSegments; j++)
+            for(int i = 0; i < numSegments; i++)
+            {
+                vertices[(numSegments*6) + 6*i + 0] = (float) (radius * Math.cos(angleStep * i));
+                vertices[(numSegments*6) + 6*i + 1] = radius - (radius / numSegments) * j;
+                vertices[(numSegments*6) + 6*i + 2] = (float) (radius * Math.sin(angleStep * i));
+            }
+
+        for(int j = 0; j < numSegments - 1; j++)
+            for(int i = 0; i < numSegments; i++)
+            {
+                indices[j*6 + 0] = (short) ((j*numSegments) + i);
+                indices[j*6 + 1] = (short) ((j*numSegments) + i + 1);
+                indices[j*6 + 2] = (short) ((j*(numSegments+1)) + i);
+
+                indices[j*6 + 3] = (short) ((j*numSegments) + i + 1);
+                indices[j*6 + 4] = (short) ((j*(numSegments+1)) + i + 1);
+                indices[j*6 + 5] = (short) ((j*(numSegments+1)) + i);
+            }
+
+
+        Mesh m = new Mesh(true, vertices.length / 6, indices.length,
+            new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+            new VertexAttribute(VertexAttributes.Usage.Normal, 3, "a_normal")
+        );
+
+        m.setVertices(vertices);
+        m.setIndices(indices);
+
+        return m;
     }
 
 
