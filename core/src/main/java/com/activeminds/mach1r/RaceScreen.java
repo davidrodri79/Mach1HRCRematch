@@ -857,6 +857,30 @@ public class RaceScreen implements Screen {
 
         game.batch.end();
 
+
+        //debugSolidNormals(game.cour.nodes[game.pl[0].segment].mesh, cam);
+        //debugSolidNormals(game.cour.nodes[game.pl[0].nextsegment].mesh, cam);
+
+
+    }
+
+    void debugSolidNormals(solid s, PerspectiveCamera cam)
+    {
+        game.shapeRenderer.setProjectionMatrix(cam.combined);
+        game.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+        for(triangle t : s.triangles)
+        {
+            game.shapeRenderer.setColor(1f, 1f, 0f, 1f);
+            game.shapeRenderer.line(new Vector3(t.v1.x, t.v1.y, t.v1.z), new Vector3(t.v2.x, t.v2.y, t.v2.z));
+            game.shapeRenderer.line(new Vector3(t.v1.x, t.v1.y, t.v1.z), new Vector3(t.v3.x, t.v3.y, t.v3.z));
+            game.shapeRenderer.line(new Vector3(t.v3.x, t.v3.y, t.v3.z), new Vector3(t.v2.x, t.v2.y, t.v2.z));
+            game.shapeRenderer.setColor(0f, 1f, 0f, 1f);
+            Vector3 or = new Vector3((t.v1.x + t.v2.x + t.v3.x) / 3f, (t.v1.y + t.v2.y + t.v3.y) / 3f, (t.v1.z + t.v2.z + t.v3.z) / 3f);
+            Vector3 end = new Vector3(or.x + 2*t.normal.x, or.y + 2*t.normal.y, or.z + 2*t.normal.z);
+            game.shapeRenderer.line(or, end);
+        }
+        game.shapeRenderer.end();
     }
 
     void set_shadowmap_values(ShaderProgram shader)

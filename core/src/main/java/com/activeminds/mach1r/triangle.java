@@ -90,9 +90,10 @@ public class triangle {
         z1=v2.z-v1.z; z2=v3.z-v1.z;
 
         normal = new Vector3((y1*z2)-(y2*z1), (z1*x2)-(x1*z2), (x1*y2)-(x2*y1));
-        normal.x = normal.x / normal.len();
-        normal.y = normal.y / normal.len();
-        normal.z = normal.z / normal.len();
+        m = normal.len();
+        normal.x = normal.x / m;
+        normal.y = normal.y / m;
+        normal.z = normal.z / m;
     }
 
 }
