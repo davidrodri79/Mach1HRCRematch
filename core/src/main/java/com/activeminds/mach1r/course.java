@@ -146,6 +146,8 @@ public class course {
     int counter;
     texture road;
     solid decorate[] = new solid[3], scube, ecube, bcube, power, mine;
+    ParticleSystem particles;
+
 
     static course_sceneJson scenes;
     static champJson championship;
@@ -198,6 +200,9 @@ public class course {
         mine=new solid();
         mine.load_mesh("model/mine.msh", true);
         mine.centrate(true, true, true);
+
+        particles = new ParticleSystem();
+
     }
 
     solid generateCube(float side, String texture)
@@ -241,6 +246,8 @@ public class course {
                 if(nodes[i].itemfade<=0.0) nodes[i].item=NONE;
             };
         };
+
+        particles.update();
     }
 
     static int rand()

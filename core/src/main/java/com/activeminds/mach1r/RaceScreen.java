@@ -653,6 +653,7 @@ public class RaceScreen implements Screen {
                     game.pl[game.position[j+1]].pos=j+2;
                 };
 
+
         /*System.out.println("==========================================================");
         for(int i=0; i<game.nplayers; i++)
         {
@@ -826,6 +827,9 @@ public class RaceScreen implements Screen {
 
         for(int i=game.nplayers-1; i>=0; i--)
             show_ship_sprites(cam,game.pl[i]);
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        game.cour.particles.render(cam, this);
 
         // The fuel wastes
         /*glDisable(GL_FOG);

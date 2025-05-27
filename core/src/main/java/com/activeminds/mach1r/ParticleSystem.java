@@ -1,29 +1,83 @@
 package com.activeminds.mach1r;
 
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+
+import java.util.ArrayList;
 
 public class ParticleSystem {
 
-    class Particle {
+    static class Particle {
 
-        Vector3 position, speed;
-        Texture sprite;
+        Vector3 position, speed, color;
+        Vector2 size;
+        texture sprite;
+        int timeLeft;
+        boolean active;
 
-
-        Particle(Vector3 position, Texture spr)
+        Particle(Vector3 position, Vector3 speed, Vector3 color, Vector2 size, int timeLeft, Texture spr)
         {
+            this.position = position;
+            this.speed = speed;
+            this.color = color;
+            this.size = size;
+            this.sprite = new texture(spr);
+            this.timeLeft = timeLeft;
+            active = true;
+        }
 
+        void update()
+        {
+            position.add(speed);
+            timeLeft--;
+            if(timeLeft <= 0)
+            {
+                active = false;
+            }
         }
     }
 
+    ArrayList<Particle> particles;
+
+
     ParticleSystem()
     {
-
+        particles = new ArrayList<>();
+    }
+    void addParticle(Particle p)
+    {
+        particles.add(p);
     }
 
     void update()
     {
+        for(int i = 0; i < particles.size(); i++)
+        {
+            Particle p = particles.get(i);
+            p.update();
+            if(!p.active) {
+                particles.remove(p);
+                i--;
+            }
+        }
+    }
 
+    void render(PerspectiveCamera cam, RaceScreen raceScreen)
+    {
+        for(Particle p : particles)
+        {
+            float alpha = 1.0f;
+            if(p.timeLeft < 140)
+                alpha = 140.f / p.timeLeft;
+
+            raceScreen.show_3d_sprite(cam, p.sprite, 0,0, 1, 1,
+                p.position.x, p.position.y, p.position.z,
+                p.color.x, p.color.y, p.color.z,
+                p.size.x, p.size.y,
+                alpha);
+        }
     }
 }

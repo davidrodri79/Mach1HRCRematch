@@ -473,41 +473,66 @@ public class ship {
 
         if(state==PLAY)
             if((dx*dx)+(dy*dy)+(dz*dz)<DISTPICKUP)
-                if((cour.nodes[segment].itemfade==1.0) && (cour.nodes[segment].item!=course.NONE)){
+                if((cour.nodes[segment].itemfade==1.0) && (cour.nodes[segment].item!=course.NONE)) {
 
-                    switch(cour.nodes[segment].item){
+                    switch (cour.nodes[segment].item) {
 
-                        case course.ENERGY : gain_energy(50);
-                            cour.play_3d_sample(soundCam,x,y,z,takee);
+                        case course.ENERGY:
+                            gain_energy(50);
+                            cour.play_3d_sample(soundCam, x, y, z, takee);
                             break;
-                        case course.BOOST  : nboosts++;
-                            cour.play_3d_sample(soundCam,x,y,z,takee);
+                        case course.BOOST:
+                            nboosts++;
+                            cour.play_3d_sample(soundCam, x, y, z, takee);
                             break;
 
-                        case course.SHIELD : shield= (short) SHIELDDURATION;
-                            cour.play_3d_sample(soundCam,x,y,z,takes);
+                        case course.SHIELD:
+                            shield = (short) SHIELDDURATION;
+                            cour.play_3d_sample(soundCam, x, y, z, takes);
                             break;
-                        case course.POWER  : power++;
+                        case course.POWER:
+                            power++;
                             new_message(Main.loc.get("powerTank"));
-                            cour.play_3d_sample(soundCam,x,y,z,takepow);
+                            cour.play_3d_sample(soundCam, x, y, z, takepow);
                             break;
-                        case course.MINE   : if((shield==0) && (hypermode==0)){
+                        case course.MINE:
+                            if ((shield == 0) && (hypermode == 0)) {
                                 lose_energy(75);
-                                counter=0; state=STUN; stunforce= (int) (velocity*40);
-                                cour.play_3d_sample(soundCam,x,y,z,litexpl);
-                            };
+                                counter = 0;
+                                state = STUN;
+                                stunforce = (int) (velocity * 40);
+                                cour.play_3d_sample(soundCam, x, y, z, litexpl);
+                            }
+                            ;
                             break;
 
-                    };
-                    cour.nodes[segment].itemfade-=0.01;
-                    if(power==5) {
-                        hypermode= (short) HYPERDURATION;
+                    }
+                    ;
+                    cour.nodes[segment].itemfade -= 0.01;
+                    if (power == 5) {
+                        hypermode = (short) HYPERDURATION;
                         new_message(Main.loc.get("hyperMode"));
-                        cour.play_3d_sample(soundCam,x,y,z,fullpower);
-                        power=0;
-                    };
-                };
+                        cour.play_3d_sample(soundCam, x, y, z, fullpower);
+                        power = 0;
+                    }
+                    ;
 
+                    for(int j = 0; j < 10; j++)
+                    {
+                        float px = cour.cube_x(segment) + (course.rand() % 8) * 0.25f - 2f;
+                        float py = cour.cube_y(segment) + (course.rand() % 8) * 0.25f - 2f;
+                        float pz = cour.cube_z(segment) + (course.rand() % 8) * 0.25f - 2f;
+
+                        ParticleSystem.Particle p = new ParticleSystem.Particle(
+                            new Vector3(px, py, pz),
+                            new Vector3(0, 0.05f, 0),
+                            new Vector3(0f, 1f, 1f),
+                            new Vector2(1f, 1f),
+                            500, Main.flame.gdxTexture
+                        );
+                        cour.particles.addParticle(p);
+                    }
+                };
 
         if(boost>0) boost--;
         if(shield>0) shield--;

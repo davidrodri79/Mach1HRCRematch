@@ -9,6 +9,10 @@ public class texture {
 
     Texture gdxTexture;
 
+    public texture(Texture t)
+    {
+        gdxTexture = t;
+    }
     public texture(String tname, int type, boolean repeat, boolean alpha)
     {
         if(type == TEX_BMP) LoadBMP(tname);
