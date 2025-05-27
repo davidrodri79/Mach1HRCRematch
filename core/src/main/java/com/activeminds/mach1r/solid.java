@@ -26,6 +26,7 @@ public class solid {
 
     Mesh mesh;
     Texture[] textures;
+    Texture normalMap;
     boolean gouraud = false;
 
     public solid()
@@ -35,6 +36,7 @@ public class solid {
         vcenter = new vertex(0,0,0);
         scale[0] = 1f; scale[1] = 1f; scale[2] = 1f;
         col_coef[0] = 1f; col_coef[1] = 1f; col_coef[2] = 1f;
+        normalMap = null;
     }
 
     boolean load_mesh(String file, boolean gouraud)
@@ -394,9 +396,15 @@ public class solid {
         shader.setUniformi("u_textures[5]", 5); // Dummy (no usamos)
         shader.setUniformf("u_colorCoef", col_coef[0], col_coef[1], col_coef[2]);
         shader.setUniformi("u_shadowMap", 6);
-
         for(int i = 0; i < textures.length; i++)
             textures[i].bind(i);
+        if(normalMap != null)
+        {
+            shader.setUniformi("u_normalMap", 16);
+            normalMap.bind(16);
+        }
+
+
         mesh.render(shader, GL20.GL_TRIANGLES);
 
 

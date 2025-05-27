@@ -4,6 +4,8 @@ precision mediump float;
 
 uniform sampler2D u_textures[6]; // Puedes ampliar si quieres más texturas
 
+uniform sampler2D u_normalMap;
+
 //#define FOG_ENABLED 0
 //#define SHADOWMAP_ENABLED 0
 //#define LIGHTING_ENABLED 0
@@ -169,14 +171,27 @@ void main() {
         texColor = texture2D(u_textures[5], v_texCoord);
     }
 
+    texColor = vec4(1,1,1,1);
+
     // --- Shadow map ---
     float shadow = getShadow();
 
     vec3 viewDir = normalize(u_cameraPos - v_worldPos);
 
+#ifdef NORMAL_MAP_ENABLED
+    // Leer el normal del mapa normal en espacio modelo/mundo
+    vec3 normalMap = texture2D(u_normalMap, v_texCoord).rbg;
+    normalMap = normalize(normalMap * 2.0 - 1.0); // De [0,1] a [-1,1]
+
+    // Combinar normal interpolada y la del mapa (simple mezcla)
+    //vec3 normal = normalize(v_normal + normalMap * 0.5);
+    vec3 normal = normalMap;
+#else
+    vec3 normal = normalize(v_normal);
+#endif
+
 #ifdef LIGHTING_ENABLED
     // --- LIGHTING ---
-    vec3 normal = normalize(v_normal);
     vec3 lightAccum = u_ambientColor;
 
     for (int i = 0; i < MAX_LIGHTS; i++) {
@@ -222,13 +237,13 @@ void main() {
 
     // --- REFLECTION WITH CUBEMAP ---
 #ifdef REFLECTION_ENABLED
-    vec3 reflectDir = reflect(-viewDir, normalize(v_normal));
+    vec3 reflectDir = reflect(-viewDir, normal);
     vec4 reflectionColor = sampleCubemap(vec3(reflectDir.x, reflectDir.y, reflectDir.z));
     //float fresnel = pow(1.0 - max(dot(viewDir, normalize(v_normal)), 0.0), 3.5);
 
     float fresnelMin = 0.03;
     float fresnelPower = 3.0;
-    float fresnel = fresnelMin + (1.0 - fresnelMin) * pow(1.0 - max(dot(viewDir, normalize(v_normal)), 0.0), fresnelPower);
+    float fresnel = fresnelMin + (1.0 - fresnelMin) * pow(1.0 - max(dot(viewDir, normal), 0.0), fresnelPower);
 
 
     // Ajuste del reflectionAmount con fresnel
@@ -261,5 +276,9 @@ void main() {
         colorWithFog.r = 0.0;*/
 
     gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
+
+    //#ifdef NORMAL_MAP_ENABLED
+    //gl_FragColor = vec4(normal, texColor.a * u_alpha);
+    //#endif
 
 }

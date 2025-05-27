@@ -32,10 +32,10 @@ public class RaceScreen implements Screen {
     public static final float HYPER_COL[]={0.96f,0.85f,0.04f};
 
     Main game;
-    ShaderProgram shipShader, sceneShader, exhaustShader, shieldShader, skyShader, billboardShader, shadowShader, depthShader;
+    ShaderProgram shipShader, sceneShader, groundShader, exhaustShader, shieldShader, skyShader, billboardShader, shadowShader, depthShader;
     solid groundMesh, skyMesh;
     Mesh billboard, shadow, shield;
-    texture ground;
+    texture ground, groundNormalMap;
 
     PerspectiveCamera cameraSingle;
     PerspectiveCamera cameras2p[] = new PerspectiveCamera[2];
@@ -104,6 +104,19 @@ public class RaceScreen implements Screen {
 
         if (!sceneShader.isCompiled()) {
             Gdx.app.error("Shader", "Error al compilar scene shader: " + sceneShader.getLog());
+        }
+
+        fragmentShader = "#define FOG_ENABLED 1\n" +
+            "#define NORMAL_MAP_ENABLED 1\n" +
+            "#define LIGHTING_ENABLED 1\n" +
+            (game.gdata.shadowmap ? "#define SHADOWMAP_ENABLED 1\n#define SHADOWPCF_ENABLED 1\n#define SHADOWMAP24B 1\n" : "") +
+            fragmentShader;
+
+        ShaderProgram.pedantic = false;
+        groundShader = new ShaderProgram(vertexShader, fragmentShader);
+
+        if (!groundShader.isCompiled()) {
+            Gdx.app.error("Shader", "Error al compilar ground shader: " + groundShader.getLog());
         }
 
         vertexShader = Gdx.files.internal("shader/exhaust_vertex.glsl").readString();
@@ -177,11 +190,13 @@ public class RaceScreen implements Screen {
         v[2]=new vertex((GROUNDWIDTH/TILE),course.GROUNDY,(GROUNDWIDTH/TILE));
         v[3]=new vertex((GROUNDWIDTH/TILE),course.GROUNDY,0f);
 
-        ground= new texture("scene/"+course.scenes.course_scenes.get(game.cour.info.scene).name+"gr.bmp",texture.TEX_BMP,true,false);
+        ground= new texture("scene/"+course.scenes.course_scenes.get(game.cour.info.scene).name+"grhd.bmp",texture.TEX_BMP,true,false);
+        groundNormalMap = new texture("scene/"+course.scenes.course_scenes.get(game.cour.info.scene).name+"grnm.png",texture.TEX_BMP,true,false);
         groundMesh = new solid();
         groundMesh.triangles = new ArrayList<>();
         groundMesh.textures = new Texture[1];
         groundMesh.textures[0] = ground.gdxTexture;
+        groundMesh.normalMap = groundNormalMap.gdxTexture;
         groundMesh.triangles.add(new triangle(v[0], v[1], v[2], 0, 0, 0f, 0f, GROUNDTILE, GROUNDTILE, GROUNDTILE));
         groundMesh.triangles.add(new triangle(v[2], v[3], v[0], 0, GROUNDTILE, GROUNDTILE, 0f, GROUNDTILE, 0f, 0f));
         groundMesh.buildGdxMesh();
@@ -669,7 +684,7 @@ public class RaceScreen implements Screen {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
-        cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y, game.pl[follow].cam_pos.z);
+        cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y+200, game.pl[follow].cam_pos.z);
         cam.lookAt(game.pl[follow].vrp.x, game.pl[follow].vrp.y, game.pl[follow].vrp.z);
         cam.up.set(0, 1, 0);
         cam.near = 0.1f;
@@ -713,6 +728,9 @@ public class RaceScreen implements Screen {
             show_3d_sprite(cam,game.flame,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,1000,1000,1f);
 
 
+        Gdx.gl.glDepthMask(true);
+        show_ground(cam);
+
         sceneShader.begin();
         sceneShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
 
@@ -734,8 +752,6 @@ public class RaceScreen implements Screen {
         if(game.gdata.exhaustLights)
             add_ship_flame_lights(sceneShader, cam);
 
-        Gdx.gl.glDepthMask(true);
-        show_ground(cam);
 
         /*glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -997,11 +1013,11 @@ public class RaceScreen implements Screen {
             case 4 : hour=22.0f; break;
         };
 
-        /*hour = game.cour.counter / 60f;
+        hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }*/
+        }
 
         if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
         if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}
@@ -1032,8 +1048,29 @@ public class RaceScreen implements Screen {
         float gx, gz, TILE=7;
         int i,x,z;
 
+        groundShader.begin();
+        groundShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
+
+        groundShader.setUniformi("u_numLights", 1);
+        groundShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
+        groundShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
+        groundShader.setUniformf("u_lightIntensity[0]", 1.0f);
+
+        groundShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
+        groundShader.setUniformf("u_fogStart", 10.0f);
+        groundShader.setUniformf("u_fogEnd", 1000.0f);
+
+        if(game.gdata.shadowmap) {
+            set_shadowmap_values(groundShader);
+        }
+
+        int numLights = 1;
+        // Flame lights
+        if(game.gdata.exhaustLights)
+            add_ship_flame_lights(groundShader, cam);
+
         gx=nearest((int) cam.position.x, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
-        gz=nearest((int) cam.position.z, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
+        //gz=nearest((int) cam.position.z, (int) (GROUNDWIDTH/GROUNDTILE))-(GROUNDWIDTH/2);
 
         for(x=0; x<TILE; x++){
 
@@ -1041,7 +1078,7 @@ public class RaceScreen implements Screen {
 
             for(z=0; z<TILE; z++){
 
-                groundMesh.render(sceneShader, cam, gx, 0f, gz, 0f, 0f, 0f);
+                groundMesh.render(groundShader, cam, gx, 0f, gz, 0f, 0f, 0f);
                 gz+=GROUNDWIDTH/TILE;
             };
 
