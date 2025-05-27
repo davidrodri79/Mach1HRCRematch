@@ -26,7 +26,7 @@
       weight : 660,
       enginef : 1,
       handling : 3,
-      sizex : 3.0,
+      sizex : 3.5,
       sizey : 2.5,
       sizez : 5.5
     },
@@ -58,7 +58,7 @@
       handling : 2,
       sizex : 4.0,
       sizey : 2.5,
-      sizez : 6.0
+      sizez : 7
     },
     {
       "name" : "vampire",
@@ -71,9 +71,9 @@
       weight : 1150,
       enginef : 1,
       handling : 3,
-      sizex : 3.5,
+      sizex : 4.5
       sizey : 3.0,
-      sizez : 7.5
+      sizez : 7
     },
     {
       "name" : "shark-iii",
@@ -88,7 +88,7 @@
       handling : 2,
       sizex : 3.5,
       sizey : 3,
-      sizez : 8.5
+      sizez : 8
     },
     {
       "name" : "greyhound",
@@ -96,14 +96,14 @@
       "gouraud" : true,
       "light" : [1,0.84,0.54],
       nlights : 1,
-      "lsize" : 0.8,
-      lpos : [[0,0.15,-3.5]],
+      "lsize" : 0.6,
+      lpos : [[0,-0.05,-3.5]],
       weight : 930,
       enginef : 2,
       handling : 2,
-      sizex : 2.5,
-      sizey : 2,
-      sizez : 7.0
+      sizex : 3.5,
+      sizey : 2.5,
+      sizez : 7.5
     },
     {
       "name" : "turbo bull",
@@ -163,7 +163,7 @@
       handling : 1,
       sizex : 3.0,
       sizey : 3.0,
-      sizez : 10
+      sizez : 8
     },
     {
       "name" : "hydra",
@@ -193,7 +193,7 @@
       handling : 1,
       sizex : 3.5,
       sizey : 2,
-      sizez : 5.8
+      sizez : 7
     },
     {
       "name" : "vertigo",
@@ -206,7 +206,7 @@
       weight : 1310,
       enginef : 3,
       handling : 1,
-      sizex : 2.0,
+      sizex : 4.0,
       sizey : 2.0,
       sizez : 6.0
     },
@@ -221,9 +221,9 @@
       weight : 1230,
       enginef : 4,
       handling : 1,
-      sizex : 3.5,
+      sizex : 4,
       sizey : 2.5,
-      sizez : 9
+      sizez : 8
     }
   ]
 }

@@ -1119,7 +1119,7 @@ public class RaceScreen implements Screen {
         float a, c, size, dy, sz, sy, dif;
         texture t;
 
-        if(s.shield>0){
+        /*if(s.shield>0){
 
 
             Vector3 dir = cam.direction;
@@ -1139,7 +1139,7 @@ public class RaceScreen implements Screen {
             if(s.shield>80) a=1.0f;
             else a=1.0f-((80-s.shield)/80.0f);
             show_3d_sprite(cam,game.shield,0,0,1,1,s.renderx,s.y,s.renderz,0.3125f,0.5507f,0.9922f,sz,sy,a);
-        };
+        };*/
 
         // Ship burning and destroyed
         if((s.state>=ship.BURN) || ((s.state==ship.STUN) && (s.counter<=50))){
@@ -1212,7 +1212,11 @@ public class RaceScreen implements Screen {
 
     void show_ship_shield(PerspectiveCamera cam, ship s) {
 
-        int i;
+        if(s.shield <= 0) return;
+
+        float a;
+        if(s.shield>80) a=1.0f;
+        else a=1.0f-((80-s.shield)/80.0f);
 
         shieldShader.begin();
 
@@ -1241,7 +1245,7 @@ public class RaceScreen implements Screen {
         shieldShader.setUniformMatrix("u_mvp", MVP);
         shieldShader.setUniformMatrix("u_model", model);
         shieldShader.setUniformf("u_cameraPos", cam.position.x, cam.position.y, cam.position.z);
-        shieldShader.setUniformf("u_meshColor", 0.3125f,0.5507f,0.9922f,1f);
+        shieldShader.setUniformf("u_meshColor", 0.3125f,0.5507f,0.9922f,a);
         shield.render(shieldShader, GL20.GL_TRIANGLES);
 
         shieldShader.end();
@@ -1820,13 +1824,13 @@ public class RaceScreen implements Screen {
 
     public Mesh createSphereMesh(float radius, int numSegments)
     {
-        float[] vertices = new float[(numSegments) * (numSegments) * 6];
-        short[] indices = new short[numSegments * numSegments * 2 * 3];
+        float[] vertices = new float[(numSegments+1) * (numSegments) * 6];
+        short[] indices = new short[(numSegments+1) * numSegments * 2 * 3];
 
         float angleStep = (float) (2*Math.PI / numSegments);
         float verticalAngleStep = (float) (Math.PI / numSegments);
 
-        for(int j = 0; j < numSegments; j++)
+        for(int j = 0; j <=numSegments; j++)
             for(int i = 0; i < numSegments; i++)
             {
                 float x = (float) (radius * Math.cos(angleStep * i) * Math.abs(Math.sin(verticalAngleStep * j)));
@@ -1845,7 +1849,7 @@ public class RaceScreen implements Screen {
                 vertices[(numSegments*6*j) + 6*i + 5] = normal.z;
             }
 
-        for(int j = 0; j < numSegments - 1; j++)
+        for(int j = 0; j < numSegments; j++)
             for(int i = 0; i < numSegments; i++)
             {
                 indices[(j*numSegments+i)*6 + 0] = (short) ((j*numSegments) + i);
