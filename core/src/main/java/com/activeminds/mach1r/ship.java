@@ -475,28 +475,35 @@ public class ship {
             if((dx*dx)+(dy*dy)+(dz*dz)<DISTPICKUP)
                 if((cour.nodes[segment].itemfade==1.0) && (cour.nodes[segment].item!=course.NONE)) {
 
+                    Vector3 particleColor = new Vector3(0f,0f,0f);
+
                     switch (cour.nodes[segment].item) {
 
                         case course.ENERGY:
                             gain_energy(50);
+                            particleColor = new Vector3(0.52f,1f,0f);
                             cour.play_3d_sample(soundCam, x, y, z, takee);
                             break;
                         case course.BOOST:
                             nboosts++;
+                            particleColor = new Vector3(0.87f,0.87f,0.42f);
                             cour.play_3d_sample(soundCam, x, y, z, takee);
                             break;
 
                         case course.SHIELD:
                             shield = (short) SHIELDDURATION;
+                            particleColor = new Vector3(0.54f,0.71f,1f);
                             cour.play_3d_sample(soundCam, x, y, z, takes);
                             break;
                         case course.POWER:
                             power++;
+                            particleColor = new Vector3(0.96f,0.85f,0.04f);
                             new_message(Main.loc.get("powerTank"));
                             cour.play_3d_sample(soundCam, x, y, z, takepow);
                             break;
                         case course.MINE:
                             if ((shield == 0) && (hypermode == 0)) {
+                                particleColor = new Vector3(1f,1f,1f);
                                 lose_energy(75);
                                 counter = 0;
                                 state = STUN;
@@ -526,10 +533,12 @@ public class ship {
                         ParticleSystem.Particle p = new ParticleSystem.Particle(
                             new Vector3(px, py, pz),
                             new Vector3(0, 0.05f, 0),
-                            new Vector3(0f, 1f, 1f),
+                            new Vector3(particleColor.x, particleColor.y, particleColor.z),
                             new Vector2(1f, 1f),
-                            500, Main.flame.gdxTexture
+                            250, Main.flame.gdxTexture
                         );
+                        p.sinMove = true;
+                        p.sinMovePhase = course.rand() % 100;
                         cour.particles.addParticle(p);
                     }
                 };

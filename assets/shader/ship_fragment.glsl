@@ -171,7 +171,7 @@ void main() {
         texColor = texture2D(u_textures[5], v_texCoord);
     }
 
-    //texColor = vec4(1,1,1,1);
+    texColor = vec4(1,1,1,1);
 
     // --- Shadow map ---
     float shadow = getShadow();
@@ -230,7 +230,7 @@ void main() {
 
     //lightAccum = u_lightColor[0];
 
-    vec3 colorWithLight = texColor.rgb * u_colorCoef * v_color.xyz * lightAccum;
+    vec3 colorWithLight = texColor.rgb * u_colorCoef * vec3(1,1,1)/*v_color.xyz*/ * lightAccum;
 #else
     vec3 colorWithLight = texColor.rgb * u_colorCoef * v_color.xyz;
 #endif

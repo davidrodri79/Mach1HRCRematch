@@ -10,7 +10,7 @@ varying vec2 v_texCoord;
 
 void main() {
     vec4 texColor = texture2D(u_texture, v_texCoord);
-    if (texColor.a < 0.01) discard; // opcional: eliminar píxeles transparentes
-    gl_FragColor = u_color * texColor;
+    //if (texColor.a < 0.01) discard; // opcional: eliminar píxeles transparentes
+    gl_FragColor = vec4(u_color.r * texColor.r, u_color.g * texColor.g, u_color.b * texColor.b, u_color.a * texColor.a);
     //gl_FragColor = vec4(v_texCoord, 0.0, 1.0);
 }

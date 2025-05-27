@@ -1017,11 +1017,11 @@ public class RaceScreen implements Screen {
             case 4 : hour=22.0f; break;
         };
 
-        /*hour = game.cour.counter / 60f;
+        hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }*/
+        }
 
         if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
         if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}

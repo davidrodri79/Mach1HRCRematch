@@ -17,6 +17,9 @@ public class ParticleSystem {
         texture sprite;
         int timeLeft;
         boolean active;
+        boolean sinMove;
+        float sinMovePhase;
+
 
         Particle(Vector3 position, Vector3 speed, Vector3 color, Vector2 size, int timeLeft, Texture spr)
         {
@@ -27,11 +30,18 @@ public class ParticleSystem {
             this.sprite = new texture(spr);
             this.timeLeft = timeLeft;
             active = true;
+            sinMove = false; sinMovePhase = 0f;
         }
 
         void update()
         {
             position.add(speed);
+
+            if(sinMove) {
+                position.x += 0.25f*(float) Math.sin((timeLeft + sinMovePhase)/ 20);
+                position.z += 0.25f*(float) Math.cos((timeLeft + sinMovePhase)/ 20);
+            }
+
             timeLeft--;
             if(timeLeft <= 0)
             {
@@ -71,7 +81,7 @@ public class ParticleSystem {
         {
             float alpha = 1.0f;
             if(p.timeLeft < 140)
-                alpha = 140.f / p.timeLeft;
+                alpha = p.timeLeft / 140.f;
 
             raceScreen.show_3d_sprite(cam, p.sprite, 0,0, 1, 1,
                 p.position.x, p.position.y, p.position.z,
