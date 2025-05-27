@@ -193,7 +193,7 @@ public class ship {
     {
         float dold, dnew, v1, v2, ya, yb;
         float f[] = new float[3], ftrac[]={0.0f,0.0f,0.0f}, fdrag[]={0.0f,0.0f,0.0f}, frr[]={0.0f,0.0f,0.0f}, enginef;
-        float radius, driveangle, omega;
+        float radius, driveangle, omega  = 0f;
         float dx, dy, dz, da;
         int seg, i;
         String s, t;
@@ -203,26 +203,27 @@ public class ship {
         if(state!=PLAY) counter++;
         if(messcount>0) messcount-=1;
 
-        // Drive
-        if(ctr.joy_xaxis[tc]!=0) {
-            driveangle= (float) (-(Math.PI/2.0)*(ctr.joy_xaxis[tc]/1500.0));
-        };
-        accangle=ry+driveangle;
-        if(rz < ctr.joy_xaxis[tc] * 0.001f * Math.PI / 6)
-        {
-            rz += 0.025f;
-        }
-        if(rz > ctr.joy_xaxis[tc] * 0.001f * Math.PI / 6) {
-            rz -= 0.025f;
-        }
-
-        radius= (float) (7/Math.sin(driveangle));
-        omega=velocity/radius;
-
-
-        if(cour.counter>540) time++;
 
         if((state==PLAY) && (cour.counter>540)){
+
+            // Drive
+            if(ctr.joy_xaxis[tc]!=0) {
+                driveangle= (float) (-(Math.PI/2.0)*(ctr.joy_xaxis[tc]/1500.0));
+            };
+            accangle=ry+driveangle;
+            if(rz < ctr.joy_xaxis[tc] * 0.001f * Math.PI / 6)
+            {
+                rz += 0.025f;
+            }
+            if(rz > ctr.joy_xaxis[tc] * 0.001f * Math.PI / 6) {
+                rz -= 0.025f;
+            }
+
+            radius= (float) (7/Math.sin(driveangle));
+            omega=velocity/radius;
+
+
+            if(cour.counter>540) time++;
 
 
             // Angle diferential
@@ -453,7 +454,22 @@ public class ship {
                 burwavplaying=true;
             };
             cour.update_3d_sample(soundCam,x,y,z,DSBFREQUENCY_ORIGINAL,burning);
-
+            if(counter % 30 == 0)
+            {
+                float size = 0.5f * ((course.rand() % 4) + 1);
+                ParticleSystem.Particle p = new ParticleSystem.Particle(
+                    new Vector3(renderx, y, renderz),
+                    new Vector3(0, 0.03f, 0),
+                    new Vector3(0.2f, 0.2f, 0.2f),
+                    new Vector2(size, size),
+                    750, Main.smokeCloud.gdxTexture
+                );
+                p.sizeIncrement = 1f;
+                p.sinMove = true;
+                p.sinSize = 0.15f;
+                p.fadeIn = 70;
+                cour.particles.addParticle(p);
+            }
         };
         // Update of burning explosions
         if(state==BURN)

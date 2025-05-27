@@ -107,7 +107,7 @@ public class Main extends Game {
     sprite active, minds, presents, title[] = new sprite[2], wallp, menucur, statbar, posnumber, speed, kmh,
         mini[] = new sprite[NSHIPS], power[] = new sprite[2], spower[] = new sprite[2], recover, start[] = new sprite[4], plcursor[] = new sprite[10],
         arrow, oppico, preview[] = new sprite[6], mistery;
-    static texture flame, shield, explos, smoke, shadow, moon;
+    static texture flame, shield, explos, smoke, smokeCloud, shadow, moon;
     wave wthree, wtwo, wone, wgo, wconfirm, wvoice;
     Music mus;
 
