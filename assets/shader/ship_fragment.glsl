@@ -171,7 +171,7 @@ void main() {
         texColor = texture2D(u_textures[5], v_texCoord);
     }
 
-    texColor = vec4(1,1,1,1);
+    //texColor = vec4(1,1,1,1);
 
     // --- Shadow map ---
     float shadow = getShadow();
@@ -276,9 +276,5 @@ void main() {
         colorWithFog.r = 0.0;*/
 
     gl_FragColor = vec4(colorWithFog, texColor.a * u_alpha);
-
-    //#ifdef NORMAL_MAP_ENABLED
-    //gl_FragColor = vec4(normal, texColor.a * u_alpha);
-    //#endif
 
 }

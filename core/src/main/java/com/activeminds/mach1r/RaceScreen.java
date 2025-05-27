@@ -198,7 +198,7 @@ public class RaceScreen implements Screen {
         groundMesh.textures[0] = ground.gdxTexture;
         groundMesh.normalMap = groundNormalMap.gdxTexture;
         groundMesh.triangles.add(new triangle(v[0], v[1], v[2], 0, 0, 0f, 0f, GROUNDTILE, GROUNDTILE, GROUNDTILE));
-        groundMesh.triangles.add(new triangle(v[2], v[3], v[0], 0, GROUNDTILE, GROUNDTILE, 0f, GROUNDTILE, 0f, 0f));
+        groundMesh.triangles.add(new triangle(v[2], v[3], v[0], 0, GROUNDTILE, GROUNDTILE, GROUNDTILE, 0f, 0f, 0f));
         groundMesh.buildGdxMesh();
 
         // Sky mesh
@@ -684,7 +684,7 @@ public class RaceScreen implements Screen {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
-        cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y+200, game.pl[follow].cam_pos.z);
+        cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y, game.pl[follow].cam_pos.z);
         cam.lookAt(game.pl[follow].vrp.x, game.pl[follow].vrp.y, game.pl[follow].vrp.z);
         cam.up.set(0, 1, 0);
         cam.near = 0.1f;
@@ -1013,11 +1013,11 @@ public class RaceScreen implements Screen {
             case 4 : hour=22.0f; break;
         };
 
-        hour = game.cour.counter / 60f;
+        /*hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }
+        }*/
 
         if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
         if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}
@@ -1049,11 +1049,11 @@ public class RaceScreen implements Screen {
         int i,x,z;
 
         groundShader.begin();
-        groundShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
+        groundShader.setUniformf("u_ambientColor", 0f, 0f, 0f);
 
         groundShader.setUniformi("u_numLights", 1);
         groundShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
-        groundShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
+        groundShader.setUniformf("u_lightColor[0]", new Vector3(1f, 1f, 1f));
         groundShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
         groundShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
