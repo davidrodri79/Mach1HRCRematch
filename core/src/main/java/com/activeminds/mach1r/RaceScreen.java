@@ -37,7 +37,7 @@ public class RaceScreen implements Screen {
     solid groundMesh, skyMesh;
     Mesh billboard, shadow, shield, skyDome;
     texture ground, groundNormalMap, sky;
-    Texture cloudTexture;
+    Texture cloudTexture, starsTexture;
 
     PerspectiveCamera cameraSingle;
     PerspectiveCamera cameras2p[] = new PerspectiveCamera[2];
@@ -48,7 +48,7 @@ public class RaceScreen implements Screen {
 
     int state;
     long counter;
-    float skyc[] = new float[4], fogc[] = new float[4], cloudc[] = new float[4], viewPortAspectRatio, hour;
+    float skyc[] = new float[4], fogc[] = new float[4], cloudc[] = new float[4], starsAlpha, viewPortAspectRatio, hour;
     float accumulatedDelta;
     int updatesPending;
     vertex sun;
@@ -337,6 +337,7 @@ public class RaceScreen implements Screen {
         sky = new texture("scene/sky.png", texture.TEX_PCX, true, false);
 
         createCloudTexture();
+        generateStarsTexture(game);
 
         generate_cube_map();
 
@@ -1025,38 +1026,49 @@ public class RaceScreen implements Screen {
             case 4 : hour=22.0f; break;
         };
 
-        /*hour = game.cour.counter / 60f;
+        hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }*/
+        }
 
-        if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daycloud; s2=nightcloud;}
-        if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daycloud; s2=nightcloud;}
-        if((hour>=6.0) && (hour<=8.0)) {g=((hour-6.0f)/2.0f); s1=daycloud; s2=nightcloud;}
-        if((hour>=18.0) && (hour<=19.5)) {g=1.0f-((hour-18.0f)/1.5f); s1=daycloud; s2=dawncloud;}
-        if((hour>=19.5) && (hour<=21.0)) {g=1.0f-((hour-19.5f)/1.5f); s1=dawncloud; s2=nightcloud;}
+        float dayStart = 6.0f;
+        float dayEnd = 21f;
+        float dawnDuration = 2f;
+        float duskDuration = 3f;
+        float duskDurHalf = duskDuration / 2f;
+
+        if((hour>dayStart + dawnDuration) && (hour<dayEnd - duskDuration)) {g=1.0f; s1=daycloud; s2=nightcloud;}
+        if((hour<dayStart) || (hour>dayEnd)) {g=0.0f; s1=daycloud; s2=nightcloud;}
+        if((hour>=dayStart) && (hour<=dayStart + dawnDuration)) {g=((hour-dayStart)/dawnDuration); s1=daycloud; s2=nightcloud;}
+        if((hour>=dayEnd - duskDuration) && (hour<=dayEnd - duskDurHalf)) {g=1.0f-((hour-(dayEnd - duskDuration))/duskDurHalf); s1=daycloud; s2=dawncloud;}
+        if((hour>=dayEnd - duskDurHalf) && (hour<=dayEnd)) {g=1.0f-((hour-(dayEnd - duskDurHalf))/duskDurHalf); s1=dawncloud; s2=nightcloud;}
         ig=1.0f-g;
         for(i=0; i<3; i++) cloudc[i]=(s1[i]*g)+(s2[i]*ig); cloudc[3]=1.0f;
 
-        if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
-        if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}
-        if((hour>=6.0) && (hour<=8.0)) {g=((hour-6.0f)/2.0f); s1=daysky; s2=nightsky;}
-        if((hour>=18.0) && (hour<=19.5)) {g=1.0f-((hour-18.0f)/1.5f); s1=daysky; s2=dawnsky;}
-        if((hour>=19.5) && (hour<=21.0)) {g=1.0f-((hour-19.5f)/1.5f); s1=dawnsky; s2=nightsky;}
+        if((hour>dayStart + dawnDuration) && (hour<dayEnd - duskDuration)) {g=1.0f; s1=daysky; s2=nightsky;}
+        if((hour<dayStart) || (hour>dayEnd)) {g=0.0f; s1=daysky; s2=nightsky;}
+        if((hour>=dayStart) && (hour<=dayStart + dawnDuration)) {g=((hour-dayStart)/dawnDuration); s1=daysky; s2=nightsky;}
+        if((hour>=dayEnd - duskDuration) && (hour<=dayEnd - duskDurHalf)) {g=1.0f-((hour-(dayEnd - duskDuration))/duskDurHalf); s1=daysky; s2=dawnsky;}
+        if((hour>=dayEnd - duskDurHalf) && (hour<=dayEnd)) {g=1.0f-((hour-(dayEnd - duskDurHalf))/duskDurHalf); s1=dawnsky; s2=nightsky;}
         ig=1.0f-g;
         for(i=0; i<3; i++) skyc[i]=(s1[i]*g)+(s2[i]*ig); skyc[3]=1.0f;
 
-        if((hour>8.0) && (hour<18.0)) g=1.0f;
-        if((hour<6.0) || (hour>20.0)) g=0.0f;
-        if((hour>=6.0) && (hour<=8.0)) g=((hour-6.0f)/2.0f);
-        if((hour>=18.0) && (hour<=21.0)) g=1.0f-((hour-18.0f)/3.0f);
+        if((hour>dayStart + dawnDuration) && (hour<dayEnd - duskDuration)) g=1.0f;
+        if((hour<dayStart) || (hour>dayEnd)) g=0.0f;
+        if((hour>=dayStart) && (hour<=dayStart + dawnDuration)) g=((hour-dayStart)/dawnDuration);
+        if((hour>=dayEnd - duskDuration) && (hour<=dayEnd)) g=1.0f-((hour-(dayEnd - duskDuration))/duskDuration);
         ig=1.0f-g;
         for(i=0; i<3; i++) fogc[i]=(course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[i]*g)+(nightfog[i]*ig); fogc[3]=1.0f;
 
+        if(hour > dayStart + dawnDuration && hour < dayEnd - duskDuration) starsAlpha = 0f;
+        if(hour < dayStart || hour > dayEnd) starsAlpha = 1.0f;
+        if(hour > dayStart && hour < dayStart + dawnDuration) starsAlpha = 1.0f - (hour-dayStart) / dawnDuration;
+        if(hour > dayEnd - duskDuration && hour < dayEnd) starsAlpha = (hour - (dayEnd - duskDuration)) / duskDuration;
+
         //Sun position!
 
-        a=((hour-7.0f)/12.0f)*3.1415f;
+        a=((hour-(dayStart + dawnDuration/2))/12.0f)*3.1415f;
         sun=new vertex((float) (-5000f*Math.cos(a)), (float) Math.abs(5000f*Math.sin(a)),0f);
     }
 
@@ -1152,6 +1164,10 @@ public class RaceScreen implements Screen {
         skyShader.setUniformf("u_fogStart", 300.0f);
         skyShader.setUniformf("u_fogEnd", 0.0f);
         skyShader.setUniformi("u_skyMode", 0);
+        skyShader.setUniformi("u_starsTexture", 1);
+        skyShader.setUniformf("u_starsAlpha", starsAlpha);
+
+        starsTexture.bind(1);
 
         skyDome.render(skyShader, GL20.GL_TRIANGLES);
 
@@ -1168,7 +1184,7 @@ public class RaceScreen implements Screen {
         skyShader.begin();
         skyShader.setUniformf("u_cloudColor", cloudc[0], cloudc[1], cloudc[2]);
         skyShader.setUniformf("u_cloudOffset", game.counter*0.0001f, 0f);
-        skyShader.setUniformi("u_texture", 0);
+        skyShader.setUniformi("u_cloudsTexture", 0);
         skyShader.setUniformi("u_skyMode", 1);
         cloudTexture.bind(0);
 
@@ -1504,6 +1520,8 @@ public class RaceScreen implements Screen {
 
 
             //game.batch.draw(cloudTexture, 0, 0, 512, 256, 0, 0, 512,256, false, true);
+            //game.batch.draw(starsTexture, 0, 0, 512, 256, 0, 0, 512,256, false, true);
+
 
             game.batch.end();
 
@@ -2090,6 +2108,41 @@ public class RaceScreen implements Screen {
         cloudTexture = new Texture(pixmap);
         cloudTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         cloudTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+    }
+
+    public void generateStarsTexture(Main game)
+    {
+        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 256, false);
+        fbo.begin();
+
+        OrthographicCamera cam = new OrthographicCamera();
+        cam.setToOrtho(false,  512, 256);
+        Gdx.gl.glViewport(0, 0, 512, 256);
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+
+        cam.update();
+        game.batch.setProjectionMatrix(cam.combined);
+        game.batch.begin();
+
+        int i,j;
+        for(i=0; i<100; i++)
+        {
+            int x = course.rand() % 512;
+            int y = course.rand() % 256;
+            int size = course.rand() % 6 + 3;
+            game.batch.draw(Main.flame.gdxTexture, x, y, size, size, 0, 0, 1, 1);
+        }
+
+        game.batch.end();
+
+        fbo.end();
+
+        starsTexture = fbo.getColorBufferTexture();
+        starsTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        starsTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+
     }
 
 
