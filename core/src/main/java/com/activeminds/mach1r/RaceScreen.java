@@ -48,7 +48,7 @@ public class RaceScreen implements Screen {
 
     int state;
     long counter;
-    float skyc[] = new float[4], fogc[] = new float[4], viewPortAspectRatio, hour;
+    float skyc[] = new float[4], fogc[] = new float[4], cloudc[] = new float[4], viewPortAspectRatio, hour;
     float accumulatedDelta;
     int updatesPending;
     vertex sun;
@@ -448,7 +448,7 @@ public class RaceScreen implements Screen {
         game.batch.setProjectionMatrix(camera2d.combined);
         game.batch.begin();
         game.batch.setColor(0.2f + 0.8f*dot, 0.2f + 0.8f*dot, 0.2f + 0.8f*dot, 1);
-        game.batch.draw(game.cour.road.gdxTexture,0, 0, cubemapSize, cubemapSize, 16, 80, 32, 48, false, false);
+        game.batch.draw(game.cour.road.gdxTexture,0, 0, cubemapSize, cubemapSize, 16*8, 80*8, 32*8, 48*8, false, false);
         game.batch.end();
         cubemapFbos[3].end();
     }
@@ -994,9 +994,13 @@ public class RaceScreen implements Screen {
     void hour_environment()
     {
         float nightfog[]={0.0f,0.0f,0.0f},
-        daysky[]={0.0f/255.0f,191.0f/255.0f,250.0f/255.0f},
+            daysky[]={0.0f/255.0f,191.0f/255.0f,250.0f/255.0f},
             dawnsky[]={1.0f,128f/255.0f,0.0f},
             nightsky[]={0.0f/255.0f,0.0f,100.0f/255.0f},
+            daycloud[]={1f, 1f, 1f},
+            dawncloud[]={0.62f,0.34f, 0.50f},
+            //nightcloud[]={0.42f,0.47f,0.54f},
+            nightcloud[]={0f,0f,0f},
 		s1[]={0f,0f,0f}, s2[]={0f,0f,0f};
         float g = 0f, ig, a;
         //struct tm *newtime;
@@ -1021,11 +1025,19 @@ public class RaceScreen implements Screen {
             case 4 : hour=22.0f; break;
         };
 
-        hour = game.cour.counter / 60f;
+        /*hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }
+        }*/
+
+        if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daycloud; s2=nightcloud;}
+        if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daycloud; s2=nightcloud;}
+        if((hour>=6.0) && (hour<=8.0)) {g=((hour-6.0f)/2.0f); s1=daycloud; s2=nightcloud;}
+        if((hour>=18.0) && (hour<=19.5)) {g=1.0f-((hour-18.0f)/1.5f); s1=daycloud; s2=dawncloud;}
+        if((hour>=19.5) && (hour<=21.0)) {g=1.0f-((hour-19.5f)/1.5f); s1=dawncloud; s2=nightcloud;}
+        ig=1.0f-g;
+        for(i=0; i<3; i++) cloudc[i]=(s1[i]*g)+(s2[i]*ig); cloudc[3]=1.0f;
 
         if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
         if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}
@@ -1137,7 +1149,7 @@ public class RaceScreen implements Screen {
         skyShader.setUniformMatrix("u_model", model);
         skyShader.setUniformf("u_skyColor", skyc[0], skyc[1], skyc[2]);
         skyShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
-        skyShader.setUniformf("u_fogStart", 500.0f);
+        skyShader.setUniformf("u_fogStart", 300.0f);
         skyShader.setUniformf("u_fogEnd", 0.0f);
         skyShader.setUniformi("u_skyMode", 0);
 
@@ -1154,8 +1166,8 @@ public class RaceScreen implements Screen {
 
         // Clouds
         skyShader.begin();
-        skyShader.setUniformf("u_cloudColor", 1f, 1f, 1f);
-        skyShader.setUniformf("u_cloudOffset", hour, hour/2);
+        skyShader.setUniformf("u_cloudColor", cloudc[0], cloudc[1], cloudc[2]);
+        skyShader.setUniformf("u_cloudOffset", game.counter*0.0001f, 0f);
         skyShader.setUniformi("u_texture", 0);
         skyShader.setUniformi("u_skyMode", 1);
         cloudTexture.bind(0);
@@ -1482,16 +1494,16 @@ public class RaceScreen implements Screen {
                 //game.batch.draw(shadowMap[3], 256+128, 0, 128, 128, 0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, false, true);
             }*/
 
-            /*
-            game.batch.draw(cubemapFaces[0], 0, 0, 128, 128, 0, 0, cubemapSize, cubemapSize, false, true);
+
+            /*game.batch.draw(cubemapFaces[0], 0, 0, 128, 128, 0, 0, cubemapSize, cubemapSize, false, true);
             game.batch.draw(cubemapFaces[1], 128, 0, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[2], 256, 0, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[3], 0, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[4], 128, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
-            game.batch.draw(cubemapFaces[5], 256, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
-             */
+            game.batch.draw(cubemapFaces[5], 256, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);*/
 
-            game.batch.draw(cloudTexture, 0, 0, 512, 256, 0, 0, 512,256, false, true);
+
+            //game.batch.draw(cloudTexture, 0, 0, 512, 256, 0, 0, 512,256, false, true);
 
             game.batch.end();
 
@@ -2024,6 +2036,23 @@ public class RaceScreen implements Screen {
         skyDome = m;
     }
 
+    double getFractalNoise(double x, double y, int octaves, double baseFreq, double persistence, double lacunarity) {
+        double total = 0.0;
+        double amplitude = 1.0;
+        double frequency = baseFreq;
+        double max = 0.0;
+
+        for (int i = 0; i < octaves; i++) {
+            total += OpenSimplex2S.noise2(12345, x * frequency, y * frequency) * amplitude;
+            max += amplitude;
+
+            amplitude *= persistence;   // 0.5 por ejemplo
+            frequency *= lacunarity;   // 2.0 por ejemplo
+        }
+
+        return total / max; // Normalizado a [-1,1]
+    }
+
     void createCloudTexture()
     {
         int width = 1024;
@@ -2032,17 +2061,26 @@ public class RaceScreen implements Screen {
 
        // OpenSimplex2S noise = new OpenSimplex2S(); // semilla
 
-        float scale = 0.05f;
+        float scale = 0.01f;
         float scale2 = 0.01f;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                float value1 = (float) OpenSimplex2S.noise2(12345, x * scale, y * scale);
-                float value2 = (float) OpenSimplex2S.noise2(67890, x * scale2, y * scale2);
+                //float value1 = (float) OpenSimplex2S.noise2(12345, x * scale, y * scale);
+                //float value2 = (float) OpenSimplex2S.noise2(67890, x * scale2, y * scale2);
                 //float value = (value + 1f) * 0.5f;  // normalizar de [-1,1] a [0,1]
-                float value = (value1 + value2) * 0.5f;
-                if(value < 0) value = 0f;
-                value = value * value;
+                //float value = (value1 + value2) * 0.5f;
+                //if(value < 0) value = 0f;
+                //value = value * value;
+                //float density = (value1 + 1.0f) / 2f;
+                //density = (float) Math.pow(density, 4.0);
+                float value = (float) getFractalNoise(x, y, 6, 0.01, 0.5, 2.0);
+                //value = (value + 1f) * 0.5f;  // normalizar de [-1,1] a [0,1]
+
+                if (value < 0f) value = 0f;
+                value = 2 * value;
+                if (value > 1f) value = 1f;
+
                 int alpha = (int)(value * 255);
                 pixmap.setColor(1f, 1f, 1f, value);
                 pixmap.drawPixel(x, y);
