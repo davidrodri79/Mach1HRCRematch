@@ -340,6 +340,12 @@ public class ship {
                     x+=v.x*velocity; z+=v.y*velocity;
                     vel[0]*=0.5f; vel[1]*=0.5f; vel[2]*=0.5f;
                     lose_energy((int) (velocity*4));
+
+                    // Chispas
+                    if(counter % 40 == 0 && velocity_kmh() > 30)
+                    {
+                        createSPark();
+                    }
                 };
             }
 
@@ -364,6 +370,12 @@ public class ship {
                     x+=v.x*velocity; z+=v.y*velocity;
                     vel[0]*=0.5; vel[1]*=0.5; vel[2]*=0.5;
                     lose_energy((int) (velocity*4));
+
+                    // Chispas
+                    if(counter % 40 == 0 && velocity_kmh() > 30)
+                    {
+                        createSPark();
+                    }
                 };
             }
 
@@ -791,6 +803,10 @@ public class ship {
             lose_energy((int) (s.data.weight*velocity/100.0));
             s.lose_energy((int) (data.weight*s.velocity/100.0));
 
+            int numSparks = (course.rand() % 4) +1;
+            for(int i = 0; i < numSparks; i++)
+                createSPark();
+
             return true;
         };
         return false;
@@ -990,5 +1006,20 @@ public class ship {
         exhaustMesh.setVertices(vertices);
         exhaustMesh.setIndices(indices);
 
+    }
+
+    void createSPark()
+    {
+        ParticleSystem.Particle p = new ParticleSystem.Particle(
+            new Vector3(renderx, y, renderz),
+            new Vector3((course.rand()%10)*0.1f - 0.5f, 0.5f, (course.rand()%10)*0.1f - 0.5f),
+            new Vector3(1f, 1f, 1f),
+            new Vector2(0.5f, 0.5f),
+            140,
+            Main.spark.gdxTexture
+        );
+        p.gravity = true;
+        p.sizeIncrement = -1.5f;
+        cour.particles.addParticle(p);
     }
 }

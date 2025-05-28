@@ -583,6 +583,8 @@ public class RaceScreen implements Screen {
     {
         state = s;
         counter = 0;
+        if(state == FINISHED)
+            viewPortAspectRatio = (float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
     }
 
     void update_level_action()
