@@ -1,5 +1,6 @@
 package com.activeminds.mach1r;
 
+import com.activeminds.mach1r.opensimplex.OpenSimplex2S;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -36,6 +37,7 @@ public class RaceScreen implements Screen {
     solid groundMesh, skyMesh;
     Mesh billboard, shadow, shield, skyDome;
     texture ground, groundNormalMap, sky;
+    Texture cloudTexture;
 
     PerspectiveCamera cameraSingle;
     PerspectiveCamera cameras2p[] = new PerspectiveCamera[2];
@@ -333,6 +335,8 @@ public class RaceScreen implements Screen {
         // Skydome
         createSkyDome(1000, 20);
         sky = new texture("scene/sky.png", texture.TEX_PCX, true, false);
+
+        createCloudTexture();
 
         generate_cube_map();
 
@@ -1141,7 +1145,7 @@ public class RaceScreen implements Screen {
         skyShader.setUniformf("u_fogEnd", 0.0f);
         skyShader.setUniformi("u_texture", 0);
 
-        sky.gdxTexture.bind(0);
+        cloudTexture.bind(0);
 
         skyDome.render(skyShader, GL20.GL_TRIANGLES);
 
@@ -1470,6 +1474,8 @@ public class RaceScreen implements Screen {
             game.batch.draw(cubemapFaces[4], 128, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[5], 256, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
              */
+
+            game.batch.draw(cloudTexture, 0, 0, 512, 256, 0, 0, 512,256, false, true);
 
             game.batch.end();
 
@@ -1970,8 +1976,8 @@ public class RaceScreen implements Screen {
                 vertices[(numSegments*8*j) + 8*i + 5] = normal.z;
 
                 // Tex coords
-                vertices[(numSegments*8*j) + 8*i + 6] = (float) (0.5f + Math.atan2(z/radius, x/radius) / (2.0f * Math.PI));
-                vertices[(numSegments*8*j) + 8*i + 7] = y/radius * 0.5f + 0.5f;
+                vertices[(numSegments*8*j) + 8*i + 6] = (float) (0.5f + Math.atan2(z/(float)radius, x/(float)radius) / (2.0f * Math.PI));
+                vertices[(numSegments*8*j) + 8*i + 7] = y/(float)radius * 0.5f + 0.5f;
             }
 
         for(int j = 0; j < numSegments; j++)
@@ -1999,6 +2005,29 @@ public class RaceScreen implements Screen {
         m.setIndices(indices);
 
         skyDome = m;
+    }
+
+    void createCloudTexture()
+    {
+        int width = 2048;
+        int height = 1024;
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+
+       // OpenSimplex2S noise = new OpenSimplex2S(); // semilla
+
+        float scale = 0.01f;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                float value = (float) OpenSimplex2S.noise2(12345, x * scale, y * scale);
+                value = (value + 1f) * 0.5f;  // normalizar de [-1,1] a [0,1]
+                int alpha = (int)(value * 255);
+                pixmap.setColor(1f, 0f, 0f, value);
+                pixmap.drawPixel(x, y);
+            }
+        }
+
+        cloudTexture = new Texture(pixmap);
     }
 
 
