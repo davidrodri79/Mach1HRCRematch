@@ -34,8 +34,8 @@ public class RaceScreen implements Screen {
     Main game;
     ShaderProgram shipShader, sceneShader, groundShader, exhaustShader, shieldShader, skyShader, billboardShader, shadowShader, depthShader;
     solid groundMesh, skyMesh;
-    Mesh billboard, shadow, shield;
-    texture ground, groundNormalMap;
+    Mesh billboard, shadow, shield, skyDome;
+    texture ground, groundNormalMap, sky;
 
     PerspectiveCamera cameraSingle;
     PerspectiveCamera cameras2p[] = new PerspectiveCamera[2];
@@ -329,6 +329,10 @@ public class RaceScreen implements Screen {
 
         // SHield
         shield = createSphereMesh(1,20);
+
+        // Skydome
+        createSkyDome(1000, 20);
+        sky = new texture("scene/sky.png", texture.TEX_PCX, true, false);
 
         generate_cube_map();
 
@@ -1094,7 +1098,7 @@ public class RaceScreen implements Screen {
 
     void show_sky(PerspectiveCamera cam)
     {
-        float gx, gz, TILE=5;
+        /*float gx, gz, TILE=5;
         int i,x,z;
 
         skyShader.begin();
@@ -1118,6 +1122,28 @@ public class RaceScreen implements Screen {
 
             gx+=SKYWIDTH/TILE;
         };
+
+        skyShader.end();*/
+
+        // Skydome version
+        skyShader.begin();
+
+        Matrix4 model = new Matrix4().idt().translate(cam.position.x, 0f, cam.position.z);
+        Matrix4 view = cam.view;
+        Matrix4 proj = cam.projection;
+        Matrix4 MVP = new Matrix4(proj).mul(view).mul(model);
+
+        skyShader.setUniformMatrix("u_mvp", MVP);
+        skyShader.setUniformMatrix("u_model", model);
+        skyShader.setUniformf("u_meshColor", skyc[0], skyc[1], skyc[2]);
+        skyShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
+        skyShader.setUniformf("u_fogStart", 500.0f);
+        skyShader.setUniformf("u_fogEnd", 0.0f);
+        skyShader.setUniformi("u_texture", 0);
+
+        sky.gdxTexture.bind(0);
+
+        skyDome.render(skyShader, GL20.GL_TRIANGLES);
 
         skyShader.end();
 
@@ -1914,6 +1940,65 @@ public class RaceScreen implements Screen {
         m.setIndices(indices);
 
         return m;
+    }
+
+    public void createSkyDome(float radius, int numSegments)
+    {
+        float[] vertices = new float[(numSegments+1) * (numSegments) * 8];
+        short[] indices = new short[(numSegments+1) * numSegments * 2 * 3];
+
+        float angleStep = (float) (2*Math.PI / numSegments);
+        float verticalAngleStep = (float) (Math.PI / numSegments);
+
+        for(int j = 0; j <=numSegments / 2; j++)
+            for(int i = 0; i < numSegments; i++)
+            {
+                float x = (float) (radius * Math.cos(angleStep * i) * Math.abs(Math.sin(verticalAngleStep * j)));
+                float y = (float) (radius * Math.cos(verticalAngleStep * j));
+                float z = (float) (radius * Math.sin(angleStep * i) * Math.abs(Math.sin(verticalAngleStep * j)));
+
+                vertices[(numSegments*8*j) + 8*i + 0] = x;
+                vertices[(numSegments*8*j) + 8*i + 1] = y;
+                vertices[(numSegments*8*j) + 8*i + 2] = z;
+
+                // Normal
+                Vector3 normal = new Vector3(-x,-y,-z);
+                normal = normal.nor();
+
+                vertices[(numSegments*8*j) + 8*i + 3] = normal.x;
+                vertices[(numSegments*8*j) + 8*i + 4] = normal.y;
+                vertices[(numSegments*8*j) + 8*i + 5] = normal.z;
+
+                // Tex coords
+                vertices[(numSegments*8*j) + 8*i + 6] = (float) (0.5f + Math.atan2(z/radius, x/radius) / (2.0f * Math.PI));
+                vertices[(numSegments*8*j) + 8*i + 7] = y/radius * 0.5f + 0.5f;
+            }
+
+        for(int j = 0; j < numSegments; j++)
+            for(int i = 0; i < numSegments; i++)
+            {
+                // First triangle
+                indices[(j*numSegments+i)*6 + 0] = (short) ((j*numSegments) + i);
+                indices[(j*numSegments+i)*6 + 2] = (short) ((j*numSegments) + (i + 1)%numSegments);
+                indices[(j*numSegments+i)*6 + 1] = (short) (((j+1)*numSegments) + i);
+
+                // Second triangle
+                indices[(j*numSegments+i)*6 + 3] = (short) ((j*numSegments) + (i + 1)%numSegments);
+                indices[(j*numSegments+i)*6 + 5] = (short) (((j+1)*numSegments) + (i + 1)%numSegments);
+                indices[(j*numSegments+i)*6 + 4] = (short) (((j+1)*numSegments) + i);
+            }
+
+
+        Mesh m = new Mesh(true, vertices.length / 8, indices.length,
+            new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+            new VertexAttribute(VertexAttributes.Usage.Normal, 3, "a_normal"),
+            new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord")
+        );
+
+        m.setVertices(vertices);
+        m.setIndices(indices);
+
+        skyDome = m;
     }
 
 
