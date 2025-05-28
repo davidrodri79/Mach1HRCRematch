@@ -4,6 +4,7 @@ attribute vec2 a_texCoord;
 
 uniform mat4 u_mvp;
 uniform mat4 u_model;
+uniform vec2 u_cloudOffset;
 
 varying vec4 v_color;
 varying vec3 v_worldPos;
@@ -14,7 +15,7 @@ void main() {
     v_worldPos = worldPos.xyz;
 
     //v_color = a_color;
-    v_texCoord = a_texCoord;
+    v_texCoord = a_texCoord + u_cloudOffset;
 
     gl_Position = u_mvp * vec4(a_position, 1.0);
 }

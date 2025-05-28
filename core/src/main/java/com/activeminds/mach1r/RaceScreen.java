@@ -403,10 +403,10 @@ public class RaceScreen implements Screen {
             };
 
             // Sun
-            if(hour < 7.f || hour >= 19.f)
+            /*if(hour < 7.f || hour >= 19.f)
                 show_3d_sprite(cubeCameras[i],game.moon,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,500, 500,1f);
             else
-                show_3d_sprite(cubeCameras[i],game.flame,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,1000,1000,1f);
+                show_3d_sprite(cubeCameras[i],game.flame,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,1000,1000,1f);*/
 
             Gdx.gl.glDisable(GL20.GL_BLEND);
 
@@ -731,12 +731,6 @@ public class RaceScreen implements Screen {
         };
 
 
-        // Sun
-        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
-        if(hour < 7.f || hour >= 19.f)
-            show_3d_sprite(cam,game.moon,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,500, 500,1f);
-        else
-            show_3d_sprite(cam,game.flame,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,1000,1000,1f);
 
 
         Gdx.gl.glDepthMask(true);
@@ -1027,11 +1021,11 @@ public class RaceScreen implements Screen {
             case 4 : hour=22.0f; break;
         };
 
-        /*hour = game.cour.counter / 60f;
+        hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }*/
+        }
 
         if((hour>8.0) && (hour<18.0)) {g=1.0f; s1=daysky; s2=nightsky;}
         if((hour<6.0) || (hour>20.0)) {g=0.0f; s1=daysky; s2=nightsky;}
@@ -1045,6 +1039,7 @@ public class RaceScreen implements Screen {
         if((hour<6.0) || (hour>20.0)) g=0.0f;
         if((hour>=6.0) && (hour<=8.0)) g=((hour-6.0f)/2.0f);
         if((hour>=18.0) && (hour<=21.0)) g=1.0f-((hour-18.0f)/3.0f);
+        ig=1.0f-g;
         for(i=0; i<3; i++) fogc[i]=(course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[i]*g)+(nightfog[i]*ig); fogc[3]=1.0f;
 
         //Sun position!
@@ -1130,6 +1125,7 @@ public class RaceScreen implements Screen {
         skyShader.end();*/
 
         // Skydome version
+        // Sky
         skyShader.begin();
 
         Matrix4 model = new Matrix4().idt().translate(cam.position.x, 0f, cam.position.z);
@@ -1139,17 +1135,37 @@ public class RaceScreen implements Screen {
 
         skyShader.setUniformMatrix("u_mvp", MVP);
         skyShader.setUniformMatrix("u_model", model);
-        skyShader.setUniformf("u_meshColor", skyc[0], skyc[1], skyc[2]);
+        skyShader.setUniformf("u_skyColor", skyc[0], skyc[1], skyc[2]);
         skyShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
         skyShader.setUniformf("u_fogStart", 500.0f);
         skyShader.setUniformf("u_fogEnd", 0.0f);
-        skyShader.setUniformi("u_texture", 0);
+        skyShader.setUniformi("u_skyMode", 0);
 
+        skyDome.render(skyShader, GL20.GL_TRIANGLES);
+
+        skyShader.end();
+
+        // Sun & Moon
+        //Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+        if(hour < 7.f || hour >= 19.f)
+            show_3d_sprite(cam, Main.moon,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,500, 500,1f);
+        else
+            show_3d_sprite(cam, Main.flame,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,1000,1000,1f);
+
+        // Clouds
+        skyShader.begin();
+        skyShader.setUniformf("u_cloudColor", 1f, 1f, 1f);
+        skyShader.setUniformf("u_cloudOffset", hour, hour/2);
+        skyShader.setUniformi("u_texture", 0);
+        skyShader.setUniformi("u_skyMode", 1);
         cloudTexture.bind(0);
 
         skyDome.render(skyShader, GL20.GL_TRIANGLES);
 
         skyShader.end();
+
+
+
 
     }
 
@@ -1950,14 +1966,15 @@ public class RaceScreen implements Screen {
 
     public void createSkyDome(float radius, int numSegments)
     {
-        float[] vertices = new float[(numSegments+1) * (numSegments) * 8];
-        short[] indices = new short[(numSegments+1) * numSegments * 2 * 3];
+        int numSegmentsVert = numSegments / 2;
+        float[] vertices = new float[(numSegmentsVert+1) * (numSegments+1) * 8];
+        short[] indices = new short[(numSegmentsVert+1) * (numSegments+1) * 2 * 3];
 
         float angleStep = (float) (2*Math.PI / numSegments);
         float verticalAngleStep = (float) (Math.PI / numSegments);
 
-        for(int j = 0; j <=numSegments / 2; j++)
-            for(int i = 0; i < numSegments; i++)
+        for(int j = 0; j <=numSegmentsVert; j++)
+            for(int i = 0; i < numSegments+1; i++)
             {
                 float x = (float) (radius * Math.cos(angleStep * i) * Math.abs(Math.sin(verticalAngleStep * j)));
                 float y = (float) (radius * Math.cos(verticalAngleStep * j));
@@ -1980,17 +1997,17 @@ public class RaceScreen implements Screen {
                 vertices[(numSegments*8*j) + 8*i + 7] = y/(float)radius * 0.5f + 0.5f;
             }
 
-        for(int j = 0; j < numSegments; j++)
+        for(int j = 0; j < numSegmentsVert; j++)
             for(int i = 0; i < numSegments; i++)
             {
                 // First triangle
                 indices[(j*numSegments+i)*6 + 0] = (short) ((j*numSegments) + i);
-                indices[(j*numSegments+i)*6 + 2] = (short) ((j*numSegments) + (i + 1)%numSegments);
+                indices[(j*numSegments+i)*6 + 2] = (short) ((j*numSegments) + (i + 1));
                 indices[(j*numSegments+i)*6 + 1] = (short) (((j+1)*numSegments) + i);
 
                 // Second triangle
-                indices[(j*numSegments+i)*6 + 3] = (short) ((j*numSegments) + (i + 1)%numSegments);
-                indices[(j*numSegments+i)*6 + 5] = (short) (((j+1)*numSegments) + (i + 1)%numSegments);
+                indices[(j*numSegments+i)*6 + 3] = (short) ((j*numSegments) + (i + 1));
+                indices[(j*numSegments+i)*6 + 5] = (short) (((j+1)*numSegments) + (i + 1));
                 indices[(j*numSegments+i)*6 + 4] = (short) (((j+1)*numSegments) + i);
             }
 
@@ -2009,25 +2026,32 @@ public class RaceScreen implements Screen {
 
     void createCloudTexture()
     {
-        int width = 2048;
-        int height = 1024;
+        int width = 1024;
+        int height = 512;
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
 
        // OpenSimplex2S noise = new OpenSimplex2S(); // semilla
 
-        float scale = 0.01f;
+        float scale = 0.05f;
+        float scale2 = 0.01f;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                float value = (float) OpenSimplex2S.noise2(12345, x * scale, y * scale);
-                value = (value + 1f) * 0.5f;  // normalizar de [-1,1] a [0,1]
+                float value1 = (float) OpenSimplex2S.noise2(12345, x * scale, y * scale);
+                float value2 = (float) OpenSimplex2S.noise2(67890, x * scale2, y * scale2);
+                //float value = (value + 1f) * 0.5f;  // normalizar de [-1,1] a [0,1]
+                float value = (value1 + value2) * 0.5f;
+                if(value < 0) value = 0f;
+                value = value * value;
                 int alpha = (int)(value * 255);
-                pixmap.setColor(1f, 0f, 0f, value);
+                pixmap.setColor(1f, 1f, 1f, value);
                 pixmap.drawPixel(x, y);
             }
         }
 
         cloudTexture = new Texture(pixmap);
+        cloudTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        cloudTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
     }
 
 
