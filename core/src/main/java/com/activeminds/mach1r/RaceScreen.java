@@ -51,7 +51,7 @@ public class RaceScreen implements Screen {
     float skyc[] = new float[4], fogc[] = new float[4], cloudc[] = new float[4], starsAlpha, viewPortAspectRatio, hour;
     float accumulatedDelta;
     int updatesPending;
-    vertex sun;
+    vertex worldLight, sun, moon;
     boolean paused;
 
     FrameBuffer shadowFBO[];
@@ -305,7 +305,7 @@ public class RaceScreen implements Screen {
 
         // Shape Renderer
 
-        sun = new vertex(0f,5000f,5000f);
+        worldLight = new vertex(0f,5000f,5000f);
 
         paused = false;
 
@@ -415,7 +415,7 @@ public class RaceScreen implements Screen {
             sceneShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
 
             sceneShader.setUniformi("u_numLights", 1);
-            sceneShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
+            sceneShader.setUniformf("u_lightPos[0]", worldLight.x, worldLight.y, worldLight.z);
             sceneShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
             sceneShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
@@ -442,7 +442,7 @@ public class RaceScreen implements Screen {
         camera2d.setToOrtho(false,  cubemapSize, cubemapSize);
         camera2d.update();
 
-        Vector3 lightDir = new Vector3(sun.x, sun.y, sun.z).nor();
+        Vector3 lightDir = new Vector3(worldLight.x, worldLight.y, worldLight.z).nor();
         Vector3 groundNormal = new Vector3(0,1,0);
         float dot = lightDir.dot(groundNormal);
         cubemapFbos[3].begin();
@@ -459,7 +459,7 @@ public class RaceScreen implements Screen {
         // O PerspectiveCamera
         lightCamera[id].setToOrtho(false, drawDist, drawDist);
 
-        Vector3 lightDirInv = new Vector3(sun.x, sun.y, sun.z);
+        Vector3 lightDirInv = new Vector3(worldLight.x, worldLight.y, worldLight.z);
         lightDirInv.limit(drawDist/2f);
         Vector3 cameraToVrp = new Vector3(sh.vrp.x - sh.cam_pos.x, sh.vrp.y - sh.cam_pos.y, sh.vrp.z - sh.cam_pos.z);
         cameraToVrp.nor();
@@ -698,6 +698,7 @@ public class RaceScreen implements Screen {
 
         cam.position.set(game.pl[follow].cam_pos.x, game.pl[follow].cam_pos.y, game.pl[follow].cam_pos.z);
         cam.lookAt(game.pl[follow].vrp.x, game.pl[follow].vrp.y, game.pl[follow].vrp.z);
+
         cam.up.set(0, 1, 0);
         cam.near = 0.1f;
         cam.far = 10000f;
@@ -741,7 +742,7 @@ public class RaceScreen implements Screen {
         sceneShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
 
         sceneShader.setUniformi("u_numLights", 1);
-        sceneShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
+        sceneShader.setUniformf("u_lightPos[0]", worldLight.x, worldLight.y, worldLight.z);
         sceneShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
         sceneShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
@@ -792,7 +793,7 @@ public class RaceScreen implements Screen {
         shipShader.setUniformf("u_ambientColor", 0.2f, 0.2f, 0.2f);
 
         shipShader.setUniformi("u_numLights", 1);
-        shipShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
+        shipShader.setUniformf("u_lightPos[0]", worldLight.x, worldLight.y, worldLight.z);
         shipShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
         shipShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
@@ -1066,10 +1067,33 @@ public class RaceScreen implements Screen {
         if(hour > dayStart && hour < dayStart + dawnDuration) starsAlpha = 1.0f - (hour-dayStart) / dawnDuration;
         if(hour > dayEnd - duskDuration && hour < dayEnd) starsAlpha = (hour - (dayEnd - duskDuration)) / duskDuration;
 
-        //Sun position!
+        //Sun & moon position!
 
-        a=((hour-(dayStart + dawnDuration/2))/12.0f)*3.1415f;
-        sun=new vertex((float) (-5000f*Math.cos(a)), (float) Math.abs(5000f*Math.sin(a)),0f);
+        //a=((hour-(dayStart + dawnDuration/2))/12.0f)*3.1415f;
+        //worldLight =new vertex((float) (-5000f*Math.cos(a)), (float) Math.abs(5000f*Math.sin(a)),0f);
+
+        float astroDist = 5000f;
+
+        // Los astros se mueven en el espacio visible para a (0, PI) y en el no visible para a (PI, 2PI)
+        float sunHour;
+        sunHour = (hour - 7f)/14.0f;
+        a = (float) (sunHour*Math.PI);
+
+        sun =new vertex((float) (-astroDist*Math.cos(a)), (float) (astroDist*Math.sin(a)),0f);
+
+        float moonHour;
+        if(hour >= 21f)
+            moonHour = (hour - 21f)/10.0f;
+        else if (hour < 7f)
+            moonHour = (hour + 3f)/10.0f;
+        else moonHour = 1f + (hour - 7f)/14.0f;
+        a = (float) (moonHour*Math.PI);
+        moon =new vertex((float) (-astroDist*Math.cos(a)), (float) (astroDist*Math.sin(a)),0f);
+
+        if(hour > 7.0f && hour <21.0f)
+            worldLight = sun;
+        else
+            worldLight = moon;
     }
 
     float nearest(int n, int m)
@@ -1085,7 +1109,7 @@ public class RaceScreen implements Screen {
         groundShader.setUniformf("u_ambientColor", 0f, 0f, 0f);
 
         groundShader.setUniformi("u_numLights", 1);
-        groundShader.setUniformf("u_lightPos[0]", sun.x, sun.y, sun.z);
+        groundShader.setUniformf("u_lightPos[0]", worldLight.x, worldLight.y, worldLight.z);
         groundShader.setUniformf("u_lightColor[0]", new Vector3(1f, 1f, 1f));
         groundShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
@@ -1174,11 +1198,11 @@ public class RaceScreen implements Screen {
         skyShader.end();
 
         // Sun & Moon
-        //Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
-        if(hour < 7.f || hour >= 19.f)
-            show_3d_sprite(cam, Main.moon,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,500, 500,1f);
-        else
-            show_3d_sprite(cam, Main.flame,0,0,1,1,sun.x,sun.y,sun.z,1.0f,1.0f,1.0f,1000,1000,1f);
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+
+        show_3d_sprite(cam, Main.moon,0,0,1,1, moon.x, moon.y, moon.z,1.0f,1.0f,1.0f,500, 500,1f);
+
+        show_3d_sprite(cam, Main.flame,0,0,1,1, sun.x, sun.y, sun.z,1.0f,1.0f,1.0f,1000,1000,1f);
 
         // Clouds
         skyShader.begin();
@@ -1499,6 +1523,7 @@ public class RaceScreen implements Screen {
             s = "BOOST " + game.pl[0].nboosts;
             game.fuente.show_text(game.batch, Main.SCREENX-HUD_START_X-140, 345, s, 1);
             s = "FPS:"+(1f/delta);
+            s = "Hour:"+(hour);
             game.fuente.show_text(game.batch, 0, 440, s, 1);
 
             show_icon_rank();
