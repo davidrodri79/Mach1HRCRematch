@@ -11,6 +11,7 @@ uniform float u_fogEnd;
 uniform vec3 u_skyColor;
 uniform vec3 u_cloudColor;
 uniform int u_skyMode;      // 0 : Sky / 1: Clouds
+uniform float u_cloudThreshold;
 uniform float u_starsAlpha;
 
 
@@ -41,7 +42,14 @@ void main() {
     else
     {
         texColor = texture2D(u_cloudsTexture, v_cloudsTexCoord);
-        finalColor= vec4(u_cloudColor, texColor.a);
+
+        // Nubes de mayor o menor densidad en función del parámetro
+        float value = texColor.a;
+        value = (1.0/(1.0-u_cloudThreshold)) * (value - u_cloudThreshold);
+        if (value < 0.0) value = 0.0;
+        if (value > 1.0) value = 1.0;
+
+        finalColor= vec4(u_cloudColor, value);
     }
 
     // --- FOG EFFECT ---

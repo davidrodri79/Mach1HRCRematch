@@ -48,7 +48,7 @@ public class RaceScreen implements Screen {
 
     int state;
     long counter;
-    float skyc[] = new float[4], fogc[] = new float[4], cloudc[] = new float[4], starsAlpha, viewPortAspectRatio, hour;
+    float skyc[] = new float[4], fogc[] = new float[4], cloudc[] = new float[4], starsAlpha, cloudiness, viewPortAspectRatio, hour;
     float accumulatedDelta;
     int updatesPending;
     vertex worldLight, sun, moon;
@@ -1009,6 +1009,10 @@ public class RaceScreen implements Screen {
         //time_t long_time;
         int i,j;
 
+        daysky[0] = daysky[0]*(1f-cloudiness) + 0.7f*cloudiness;
+        daysky[1] = daysky[1]*(1f-cloudiness) + 0.7f*cloudiness;
+        daysky[2] = daysky[2]*(1f-cloudiness) + 0.7f*cloudiness;
+
         // Different color of sky when dawn or sunset!
         /*time( &long_time );                // Get time as long integer.
         newtime = localtime( &long_time ); // Convert to local time.
@@ -1027,11 +1031,13 @@ public class RaceScreen implements Screen {
             case 4 : hour=22.0f; break;
         };
 
-        hour = game.cour.counter / 60f;
+        /*hour = game.cour.counter / 60f;
         while (hour >= 24.f)
         {
             hour -=24.f;
-        }
+        }*/
+
+        cloudiness = (float) Math.abs(Math.sin(game.cour.counter / 60f));
 
         float dayStart = 6.0f;
         float dayEnd = 21f;
@@ -1066,6 +1072,11 @@ public class RaceScreen implements Screen {
         if(hour < dayStart || hour > dayEnd) starsAlpha = 1.0f;
         if(hour > dayStart && hour < dayStart + dawnDuration) starsAlpha = 1.0f - (hour-dayStart) / dawnDuration;
         if(hour > dayEnd - duskDuration && hour < dayEnd) starsAlpha = (hour - (dayEnd - duskDuration)) / duskDuration;
+
+        for(i = 0; i < 3; i++)
+        {
+            cloudc[i] *= 1.f - 0.75f*cloudiness;
+        }
 
         //Sun & moon position!
 
@@ -1190,6 +1201,8 @@ public class RaceScreen implements Screen {
         skyShader.setUniformi("u_skyMode", 0);
         skyShader.setUniformi("u_starsTexture", 1);
         skyShader.setUniformf("u_starsAlpha", starsAlpha);
+        skyShader.setUniformf("u_cloudThreshold", 0.5f - cloudiness*0.5f);
+
 
         starsTexture.bind(1);
 
@@ -2035,35 +2048,43 @@ public class RaceScreen implements Screen {
                 float y = (float) (radius * Math.cos(verticalAngleStep * j));
                 float z = (float) (radius * Math.sin(angleStep * i) * Math.abs(Math.sin(verticalAngleStep * j)));
 
-                vertices[(numSegments*8*j) + 8*i + 0] = x;
-                vertices[(numSegments*8*j) + 8*i + 1] = y;
-                vertices[(numSegments*8*j) + 8*i + 2] = z;
+                vertices[((numSegments+1)*8*j) + 8*i + 0] = x;
+                vertices[((numSegments+1)*8*j) + 8*i + 1] = y;
+                vertices[((numSegments+1)*8*j) + 8*i + 2] = z;
 
                 // Normal
                 Vector3 normal = new Vector3(-x,-y,-z);
                 normal = normal.nor();
 
-                vertices[(numSegments*8*j) + 8*i + 3] = normal.x;
-                vertices[(numSegments*8*j) + 8*i + 4] = normal.y;
-                vertices[(numSegments*8*j) + 8*i + 5] = normal.z;
+                vertices[((numSegments+1)*8*j) + 8*i + 3] = normal.x;
+                vertices[((numSegments+1)*8*j) + 8*i + 4] = normal.y;
+                vertices[((numSegments+1)*8*j) + 8*i + 5] = normal.z;
 
                 // Tex coords
-                vertices[(numSegments*8*j) + 8*i + 6] = (float) (0.5f + Math.atan2(z/(float)radius, x/(float)radius) / (2.0f * Math.PI));
-                vertices[(numSegments*8*j) + 8*i + 7] = y/(float)radius * 0.5f + 0.5f;
+                vertices[((numSegments+1)*8*j) + 8*i + 6] = (float) (0.5f + Math.atan2(z/(float)radius, x/(float)radius) / (2.0f * Math.PI));
+                vertices[((numSegments+1)*8*j) + 8*i + 7] = y/(float)radius * 0.5f + 0.5f;
+
+                // HACK TOTAL
+                if(i >= numSegments/2) vertices[((numSegments+1)*8*j) + 8*i + 6] += 1f;
+
+              //  System.out.println("Vertical:"+j+", horizontal:"+i+", (x,z):("+x+","+z+"), (U,V):("+vertices[(numSegments*8*j) + 8*i + 6]+","+vertices[(numSegments*8*j) + 8*i + 7]+")");
             }
 
         for(int j = 0; j < numSegmentsVert; j++)
             for(int i = 0; i < numSegments; i++)
             {
                 // First triangle
-                indices[(j*numSegments+i)*6 + 0] = (short) ((j*numSegments) + i);
-                indices[(j*numSegments+i)*6 + 2] = (short) ((j*numSegments) + (i + 1));
-                indices[(j*numSegments+i)*6 + 1] = (short) (((j+1)*numSegments) + i);
+                indices[(j*(numSegments+1)+i)*6 + 0] = (short) ((j*(numSegments+1)) + i);
+                indices[(j*(numSegments+1)+i)*6 + 2] = (short) ((j*(numSegments+1)) + (i + 1));
+                indices[(j*(numSegments+1)+i)*6 + 1] = (short) (((j+1)*(numSegments+1)) + i);
 
                 // Second triangle
-                indices[(j*numSegments+i)*6 + 3] = (short) ((j*numSegments) + (i + 1));
-                indices[(j*numSegments+i)*6 + 5] = (short) (((j+1)*numSegments) + (i + 1));
-                indices[(j*numSegments+i)*6 + 4] = (short) (((j+1)*numSegments) + i);
+                indices[(j*(numSegments+1)+i)*6 + 3] = (short) ((j*(numSegments+1)) + (i + 1));
+                indices[(j*(numSegments+1)+i)*6 + 5] = (short) (((j+1)*(numSegments+1)) + (i + 1));
+                indices[(j*(numSegments+1)+i)*6 + 4] = (short) (((j+1)*(numSegments+1)) + i);
+
+               // System.out.println("Vertical:"+j+", horizontal:"+i+", Conectando el "+i+" con el "+(i+1));
+
             }
 
 
@@ -2079,6 +2100,18 @@ public class RaceScreen implements Screen {
         skyDome = m;
     }
 
+    /*
+    double periodicNoise( double x, double y, double period) {
+        double dx = 2.0 * Math.PI * x / period;
+        double dy = 2.0 * Math.PI * y / period;
+
+        double s = Math.sin(dx), t = Math.sin(dy);
+        double c = Math.cos(dx), u = Math.cos(dy);
+
+        // Evalúa ruido en 4D para simular repetición en 2D
+        return OpenSimplex2S.noise4_Fallback(12345, s, c, t, u);
+    }
+
     double getFractalNoise(double x, double y, int octaves, double baseFreq, double persistence, double lacunarity) {
         double total = 0.0;
         double amplitude = 1.0;
@@ -2086,7 +2119,7 @@ public class RaceScreen implements Screen {
         double max = 0.0;
 
         for (int i = 0; i < octaves; i++) {
-            total += OpenSimplex2S.noise2(12345, x * frequency, y * frequency) * amplitude;
+            total += periodicNoise( x * frequency, y * frequency, 256) * amplitude;
             max += amplitude;
 
             amplitude *= persistence;   // 0.5 por ejemplo
@@ -2094,6 +2127,29 @@ public class RaceScreen implements Screen {
         }
 
         return total / max; // Normalizado a [-1,1]
+    }*/
+
+    double periodicFBM(double x, double y, double period, int octaves) {
+        double sum = 0.0;
+        double amplitude = 1.0;
+        double frequency = 1.0;
+        double maxAmplitude = 0.0;
+
+        for (int i = 0; i < octaves; i++) {
+            double dx = 2.0 * Math.PI * x * frequency / period;
+            double dy = 2.0 * Math.PI * y * frequency / period;
+
+            double s = Math.sin(dx), t = Math.sin(dy);
+            double c = Math.cos(dx), u = Math.cos(dy);
+
+            sum += OpenSimplex2S.noise4_Fallback(12345, s, c, t, u) * amplitude;
+
+            maxAmplitude += amplitude;
+            amplitude *= 0.5;   // o cualquier otro `gain`
+            frequency *= 2.0;   // o cualquier otro `lacunarity`
+        }
+
+        return sum / maxAmplitude; // Normalizamos a [-1,1]
     }
 
     void createCloudTexture()
@@ -2117,12 +2173,21 @@ public class RaceScreen implements Screen {
                 //value = value * value;
                 //float density = (value1 + 1.0f) / 2f;
                 //density = (float) Math.pow(density, 4.0);
-                float value = (float) getFractalNoise(x, y, 6, 0.01, 0.5, 2.0);
+
+                //float value = (float) getFractalNoise(x, y, 6, 0.01, 0.5, 2.0);
                 //value = (value + 1f) * 0.5f;  // normalizar de [-1,1] a [0,1]
 
-                if (value < 0f) value = 0f;
-                value = 2 * value;
-                if (value > 1f) value = 1f;
+                float value = (float) periodicFBM(x, y, 256, 5);
+                value = value * 0.5f + 0.5f; // Convertimos de [-1,1] a [0,1]
+
+                // Ajuste de contraste/densidad si hace falta:
+                //value = (float) Math.pow(value, 1.5f);  // más denso
+
+
+                /*float threshold = 0.0f;
+                value = (1f/(1f-threshold)) * (value - threshold);
+                if (value < 0) value = 0f;
+                if (value > 1f) value = 1f;*/
 
                 int alpha = (int)(value * 255);
                 pixmap.setColor(1f, 1f, 1f, value);
