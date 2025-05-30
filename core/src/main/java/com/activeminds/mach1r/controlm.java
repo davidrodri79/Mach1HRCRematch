@@ -34,7 +34,7 @@ public class controlm implements InputProcessor, ControllerListener {
 
 
     public static final int CMET=9;
-    public static final int CMAXB=4;
+    public static final int CMAXB=6;
 
     public static final int CARR = 0;
     public static final int CABA = 1;
@@ -363,6 +363,18 @@ public class controlm implements InputProcessor, ControllerListener {
             case CBU5 : cboton[t][4]=true; break;
             case CBU6 : cboton[t][5]=true; break;
         };
+    }
+
+    void desactiva_todo(int t)
+    {
+            carr[t]=false; joy_yaxis[t]=0;
+            caba[t]=false; joy_yaxis[t]=0;
+            cizq[t]=false; joy_xaxis[t]=0;
+            cder[t]=false; joy_xaxis[t]=0;
+            catr[t]=false;
+            cpau[t]=false;
+            for(int i = 0; i < CMAXB; i++)
+                cboton[t][i]=false;
     }
 
     @Override

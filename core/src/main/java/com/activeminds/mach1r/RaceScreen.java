@@ -629,7 +629,7 @@ public class RaceScreen implements Screen {
         //if(ctr->tecla(DIK_F1)){pl[0]->raceover=TRUE;};
         //if(ctr->tecla(DIK_F2)){pl[1]->raceover=TRUE;};*/
 
-        for(int i=0; i<0/*game.nhumans*/; i++){
+        for(int i=0; i<game.nhumans; i++){
             //cam.look_at(pl[i]->cam_pos.x,pl[i]->cam_pos.y,pl[i]->cam_pos.z,pl[i]->vrp.x,pl[i]->vrp.y,pl[i]->vrp.z);
             if(game.pl[i].raceover)
                 game.pl[i].ia_update(null,game.ctr);
@@ -638,7 +638,7 @@ public class RaceScreen implements Screen {
             if(game.pl[i].finallapflag) { game.play_voice("finallap.wav"); game.pl[i].finallapflag=false;};
         };
 
-        for(int i=0/*game.nhumans*/; i<game.nplayers; i++)
+        for(int i=game.nhumans; i<game.nplayers; i++)
             game.pl[i].ia_update(null,game.ctr);
 
         for(int i=0; i<game.nplayers; i++)
@@ -1320,10 +1320,12 @@ public class RaceScreen implements Screen {
             };
         };
 
+        /*
+        //Debug manouver
         if(s.frontPos != null) {
             show_3d_sprite(cam, game.flame, 0, 0, 1, 1, s.frontPos.x, s.frontPos.y, s.frontPos.z, 1f, 1.0f, 1f, 1f, 1f, 1f);
             show_3d_sprite(cam, game.flame, 0, 0, 1, 1, s.rearPos.x, s.rearPos.y, s.rearPos.z, 1f, 0f, 0f, 1f, 1f, 1f);
-        }
+        }*/
 
     }
 

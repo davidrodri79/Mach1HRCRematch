@@ -38,6 +38,7 @@ public class ship {
     public static final float BOOSTDURATION = 400;
     public static final float SHIELDDURATION = 600;
     public static final float HYPERDURATION = 1800;
+    public static final float MANOUVER_THRESHOLD = (float) (Math.PI/3);
 
         public static final int PLAY=0;
         public static final int STUN=1;
@@ -85,7 +86,7 @@ public class ship {
     short state, camtype, camchwait, nboosts;
     long counter, time, laptime, totaltime;
     boolean outofcourse, raceover, engwavplaying, burwavplaying, sliwavplaying, alawavplaying, scrwavplaying ,finallapflag,
-        backwards;
+        backwards, manouver, manouverRear, manouverSide;
     String message;
     solid mesh, lowres;
     wave takepow, takee, takes, takeb, scratch, engsound, colsound, litexpl, bigexpl, fullpower, burning, alarm, slide;
@@ -149,6 +150,7 @@ public class ship {
         segment=0; nextsegment=0; lap=1; pos=0; camtype=0; camchwait=0;
         energy=MAXENERGY; shield=0; boost=0; power=0; maxspeed=0; hypermode=0;
         messcount=0; finallapflag=false; backwards=false; nboosts=3;
+        manouver = false; manouverRear = false;
         for(int i = 0; i < MAX_LIGHTS; i++) lightPos[i] = new Vector3();
 
         this.cour = cour;
@@ -617,6 +619,8 @@ public class ship {
     {
         float da;
 
+        ctr.desactiva_todo(controlm.NOTC);
+
         // Optimal orientation to go towards next node
         an=optimal_direction();
 
@@ -654,19 +658,57 @@ public class ship {
         // Turn
 
         if(state != BURN && state != DESTR) {
-            if (da > 0.03) ctr.activa(controlm.NOTC, controlm.CDER);
-            if (da < -0.03) ctr.activa(controlm.NOTC, controlm.CIZQ);
-            // Rear gear
-            if ((da > 0.15) || (da < -0.15)) ctr.activa(controlm.NOTC, controlm.CBU3);
-                // Brake
-            else if (((da > 0.03) || (da < -0.03)) && (velocity > 0.0)) ctr.activa(controlm.NOTC, controlm.CABA);
 
-            // Accelerate
-            if ((da < 0.15) && (da > -0.15)) {
-                ctr.activa(controlm.NOTC, controlm.CBU1);
-                if ((course.rand() % 600 == 0) && (nboosts > 0)) ctr.activa(controlm.NOTC, controlm.CBU2);
+            if(manouver)
+            {
+                if(manouverSide)
+                    ctr.activa(controlm.NOTC, controlm.CDER);
+                else
+                    ctr.activa(controlm.NOTC, controlm.CIZQ);
+
+                if(manouverRear)
+                {
+                    ctr.activa(controlm.NOTC, controlm.CBU3);
+                    if(cour.distance_to_edge(rearPos.x, rearPos.y, rearPos.z, segment, 1) < 1.0f ||
+                        cour.distance_to_edge(rearPos.x, rearPos.y, rearPos.z, segment, 2) < 1.0f)
+                        manouverRear = false;
+                }
+                else
+                {
+                    ctr.activa(controlm.NOTC, controlm.CBU1);
+                    if(cour.distance_to_edge(frontPos.x, frontPos.y, frontPos.z, segment, 1) < 1.0f ||
+                        cour.distance_to_edge(frontPos.x, frontPos.y, frontPos.z, segment, 2) < 1.0f)
+                        manouverRear = true;
+                }
+
+                if(da <= MANOUVER_THRESHOLD && da >= -MANOUVER_THRESHOLD)
+                {
+                    manouver = false;
+                }
             }
-            if (velocity < 1.0) ctr.activa(controlm.NOTC, controlm.CBU1);
+            else {
+
+                if (da > 0.03) ctr.activa(controlm.NOTC, controlm.CDER);
+                if (da < -0.03) ctr.activa(controlm.NOTC, controlm.CIZQ);
+                // Rear gear
+                if ((da > 0.15) || (da < -0.15)) ctr.activa(controlm.NOTC, controlm.CBU3);
+                    // Brake
+                else if (((da > 0.03) || (da < -0.03)) && (velocity > 0.0)) ctr.activa(controlm.NOTC, controlm.CABA);
+
+                // Accelerate
+                if ((da < 0.15) && (da > -0.15)) {
+                    ctr.activa(controlm.NOTC, controlm.CBU1);
+                    if ((course.rand() % 600 == 0) && (nboosts > 0)) ctr.activa(controlm.NOTC, controlm.CBU2);
+                }
+                if (velocity < 1.0) ctr.activa(controlm.NOTC, controlm.CBU1);
+
+                if(da > MANOUVER_THRESHOLD || da < -MANOUVER_THRESHOLD)
+                {
+                    manouver = true; manouverRear = true;
+                    if(da > 0) manouverSide = true;
+                    else manouverSide = false;
+                }
+            }
         }
 
         //ry=an;
