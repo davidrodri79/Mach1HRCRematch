@@ -372,7 +372,7 @@ public class RaceScreen implements Screen {
             cam.direction.set(dirs[i]);
             cam.up.set(ups[i]);
             cam.near = 1f;
-            cam.far = 1200f;
+            cam.far = 10000f;
             cam.update();
             cubeCameras[i] = cam;
         }
@@ -438,6 +438,7 @@ public class RaceScreen implements Screen {
         }
 
         // Ground
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
         OrthographicCamera camera2d = new OrthographicCamera();
         camera2d.setToOrtho(false,  cubemapSize, cubemapSize);
         camera2d.update();
@@ -1560,7 +1561,8 @@ public class RaceScreen implements Screen {
             }*/
 
 
-            /*game.batch.draw(cubemapFaces[0], 0, 0, 128, 128, 0, 0, cubemapSize, cubemapSize, false, true);
+            /*Gdx.gl.glDisable(GL20.GL_BLEND);
+            game.batch.draw(cubemapFaces[0], 0, 0, 128, 128, 0, 0, cubemapSize, cubemapSize, false, true);
             game.batch.draw(cubemapFaces[1], 128, 0, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[2], 256, 0, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
             game.batch.draw(cubemapFaces[3], 0, 128, 128, 128, 0, 0, cubemapSize,cubemapSize, false, true);
