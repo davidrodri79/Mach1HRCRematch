@@ -169,7 +169,7 @@ public class StartupScreen implements Screen {
                     /*light=new sprite(2,2,"sprite\\light");*/
                     game.posnumber = new sprite(64, 64, "sprite/positionhd.png");
                     game.speed = new sprite(64, 64, "sprite/speedhd.png");
-                    game.kmh = new sprite(128, 32, "sprite/kmh.png");
+                    game.kmh = new sprite(128, 32, "sprite/kmhhd.png");
                     game.power[0] = new sprite(256, 128, "sprite/power.png");
                     game.power[1] = new sprite(256, 128, "sprite/fullpowe.png");
                     game.spower[0] = new sprite(256, 32, "sprite/spower.png");

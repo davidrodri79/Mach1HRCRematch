@@ -93,7 +93,7 @@ public class ship {
     sprite logo;
     vertex cam_pos, vrp;
     course cour;
-    Vector3 lightPos[] = new Vector3[MAX_LIGHTS];
+    Vector3 lightPos[] = new Vector3[MAX_LIGHTS], frontPos, rearPos;
 
     public PerspectiveCamera soundCam;
 
@@ -626,6 +626,29 @@ public class ship {
         // Mantain the difference between (-PI,PI)
         if(da>=Math.PI) da-=2*Math.PI;
         else if(da<=-Math.PI) da+=2*Math.PI;
+
+
+        // Calc aux positions
+        Quaternion qx = new Quaternion();
+        Quaternion qy = new Quaternion();
+        Quaternion qz = new Quaternion();
+
+        qx.setEulerAnglesRad(0, 0, rx);
+        qy.setEulerAnglesRad(ry, 0, 0);
+        qz.setEulerAnglesRad(0, -rz, 0);
+
+        Quaternion combined = qx.mul(qy).mul(qz);
+        Matrix4 rot = new Matrix4().set(combined);
+
+
+        frontPos = new Vector3(-data.sizez/2f, 0f, 0f);
+        rearPos = new Vector3(data.sizez/2f, 0f, 0f);
+        Matrix4 model = new Matrix4().idt().translate(renderx,y,renderz)
+                .mul(rot);
+
+        frontPos.mul(model);
+        rearPos.mul(model);
+
 
         //ctr->reset();
         // Turn
