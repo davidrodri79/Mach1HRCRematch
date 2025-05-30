@@ -11,7 +11,8 @@ uniform float u_fogEnd;
 uniform vec3 u_skyColor;
 uniform vec3 u_cloudColor;
 uniform int u_skyMode;      // 0 : Sky / 1: Clouds
-uniform float u_cloudThreshold;
+uniform float u_cloudThreshold; // 0.0-1.0 : Nivel de densidad de las nubes
+uniform float u_cloudOverload; // 0.0-1.0 : Nivel de sobrecarga de las nubes. mayor sobrecarga, más nubes oscuras
 uniform float u_starsAlpha;
 
 
@@ -49,7 +50,14 @@ void main() {
         if (value < 0.0) value = 0.0;
         if (value > 1.0) value = 1.0;
 
-        finalColor= vec4(u_cloudColor, value);
+        value += u_cloudOverload;
+
+        if (value > 2.0) value = 2.0;
+
+        if(value < 1.0)
+            finalColor= vec4(u_cloudColor, value);
+        else
+            finalColor= vec4(mix(u_cloudColor, u_cloudColor * 0.2, value - 1.0), 1.0);
     }
 
     // --- FOG EFFECT ---

@@ -51,7 +51,7 @@ public class RaceScreen implements Screen {
     float skyc[] = new float[4], fogc[] = new float[4], cloudc[] = new float[4], starsAlpha, cloudiness, viewPortAspectRatio, hour;
     float accumulatedDelta;
     int updatesPending;
-    vertex worldLight, sun, moon;
+    vertex worldLight, worldLightColor, sun, moon;
     boolean paused;
 
     FrameBuffer shadowFBO[];
@@ -333,7 +333,7 @@ public class RaceScreen implements Screen {
         shield = createSphereMesh(1,20);
 
         // Skydome
-        createSkyDome(1000, 20);
+        createSkyDome(5000, 20);
         sky = new texture("scene/sky.png", texture.TEX_PCX, true, false);
 
         createCloudTexture();
@@ -416,7 +416,7 @@ public class RaceScreen implements Screen {
 
             sceneShader.setUniformi("u_numLights", 1);
             sceneShader.setUniformf("u_lightPos[0]", worldLight.x, worldLight.y, worldLight.z);
-            sceneShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
+            sceneShader.setUniformf("u_lightColor[0]", worldLightColor.x, worldLightColor.y, worldLightColor.z);
             sceneShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
             sceneShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
@@ -743,7 +743,7 @@ public class RaceScreen implements Screen {
 
         sceneShader.setUniformi("u_numLights", 1);
         sceneShader.setUniformf("u_lightPos[0]", worldLight.x, worldLight.y, worldLight.z);
-        sceneShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
+        sceneShader.setUniformf("u_lightColor[0]", new Vector3(worldLightColor.x, worldLightColor.y, worldLightColor.z));
         sceneShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
         sceneShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
@@ -794,7 +794,7 @@ public class RaceScreen implements Screen {
 
         shipShader.setUniformi("u_numLights", 1);
         shipShader.setUniformf("u_lightPos[0]", worldLight.x, worldLight.y, worldLight.z);
-        shipShader.setUniformf("u_lightColor[0]", new Vector3(0.8f, 0.8f, 0.8f));
+        shipShader.setUniformf("u_lightColor[0]", new Vector3(worldLightColor.x, worldLightColor.y, worldLightColor.z));
         shipShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
         if(game.gdata.exhaustLights)
@@ -998,20 +998,17 @@ public class RaceScreen implements Screen {
         float nightfog[]={0.0f,0.0f,0.0f},
             daysky[]={0.0f/255.0f,191.0f/255.0f,250.0f/255.0f},
             dawnsky[]={1.0f,128f/255.0f,0.0f},
-            nightsky[]={0.0f/255.0f,0.0f,100.0f/255.0f},
+            nightsky[]={0.12f,0.22f,0.29f},
             daycloud[]={1f, 1f, 1f},
             dawncloud[]={0.62f,0.34f, 0.50f},
             //nightcloud[]={0.42f,0.47f,0.54f},
-            nightcloud[]={0f,0f,0f},
+            nightcloud[]={0.48f,0.56f,0.6f},
 		s1[]={0f,0f,0f}, s2[]={0f,0f,0f};
         float g = 0f, ig, a;
         //struct tm *newtime;
         //time_t long_time;
         int i,j;
 
-        daysky[0] = daysky[0]*(1f-cloudiness) + 0.7f*cloudiness;
-        daysky[1] = daysky[1]*(1f-cloudiness) + 0.7f*cloudiness;
-        daysky[2] = daysky[2]*(1f-cloudiness) + 0.7f*cloudiness;
 
         // Different color of sky when dawn or sunset!
         /*time( &long_time );                // Get time as long integer.
@@ -1037,7 +1034,8 @@ public class RaceScreen implements Screen {
             hour -=24.f;
         }*/
 
-        cloudiness = (float) Math.abs(Math.sin(game.cour.counter / 60f));
+        //cloudiness = (float) Math.abs(Math.sin(game.cour.counter / 60f));
+        cloudiness = 0.25f;
 
         float dayStart = 6.0f;
         float dayEnd = 21f;
@@ -1066,17 +1064,17 @@ public class RaceScreen implements Screen {
         if((hour>=dayStart) && (hour<=dayStart + dawnDuration)) g=((hour-dayStart)/dawnDuration);
         if((hour>=dayEnd - duskDuration) && (hour<=dayEnd)) g=1.0f-((hour-(dayEnd - duskDuration))/duskDuration);
         ig=1.0f-g;
-        for(i=0; i<3; i++) fogc[i]=(course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[i]*g)+(nightfog[i]*ig); fogc[3]=1.0f;
+        for(i=0; i<3; i++)
+        {
+            float dayfog = course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[i];
+            dayfog = cloudiness < 0.5f ? dayfog : dayfog*(1f-((cloudiness - 0.5f)*2f)) + ((cloudiness - 0.5f)*2f)*0.5f;
+            fogc[i]=(dayfog*g)+(nightfog[i]*ig);
+        } fogc[3]=1.0f;
 
         if(hour > dayStart + dawnDuration && hour < dayEnd - duskDuration) starsAlpha = 0f;
         if(hour < dayStart || hour > dayEnd) starsAlpha = 1.0f;
         if(hour > dayStart && hour < dayStart + dawnDuration) starsAlpha = 1.0f - (hour-dayStart) / dawnDuration;
         if(hour > dayEnd - duskDuration && hour < dayEnd) starsAlpha = (hour - (dayEnd - duskDuration)) / duskDuration;
-
-        for(i = 0; i < 3; i++)
-        {
-            cloudc[i] *= 1.f - 0.75f*cloudiness;
-        }
 
         //Sun & moon position!
 
@@ -1105,6 +1103,9 @@ public class RaceScreen implements Screen {
             worldLight = sun;
         else
             worldLight = moon;
+
+        float lightCol = 0.8f - 0.3f*cloudiness;
+        worldLightColor = new vertex(lightCol, lightCol, lightCol);
     }
 
     float nearest(int n, int m)
@@ -1121,7 +1122,7 @@ public class RaceScreen implements Screen {
 
         groundShader.setUniformi("u_numLights", 1);
         groundShader.setUniformf("u_lightPos[0]", worldLight.x, worldLight.y, worldLight.z);
-        groundShader.setUniformf("u_lightColor[0]", new Vector3(1f, 1f, 1f));
+        groundShader.setUniformf("u_lightColor[0]", worldLightColor.x, worldLightColor.y, worldLightColor.z);
         groundShader.setUniformf("u_lightIntensity[0]", 1.0f);
 
         groundShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
@@ -1196,13 +1197,15 @@ public class RaceScreen implements Screen {
         skyShader.setUniformMatrix("u_model", model);
         skyShader.setUniformf("u_skyColor", skyc[0], skyc[1], skyc[2]);
         skyShader.setUniformf("u_fogColor", fogc[0], fogc[1], fogc[2]); // gris claro
-        skyShader.setUniformf("u_fogStart", 300.0f);
+        skyShader.setUniformf("u_fogStart", 1500.0f);
         skyShader.setUniformf("u_fogEnd", 0.0f);
         skyShader.setUniformi("u_skyMode", 0);
         skyShader.setUniformi("u_starsTexture", 1);
         skyShader.setUniformf("u_starsAlpha", starsAlpha);
-        skyShader.setUniformf("u_cloudThreshold", 0.5f - cloudiness*0.5f);
+        skyShader.setUniformf("u_cloudThreshold", 1f - Math.min(cloudiness * 2f, 1f));
+        skyShader.setUniformf("u_cloudOverload", Math.max((cloudiness - 0.5f) * 2f, 0f));
 
+        //System.out.println("Cloudiness:"+cloudiness+", Threshold:"+Math.min(cloudiness * 2f, 1f)+", Overload:"+Math.max((cloudiness - 0.5f) * 2f, 0f));
 
         starsTexture.bind(1);
 
@@ -2034,7 +2037,7 @@ public class RaceScreen implements Screen {
 
     public void createSkyDome(float radius, int numSegments)
     {
-        int numSegmentsVert = numSegments / 2;
+        int numSegmentsVert = numSegments / 2 + 1;
         float[] vertices = new float[(numSegmentsVert+1) * (numSegments+1) * 8];
         short[] indices = new short[(numSegmentsVert+1) * (numSegments+1) * 2 * 3];
 
