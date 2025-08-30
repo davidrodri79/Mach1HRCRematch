@@ -996,14 +996,20 @@ public class RaceScreen implements Screen {
 
     void hour_environment()
     {
-        float nightfog[]={0.0f,0.0f,0.0f},
+        float
+            dayfog[]={0f,0f,0f},
+            dawnfog[]={0.76f,0.44f,0.29f},
+            nightfog[]={0.0f,0.0f,0.0f},
             daysky[]={0.0f/255.0f,191.0f/255.0f,250.0f/255.0f},
-            dawnsky[]={1.0f,128f/255.0f,0.0f},
+            dawnsky[]={0.30f,0.34f,0.49f},
             nightsky[]={0.12f,0.22f,0.29f},
             daycloud[]={1f, 1f, 1f},
-            dawncloud[]={0.62f,0.34f, 0.50f},
+            dawncloud[]={1.0f,128f/255.0f,0.0f},
             //nightcloud[]={0.42f,0.47f,0.54f},
             nightcloud[]={0.48f,0.56f,0.6f},
+            daylight[]={1f,1f,1f},
+            dawnlight[]={0.98f,0.72f,0.36f},
+            nightlight[]={0.6f,0.6f,0.6f},
 		s1[]={0f,0f,0f}, s2[]={0f,0f,0f};
         float g = 0f, ig, a;
         //struct tm *newtime;
@@ -1060,7 +1066,7 @@ public class RaceScreen implements Screen {
         ig=1.0f-g;
         for(i=0; i<3; i++) skyc[i]=(s1[i]*g)+(s2[i]*ig); skyc[3]=1.0f;
 
-        if((hour>dayStart + dawnDuration) && (hour<dayEnd - duskDuration)) g=1.0f;
+        /*if((hour>dayStart + dawnDuration) && (hour<dayEnd - duskDuration)) g=1.0f;
         if((hour<dayStart) || (hour>dayEnd)) g=0.0f;
         if((hour>=dayStart) && (hour<=dayStart + dawnDuration)) g=((hour-dayStart)/dawnDuration);
         if((hour>=dayEnd - duskDuration) && (hour<=dayEnd)) g=1.0f-((hour-(dayEnd - duskDuration))/duskDuration);
@@ -1070,7 +1076,19 @@ public class RaceScreen implements Screen {
             float dayfog = course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[i];
             dayfog = cloudiness < 0.5f ? dayfog : dayfog*(1f-((cloudiness - 0.5f)*2f)) + ((cloudiness - 0.5f)*2f)*0.5f;
             fogc[i]=(dayfog*g)+(nightfog[i]*ig);
-        } fogc[3]=1.0f;
+        } fogc[3]=1.0f;*/
+
+        for(i=0; i<3; i++) {
+            dayfog[i] = course.scenes.course_scenes.get(game.cour.info.scene).fogcolor[i];
+            dayfog[i] = cloudiness < 0.5f ? dayfog[i] : dayfog[i] * (1f - ((cloudiness - 0.5f) * 2f)) + ((cloudiness - 0.5f) * 2f) * 0.5f;
+        }
+        if((hour>dayStart + dawnDuration) && (hour<dayEnd - duskDuration)) {g=1.0f; s1=dayfog; s2=nightfog;}
+        if((hour<dayStart) || (hour>dayEnd)) {g=0.0f; s1=dayfog; s2=nightfog;}
+        if((hour>=dayStart) && (hour<=dayStart + dawnDuration)) {g=((hour-dayStart)/dawnDuration); s1=dayfog; s2=nightfog;}
+        if((hour>=dayEnd - duskDuration) && (hour<=dayEnd - duskDurHalf)) {g=1.0f-((hour-(dayEnd - duskDuration))/duskDurHalf); s1=dayfog; s2=dawnfog;}
+        if((hour>=dayEnd - duskDurHalf) && (hour<=dayEnd)) {g=1.0f-((hour-(dayEnd - duskDurHalf))/duskDurHalf); s1=dawnfog; s2=nightfog;}
+        ig=1.0f-g;
+        for(i=0; i<3; i++) fogc[i]=(s1[i]*g)+(s2[i]*ig); cloudc[3]=1.0f;
 
         if(hour > dayStart + dawnDuration && hour < dayEnd - duskDuration) starsAlpha = 0f;
         if(hour < dayStart || hour > dayEnd) starsAlpha = 1.0f;
@@ -1105,8 +1123,16 @@ public class RaceScreen implements Screen {
         else
             worldLight = moon;
 
-        float lightCol = 0.8f - 0.3f*cloudiness;
-        worldLightColor = new vertex(lightCol, lightCol, lightCol);
+
+        //float lightCol = 0.8f - 0.3f*cloudiness;
+        //worldLightColor = new vertex(lightCol, lightCol, lightCol);
+        if((hour>dayStart + dawnDuration) && (hour<dayEnd - duskDuration)) {g=1.0f; s1=daylight; s2=nightlight;}
+        if((hour<dayStart) || (hour>dayEnd)) {g=0.0f; s1=daylight; s2=nightlight;}
+        if((hour>=dayStart) && (hour<=dayStart + dawnDuration)) {g=((hour-dayStart)/dawnDuration); s1=daylight; s2=nightlight;}
+        if((hour>=dayEnd - duskDuration) && (hour<=dayEnd - duskDurHalf)) {g=1.0f-((hour-(dayEnd - duskDuration))/duskDurHalf); s1=daylight; s2=dawnlight;}
+        if((hour>=dayEnd - duskDurHalf) && (hour<=dayEnd)) {g=1.0f-((hour-(dayEnd - duskDurHalf))/duskDurHalf); s1=dawnlight; s2=nightlight;}
+        ig=1.0f-g;
+        worldLightColor = new vertex((s1[0]*g)+(s2[0]*ig), (s1[1]*g)+(s2[1]*ig), (s1[2]*g)+(s2[2]*ig));
     }
 
     float nearest(int n, int m)
@@ -1217,9 +1243,9 @@ public class RaceScreen implements Screen {
         // Sun & Moon
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 
-        show_3d_sprite(cam, Main.moon,0,0,1,1, moon.x, moon.y, moon.z,1.0f,1.0f,1.0f,500, 500,1f);
+        show_3d_sprite(cam, Main.moon,0,0,1,1, moon.x, moon.y, moon.z,worldLightColor.x,worldLightColor.y,worldLightColor.z,500, 500,1f);
 
-        show_3d_sprite(cam, Main.flame,0,0,1,1, sun.x, sun.y, sun.z,1.0f,1.0f,1.0f,1000,1000,1f);
+        show_3d_sprite(cam, Main.flame,0,0,1,1, sun.x, sun.y, sun.z,worldLightColor.x,worldLightColor.y,worldLightColor.z,1000,1000,1f);
 
         // Clouds
         skyShader.begin();
